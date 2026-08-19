@@ -19,7 +19,7 @@ export function AnchorNav({ items }: AnchorNavProps) {
   return (
     <nav className="sticky top-0 z-30 flex items-center justify-between bg-page/95 px-6 py-4 backdrop-blur">
       <a href="#topo" className="font-display text-400 text-text-primary">
-        Emanuel &amp; Gabriela
+        Gabriela &amp; Emanuel
       </a>
       <button
         type="button"

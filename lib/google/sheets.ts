@@ -30,8 +30,16 @@ export interface RsvpDetails {
   telefone: string;
 }
 
+export interface GiftIdea {
+  titulo: string;
+  descricao: string;
+}
+
 const SHEET_NAME = "Convidados";
 const SHEET_RANGE = `${SHEET_NAME}!A2:F`;
+
+const GIFTS_SHEET_NAME = "Presentes";
+const GIFTS_SHEET_RANGE = `${GIFTS_SHEET_NAME}!A2:B`;
 
 const COLUMN = { NOME: 0, EMAIL: 1, TELEFONE: 2, RSVP: 3, DRIVE: 4, LINK: 5 } as const;
 
@@ -119,4 +127,22 @@ export async function recordRsvp(token: string, details: RsvpDetails): Promise<v
       values: [[details.nome, details.email, details.telefone, "confirmado"]],
     },
   });
+}
+
+/**
+ * Busca as ideias de presente na aba "Presentes" (A: Nome do presente,
+ * B: Descrição — preenchida pelo casal, não pelo agente). Não tem Pix por
+ * item: o código Pix é único e compartilhado (ver `PIX_CODE` em `.env`),
+ * a lista aqui é só de referência do que a contribuição ajuda a comprar.
+ */
+export async function getGiftIdeas(): Promise<GiftIdea[]> {
+  const sheets = getSheetsClient();
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: getSpreadsheetId(),
+    range: GIFTS_SHEET_RANGE,
+  });
+  const rows = response.data.values ?? [];
+  return rows
+    .filter((row) => row[0]?.trim())
+    .map((row) => ({ titulo: row[0].trim(), descricao: row[1]?.trim() ?? "" }));
 }

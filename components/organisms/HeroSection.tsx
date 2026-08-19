@@ -21,7 +21,7 @@ export function HeroSection() {
           Vamos nos casar
         </Text>
         <Heading as="h1" size="xl">
-          Emanuel &amp; Gabriela
+          Gabriela &amp; Emanuel
         </Heading>
         <Text tone="secondary" className="text-400">
           17 de abril de 2027

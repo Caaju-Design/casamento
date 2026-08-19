@@ -11,11 +11,8 @@ Nenhuma no momento — o casal decidiu não buscar validação jurídica formal 
 | Item | Contexto | Impacto | Dono | Próximo passo | Data de revisão |
 | --- | --- | --- | --- | --- | --- |
 | Criar Drive compartilhado e mover/recriar "Convidados" lá dentro (ver ADR-0005) | Upload real testado e falhou: conta de serviço não tem cota própria em pasta comum do Drive — só funciona em Drive compartilhado (Workspace) | Bloqueia o upload de foto/mensagem em produção | Casal | Criar o Drive compartilhado, adicionar `casamento-rsvp@casamento-caaju.iam.gserviceaccount.com` como Gerente de conteúdo, mover a pasta "Convidados" pra lá e mandar o novo ID | 2026-08-20 |
-| Conteúdo da lista de presentes + imagens de QR code Pix | Tela de sucesso do RSVP exibe presentes e Pix | Bloqueia a seção de presentes | Casal | Enviar lista e imagens | 2026-08-22 |
+| Preencher os itens da lista de presentes | Aba "Presentes" já existe na planilha (coluna A: nome do presente), mas ainda sem linhas — enquanto vazia, o site mostra "Estamos preparando a lista" | Seção de presentes fica sem itens até ser preenchida | Gabriela | Adicionar os presentes na aba "Presentes" (coluna A; coluna B opcional para descrição) | — |
 
 ## Trabalho local
 
-| Item | Contexto | Impacto | Dono | Próximo passo | Data de revisão |
-| --- | --- | --- | --- | --- | --- |
-| Deploy inicial na Vercel | Código só existe local + no GitHub; nunca foi implantado | Site não está acessível publicamente ainda | Emanuel | Criar/linkar projeto na Vercel e fazer o primeiro deploy | 2026-08-20 |
-| Configurar domínio `casamento.caaju.com.br` na Vercel | Domínio já existe, precisa apontar para o projeto | Bloqueia acesso público pelo domínio final | Emanuel | Configurar DNS e domínio custom na Vercel | 2026-08-22 |
+Nenhum no momento — site em produção em `casamento.caaju.com.br` desde 2026-08-19.

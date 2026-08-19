@@ -10,13 +10,14 @@ Referência de todo componente existente, sua camada (Atomic Design) e onde é u
 | `Icon` | Atom | Menu, estados (erro, sucesso) |
 | `FormField` (label + input + mensagem de erro) | Molecule | Formulário de RSVP |
 | `PhotoDropzone` (seleção de arquivo + preview) | Molecule | Envio de foto no convite pessoal |
-| `GiftCard` (presente + botão de Pix) | Molecule | Seção de lista de presentes |
+| `GiftCard` (ideia de presente, sem Pix próprio) | Molecule | Seção de lista de presentes |
+| `PixBlock` (código Pix único + QR gerado a partir dele, botão de copiar) | Molecule | Seção de lista de presentes, compartilhado por todos os itens |
 | `AnchorNav` (menu de âncoras) | Molecule | Topo da página one-page |
 | `RsvpForm` | Organism | Página `/convite/[token]` |
 | `RsvpFlow` | Organism | Orquestra o estado vazio (formulário) e o de sucesso (depoimento + presentes) na página `/convite/[token]` — introduzido na implementação |
 | `InviteNotFound` | Organism | Estado de token inválido/não encontrado na página `/convite/[token]` — introduzido na implementação |
 | `HeroSection` (com cena three.js) | Organism | Topo da home |
-| `GiftListSection` | Organism | Página `/convite/[token]`, exibida após confirmação (não na home — decisão de implementação) |
+| `GiftListSection` | Organism | Página `/convite/[token]`, exibida após confirmação (não na home — decisão de implementação); recebe a lista da aba "Presentes" da planilha (`lib/gifts.ts`) — trata lista vazia e Pix ainda não configurado sem quebrar |
 | `TestimonialSection` | Organism | Coleta de depoimento no convite pessoal |
 | `RecommendationsSection` (hospedagem/restaurantes) | Organism | Home |
 | `InvitePageTemplate` | Template | Esqueleto da página `/convite/[token]` |

@@ -60,7 +60,7 @@ export function HomePageTemplate() {
 
       <footer className="px-6 py-section-gap text-center">
         <Text tone="secondary" className="text-100">
-          Com amor, Emanuel &amp; Gabriela.
+          Com amor, Gabriela &amp; Emanuel.
         </Text>
       </footer>
     </div>

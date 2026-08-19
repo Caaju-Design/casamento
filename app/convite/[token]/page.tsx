@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { InviteNotFound } from "@/components/organisms/InviteNotFound";
 import { InvitePageTemplate } from "@/components/templates/InvitePageTemplate";
 import { resolveInvite } from "@/lib/invite/token";
+import { getGiftListData } from "@/lib/gifts";
 
 export const metadata: Metadata = {
-  title: "Seu convite — Emanuel & Gabriela",
+  title: "Seu convite — Gabriela & Emanuel",
 };
 
 // Sempre resolve o convite no servidor a cada requisição — nunca em cache
@@ -28,5 +29,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
     return <InviteNotFound reason="not_found" />;
   }
 
-  return <InvitePageTemplate token={lookup.invite.token} invite={lookup.invite} />;
+  const giftList = await getGiftListData();
+
+  return <InvitePageTemplate token={lookup.invite.token} invite={lookup.invite} giftList={giftList} />;
 }

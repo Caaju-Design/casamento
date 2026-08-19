@@ -7,20 +7,24 @@ import { Text } from "@/components/atoms/Text";
 import { GiftListSection } from "@/components/organisms/GiftListSection";
 import { RsvpForm } from "@/components/organisms/RsvpForm";
 import { TestimonialSection } from "@/components/organisms/TestimonialSection";
+import type { GiftListData } from "@/lib/gifts";
 
 export interface RsvpFlowProps {
   token: string;
   initialNome?: string;
   /** Estado inicial vindo da planilha — se já confirmado antes, pula direto para os presentes. */
   alreadyConfirmed?: boolean;
+  giftList?: GiftListData;
 }
+
+const EMPTY_GIFT_LIST: GiftListData = { gifts: [], pix: null };
 
 /**
  * Orquestra o estado "vazio" (confirmação ainda não feita) e o estado de
  * sucesso do RSVP (ver docs/design-system/matriz-estados.md), decidindo
  * quando mostrar o formulário ou a lista de presentes + depoimento.
  */
-export function RsvpFlow({ token, initialNome, alreadyConfirmed = false }: RsvpFlowProps) {
+export function RsvpFlow({ token, initialNome, alreadyConfirmed = false, giftList = EMPTY_GIFT_LIST }: RsvpFlowProps) {
   const [confirmedNome, setConfirmedNome] = useState<string | null>(alreadyConfirmed ? initialNome ?? "" : null);
 
   if (confirmedNome === null) {
@@ -48,7 +52,7 @@ export function RsvpFlow({ token, initialNome, alreadyConfirmed = false }: RsvpF
         </Text>
       </section>
       <TestimonialSection token={token} />
-      <GiftListSection />
+      <GiftListSection gifts={giftList.gifts} pix={giftList.pix} />
     </div>
   );
 }
