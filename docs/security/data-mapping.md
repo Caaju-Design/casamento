@@ -24,6 +24,7 @@
 | Data | Mudança arquitetural / ADR / PR | Impacto nos dados | Alteração realizada neste documento | Responsável |
 | --- | --- | --- | --- | --- |
 | 2026-08-19 | Bootstrap inicial do produto (ADR-0002, ADR-0003) | Criação da atividade de tratamento AT-001 | Documento criado | Emanuel |
+| 2026-08-19 | Casal confirmou a data do casamento (17/04/2027) | Prazo de retenção deixa de ser estimativa | Seção 3 (retenção) e seção 6 (pendência removida) | Emanuel |
 
 ## 3. Inventário de atividades de tratamento
 
@@ -41,7 +42,7 @@
 | Local de armazenamento/processamento | Google Sheets e Google Drive (conta do casal), infraestrutura Vercel para a aplicação |
 | Compartilhamento e operadores | Google (Sheets, Drive, Docs) como operador de armazenamento; Google Looker Studio como operador de visualização (só leitura da planilha) |
 | Transferência internacional | Sim — infraestrutura do Google e da Vercel pode processar fora do Brasil; sem salvaguarda contratual adicional definida nesta v1 |
-| Retenção, descarte e backups | Até 17 de abril *(ano a confirmar com o casal — ver pendência)*; após o prazo, exclusão da planilha e das pastas do Drive |
+| Retenção, descarte e backups | Até 17 de abril de 2027 (data do casamento); após o prazo, exclusão da planilha e das pastas do Drive |
 | Riscos e controles | Ver `docs/architecture/risks.md` (cota/indisponibilidade da API do Google); token de convite não sequencial (ADR-0003) |
 | Canal de direitos do titular | Solicitação direta ao casal (contato informado no próprio convite); atendimento manual nesta v1 |
 
@@ -69,7 +70,6 @@ Não há perfil de suporte, operador de cadastro ou admin técnico distinto do c
 
 | Item | Impacto | Próximo passo | Dono | Data de revisão |
 | --- | --- | --- | --- | --- |
-| Confirmar ano exato da retenção ("17 de abril") | Médio | Casal confirma o ano | Casal | 2026-08-26 |
 | Validar juridicamente a base legal (consentimento) | Baixo | Revisar se há dúvida sobre o enquadramento | Casal/jurídico se necessário | 2026-08-26 |
 | Definir se há necessidade de salvaguarda para transferência internacional (Google/Vercel) | Baixo | Avaliar se o volume/sensibilidade do dado justifica cláusula contratual adicional | Emanuel | 2026-08-26 |
 

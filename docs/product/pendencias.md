@@ -6,7 +6,6 @@ Riscos e decisões em aberto que surgiram durante o bootstrap — cada item tem 
 
 | Item | Contexto | Impacto | Dono | Próximo passo | Data de revisão |
 | --- | --- | --- | --- | --- | --- |
-| Confirmar ano da retenção de dados ("até 17 de abril") | Casal informou só o dia/mês na entrevista; assumido 2027 (ano seguinte ao lançamento) para `docs/security/data-mapping.md` | Define quando os dados dos convidados são excluídos | Casal | Confirmar o ano exato | 2026-08-26 |
 | Confirmar necessidade da página de status público | Pedido no cardápio de artefatos, mas atípico para um site de casamento (normalmente serve produto com uptime crítico) | Se descartada, remove um artefato do escopo | Casal | Confirmar se mantém ou remove | 2026-08-26 |
 
 ## Validações
@@ -20,7 +19,7 @@ Riscos e decisões em aberto que surgiram durante o bootstrap — cada item tem 
 | Item | Contexto | Impacto | Dono | Próximo passo | Data de revisão |
 | --- | --- | --- | --- | --- | --- |
 | Lista final de convidados e geração dos links únicos | Cada convidado precisa de um token pessoal antes do envio dos convites | Bloqueia o envio de convites e o teste do fluxo de RSVP | Casal | Fechar lista e gerar tokens | 2026-08-22 |
-| Estrutura de pastas no Google Drive (uma por convidado) | Upload de foto/mensagem depende de pastas já existentes no Drive | Bloqueia o fluxo de upload em produção | Casal | Criar estrutura de pastas e compartilhar acesso da conta de serviço | 2026-08-22 |
+| `GOOGLE_DRIVE_ROOT_FOLDER_ID` precisa apontar para a subpasta "Convidados", não para a pasta raiz | O código já cria a subpasta de cada convidado automaticamente (não precisa preparar manualmente) dentro do ID configurado nessa variável — mas a pasta raiz que o casal compartilhou também contém a planilha, então a variável deve apontar para "Convidados" especificamente | Se apontar para a pasta errada, as subpastas de convidado nascem misturadas com a planilha | Casal | Enviar o ID da subpasta "Convidados" | 2026-08-22 |
 | Conteúdo da lista de presentes + imagens de QR code Pix | Tela de sucesso do RSVP exibe presentes e Pix | Bloqueia a seção de presentes | Casal | Enviar lista e imagens | 2026-08-22 |
 | Conta de serviço do Google (Sheets + Drive API) | Backend precisa de credencial de serviço para gravar na planilha e no Drive | Bloqueia toda a integração | Emanuel | Criar conta de serviço no Google Cloud e compartilhar acesso com a planilha/pastas | 2026-08-22 |
 

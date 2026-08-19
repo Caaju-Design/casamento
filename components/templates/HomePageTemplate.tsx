@@ -34,19 +34,25 @@ export function HomePageTemplate() {
         <dl className="mx-auto mt-6 grid max-w-md gap-6 text-left sm:grid-cols-2">
           <div>
             <dt className="font-body text-100 uppercase tracking-wide text-text-secondary">Data</dt>
-            <dd className="font-display text-400 text-text-primary">A definir</dd>
+            <dd className="font-display text-400 text-text-primary">17 de abril de 2027</dd>
           </div>
           <div>
             <dt className="font-body text-100 uppercase tracking-wide text-text-secondary">Horário</dt>
-            <dd className="font-display text-400 text-text-primary">A definir</dd>
+            <dd className="font-display text-400 text-text-primary">16h00</dd>
           </div>
           <div className="sm:col-span-2">
             <dt className="font-body text-100 uppercase tracking-wide text-text-secondary">Local</dt>
-            <dd className="font-display text-400 text-text-primary">A definir</dd>
+            <dd className="font-display text-400 text-text-primary">
+              Ed. Square 2 — Salão de festa
+              <br />
+              Rua Luís Correia de Melo, 86, Chácara Santo Antônio
+              <br />
+              São Paulo — CEP 04726-220
+            </dd>
           </div>
         </dl>
         <Text tone="secondary" className="mx-auto mt-6 max-w-xl">
-          Em breve atualizamos esta seção com todos os detalhes — guarde a data provisoriamente no coração.
+          Contamos com você para celebrar esse dia com a gente.
         </Text>
       </section>
 
@@ -54,7 +60,7 @@ export function HomePageTemplate() {
 
       <footer className="px-6 py-section-gap text-center">
         <Text tone="secondary" className="text-100">
-          Com amor, Nome &amp; Nome.
+          Com amor, Emanuel &amp; Gabriela.
         </Text>
       </footer>
     </div>

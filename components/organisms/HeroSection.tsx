@@ -21,10 +21,10 @@ export function HeroSection() {
           Vamos nos casar
         </Text>
         <Heading as="h1" size="xl">
-          Nome &amp; Nome
+          Emanuel &amp; Gabriela
         </Heading>
         <Text tone="secondary" className="text-400">
-          Data a definir
+          17 de abril de 2027
         </Text>
         <Text className="max-w-lg">
           Com o coração cheio de alegria, convidamos você para celebrar ao nosso lado o começo de uma nova

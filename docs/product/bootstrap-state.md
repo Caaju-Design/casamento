@@ -3,6 +3,8 @@
 Registro de retomada do bootstrap deste produto — permite continuar em outra sessão sem repetir a entrevista.
 
 - **Produto:** Site de casamento (RSVP, presentes via Pix, upload de fotos/depoimentos, recomendações de hospedagem).
+- **Casal:** Emanuel & Gabriela.
+- **Data, horário e local do casamento:** 17/04/2027, 16h00, Ed. Square 2 (salão de festa) — Rua Luís Correia de Melo, 86, Chácara Santo Antônio, São Paulo, CEP 04726-220.
 - **Etapa atual:** Etapa 4 (criação) — proposta aprovada em 2026-08-19.
 - **Próximo passo:** implementar a aplicação (Next.js) conforme decisões abaixo, depois marcar esta etapa como concluída.
 
