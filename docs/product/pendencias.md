@@ -10,10 +10,8 @@ Nenhuma no momento — o casal decidiu não buscar validação jurídica formal 
 
 | Item | Contexto | Impacto | Dono | Próximo passo | Data de revisão |
 | --- | --- | --- | --- | --- | --- |
-| Confirmar se o link de lista de convidados enviado (`.../folders/1EOfDdEEjN-x5xiNJuKr99kxetJejsKFz`) já tem token por convidado, ou é só a lista de nomes | O RSVP depende de token pessoal por convidado (ver ADR-0003); uma lista sem token precisa passar por uma etapa de geração antes de virar link de convite | Bloqueia o envio de convites e o teste do fluxo de RSVP | Emanuel/Casal | Confirmar formato do conteúdo desse link | 2026-08-20 |
-| `GOOGLE_DRIVE_ROOT_FOLDER_ID` precisa apontar para a subpasta "Convidados", não para a pasta raiz | O código já cria a subpasta de cada convidado automaticamente (não precisa preparar manualmente) dentro do ID configurado nessa variável — mas a pasta raiz que o casal compartilhou também contém a planilha, então a variável deve apontar para "Convidados" especificamente | Se apontar para a pasta errada, as subpastas de convidado nascem misturadas com a planilha | Casal | Enviar o ID da subpasta "Convidados" | 2026-08-22 |
+| Criar Drive compartilhado e mover/recriar "Convidados" lá dentro (ver ADR-0005) | Upload real testado e falhou: conta de serviço não tem cota própria em pasta comum do Drive — só funciona em Drive compartilhado (Workspace) | Bloqueia o upload de foto/mensagem em produção | Casal | Criar o Drive compartilhado, adicionar `casamento-rsvp@casamento-caaju.iam.gserviceaccount.com` como Gerente de conteúdo, mover a pasta "Convidados" pra lá e mandar o novo ID | 2026-08-20 |
 | Conteúdo da lista de presentes + imagens de QR code Pix | Tela de sucesso do RSVP exibe presentes e Pix | Bloqueia a seção de presentes | Casal | Enviar lista e imagens | 2026-08-22 |
-| Conta de serviço do Google (Sheets + Drive API) | Backend precisa de credencial de serviço para gravar na planilha e no Drive | Bloqueia toda a integração | Emanuel (com ajuda do agente) | Criar projeto/conta de serviço no Google Cloud, habilitar Sheets+Drive API, compartilhar acesso com a planilha/pastas | 2026-08-20 |
 
 ## Trabalho local
 

@@ -5,8 +5,14 @@ import { google, sheets_v4 } from "googleapis";
  * e recebe as confirmações de presença, consumida pelo Looker Studio
  * (ver docs/architecture/adr/0002-armazenamento-em-google-sheets-e-drive.md).
  *
- * Layout esperado da aba "Convidados" (linha 1 = cabeçalho):
- *   A: Token   B: Nome   C: Email   D: Telefone   E: Status   F: ConfirmadoEm
+ * Layout real da aba "Convidados" (linha 1 = cabeçalho, planilha preparada
+ * pelo casal — não pelo agente):
+ *   A: Nome   B: E-mail   C: Telefone   D: RSVP   E: Drive   F: Link
+ *
+ * Não existe uma coluna de "token" separada: o token do convite é o último
+ * trecho do caminho da URL guardada na coluna "Link" (ex.:
+ * ".../convite/laura-8f2a1c" → token "laura-8f2a1c"). Esse link é gerado
+ * por `scripts/generate-invite-links.mjs`, não digitado à mão.
  *
  * O convidado nunca fala diretamente com a API do Google — só o servidor
  * (rotas em app/api/**) importa este módulo.
@@ -26,6 +32,8 @@ export interface RsvpDetails {
 
 const SHEET_NAME = "Convidados";
 const SHEET_RANGE = `${SHEET_NAME}!A2:F`;
+
+const COLUMN = { NOME: 0, EMAIL: 1, TELEFONE: 2, RSVP: 3, DRIVE: 4, LINK: 5 } as const;
 
 let cachedClient: sheets_v4.Sheets | null = null;
 
@@ -57,22 +65,36 @@ function getSheetsClient(): sheets_v4.Sheets {
   return cachedClient;
 }
 
+/**
+ * Extrai o token do último trecho do caminho de uma URL de convite
+ * (ex.: "https://casamento.caaju.com.br/convite/laura-8f2a1c" → "laura-8f2a1c").
+ * Retorna `null` se a célula estiver vazia ou não parecer uma URL de convite.
+ */
+export function extractTokenFromInviteLink(link: string | undefined | null): string | null {
+  if (!link) return null;
+  const trimmed = link.trim();
+  if (!trimmed) return null;
+  const segments = trimmed.split("/").filter(Boolean);
+  const last = segments.at(-1);
+  return last && last !== "convite" ? last : null;
+}
+
+async function fetchGuestRows(sheets: sheets_v4.Sheets, spreadsheetId: string): Promise<string[][]> {
+  const response = await sheets.spreadsheets.values.get({ spreadsheetId, range: SHEET_RANGE });
+  return response.data.values ?? [];
+}
+
 /** Busca o convite correspondente a um token. Retorna `null` se não existir. */
 export async function getInviteByToken(token: string): Promise<GuestInvite | null> {
   const sheets = getSheetsClient();
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: getSpreadsheetId(),
-    range: SHEET_RANGE,
-  });
-
-  const rows = response.data.values ?? [];
-  const row = rows.find((candidate) => candidate[0] === token);
+  const rows = await fetchGuestRows(sheets, getSpreadsheetId());
+  const row = rows.find((candidate) => extractTokenFromInviteLink(candidate[COLUMN.LINK]) === token);
   if (!row) return null;
 
   return {
     token,
-    nome: row[1] ?? "",
-    status: row[4] === "confirmado" ? "confirmado" : "pendente",
+    nome: row[COLUMN.NOME] ?? "",
+    status: row[COLUMN.RSVP]?.trim().toLowerCase() === "confirmado" ? "confirmado" : "pendente",
   };
 }
 
@@ -81,12 +103,8 @@ export async function recordRsvp(token: string, details: RsvpDetails): Promise<v
   const sheets = getSheetsClient();
   const spreadsheetId = getSpreadsheetId();
 
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: SHEET_RANGE,
-  });
-  const rows = response.data.values ?? [];
-  const rowIndex = rows.findIndex((candidate) => candidate[0] === token);
+  const rows = await fetchGuestRows(sheets, spreadsheetId);
+  const rowIndex = rows.findIndex((candidate) => extractTokenFromInviteLink(candidate[COLUMN.LINK]) === token);
   if (rowIndex === -1) {
     throw new Error("Token não encontrado na planilha de convidados");
   }
@@ -95,10 +113,10 @@ export async function recordRsvp(token: string, details: RsvpDetails): Promise<v
   const sheetRowNumber = rowIndex + 2;
   await sheets.spreadsheets.values.update({
     spreadsheetId,
-    range: `${SHEET_NAME}!B${sheetRowNumber}:F${sheetRowNumber}`,
+    range: `${SHEET_NAME}!A${sheetRowNumber}:D${sheetRowNumber}`,
     valueInputOption: "RAW",
     requestBody: {
-      values: [[details.nome, details.email, details.telefone, "confirmado", new Date().toISOString()]],
+      values: [[details.nome, details.email, details.telefone, "confirmado"]],
     },
   });
 }

@@ -59,6 +59,10 @@ function getRootFolderId(): string {
  * Localiza a subpasta do convidado (nomeada com o próprio token) dentro da
  * pasta raiz; cria a subpasta caso a estrutura ainda não tenha sido
  * preparada pelo casal (ver docs/product/pendencias.md).
+ *
+ * `supportsAllDrives`/`includeItemsFromAllDrives` são obrigatórios para
+ * operar dentro de um Drive compartilhado (ver ADR-0005) — sem eles a API
+ * simplesmente ignora itens de Drive compartilhado, como se não existissem.
  */
 async function findOrCreateGuestFolder(drive: drive_v3.Drive, token: string): Promise<string> {
   const rootFolderId = getRootFolderId();
@@ -69,6 +73,8 @@ async function findOrCreateGuestFolder(drive: drive_v3.Drive, token: string): Pr
     q: query,
     fields: "files(id, name)",
     pageSize: 1,
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true,
   });
 
   const found = existing.data.files?.[0]?.id;
@@ -81,6 +87,7 @@ async function findOrCreateGuestFolder(drive: drive_v3.Drive, token: string): Pr
       parents: [rootFolderId],
     },
     fields: "id",
+    supportsAllDrives: true,
   });
 
   if (!created.data.id) {
@@ -104,6 +111,7 @@ export async function uploadGuestPhoto(token: string, file: UploadableFile): Pro
       body: Readable.from(Buffer.from(file.bytes)),
     },
     fields: "id",
+    supportsAllDrives: true,
   });
 
   if (!response.data.id) {
@@ -125,6 +133,7 @@ export async function saveGuestMessage(token: string, message: string): Promise<
       parents: [folderId],
     },
     fields: "id",
+    supportsAllDrives: true,
   });
 
   const documentId = created.data.id;

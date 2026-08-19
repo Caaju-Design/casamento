@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "invites:generate": "node scripts/generate-invite-links.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "^9.7.0",

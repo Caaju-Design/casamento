@@ -6,7 +6,15 @@ Registro de retomada do bootstrap deste produto — permite continuar em outra s
 - **Casal:** Emanuel & Gabriela.
 - **Data, horário e local do casamento:** 17/04/2027, 16h00, Ed. Square 2 (salão de festa) — Rua Luís Correia de Melo, 86, Chácara Santo Antônio, São Paulo, CEP 04726-220.
 - **Etapa atual:** Etapa 4 (criação) — proposta aprovada em 2026-08-19.
-- **Próximo passo:** implementar a aplicação (Next.js) conforme decisões abaixo, depois marcar esta etapa como concluída.
+- **Próximo passo:** resolver as pendências de infraestrutura em `docs/product/pendencias.md` (Drive compartilhado, conteúdo da lista de presentes, deploy na Vercel), depois marcar esta etapa como concluída.
+
+## Infraestrutura (progresso real, 2026-08-19)
+
+- Repositório: `git@github.com:Caaju-Design/casamento.git` (privado, push feito).
+- Google Cloud: projeto `casamento-caaju`, APIs Sheets/Drive/Docs habilitadas, conta de serviço `casamento-rsvp@casamento-caaju.iam.gserviceaccount.com` criada, credenciais em `.env.local` (nunca versionado).
+- Planilha de RSVP real: `1wGvjG-EfWcFaKOkIZxskoF3dAuINJ9N1_WsypCA53sc`, aba renomeada para "Convidados", 90 convidados já cadastrados com nome — links de convite gerados via `npm run invites:generate` (ver `scripts/generate-invite-links.mjs`).
+- Testado de ponta a ponta contra dado real: leitura do convite e confirmação de presença (RSVP) funcionam. Upload de foto/mensagem bloqueado por limitação de cota de conta de serviço no Drive — ver ADR-0005, resolução em andamento (Drive compartilhado).
+- Vercel: ainda não implantado.
 
 ## Respostas da entrevista
 
