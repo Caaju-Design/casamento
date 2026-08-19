@@ -67,7 +67,7 @@ Registro de retomada do bootstrap deste produto — permite continuar em outra s
 4. ADR retroativo — **não se aplica**: projeto novo, sem decisão anterior a este bootstrap. As decisões desta entrevista entram como ADRs normais (0001-0003).
 5. Storybook/catálogo visual — não.
 6. Ambiente de staging separado — não.
-7. Página de status público — **sim**, pedido explícito, mesmo sendo atípico para este tipo de produto (registrado como pendência de confirmação em `docs/product/pendencias.md`).
+7. Página de status público — **revertido para não** em 2026-08-19 (confirmado após a proposta): o casal quer, em vez disso, que a própria página `/convite/[token]` mostre "presença já confirmada" quando o convidado revisitar o link — funcionalidade que já nasce coberta pelo fluxo de RSVP (`components/organisms/RsvpFlow.tsx`, prop `alreadyConfirmed`), sem artefato adicional.
 
 ## Decisões e critérios (Etapa 3)
 

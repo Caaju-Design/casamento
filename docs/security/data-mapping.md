@@ -37,7 +37,7 @@
 | Dado pessoal sensível / criança ou adolescente? | Não identificado como sensível; possível presença de foto de criança/adolescente entre convidados — tratar com o mesmo cuidado dos demais dados, sem categoria diferenciada nesta v1 |
 | Origem e método de coleta | Formulário no site, acessado via link pessoal único (`/convite/<token>`) |
 | Finalidade específica | Confirmar presença no casamento; registrar foto/mensagem como lembrança para o casal; permitir visualização, pelo casal, do percentual de confirmação |
-| Base legal | Consentimento — a pessoa preenche o formulário voluntariamente ao acessar seu link. *(pendente validação jurídica formal — ver `docs/product/pendencias.md`)* |
+| Base legal | Consentimento — a pessoa preenche o formulário voluntariamente ao acessar seu link. O casal optou por não buscar validação jurídica formal (todos os titulares são familiares) — decisão do casal, registrada em 2026-08-19. |
 | Sistemas e fluxo | Navegador do convidado → rota de API do Next.js (Vercel) → Google Sheets (linha de confirmação) e Google Drive (arquivo de foto/mensagem, pasta do convidado) |
 | Local de armazenamento/processamento | Google Sheets e Google Drive (conta do casal), infraestrutura Vercel para a aplicação |
 | Compartilhamento e operadores | Google (Sheets, Drive, Docs) como operador de armazenamento; Google Looker Studio como operador de visualização (só leitura da planilha) |
@@ -70,7 +70,6 @@ Não há perfil de suporte, operador de cadastro ou admin técnico distinto do c
 
 | Item | Impacto | Próximo passo | Dono | Data de revisão |
 | --- | --- | --- | --- | --- |
-| Validar juridicamente a base legal (consentimento) | Baixo | Revisar se há dúvida sobre o enquadramento | Casal/jurídico se necessário | 2026-08-26 |
 | Definir se há necessidade de salvaguarda para transferência internacional (Google/Vercel) | Baixo | Avaliar se o volume/sensibilidade do dado justifica cláusula contratual adicional | Emanuel | 2026-08-26 |
 
 ## Arquivos e caminhos cobertos
