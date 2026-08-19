@@ -1,0 +1,34 @@
+{
+  "button": {
+    "primary": {
+      "background": { "$value": "{color.action.primary}", "$type": "color" },
+      "backgroundHover": { "$value": "{color.action.primaryHover}", "$type": "color" },
+      "text": { "$value": "{color.text.onAccent}", "$type": "color" },
+      "radius": { "$value": "{radius.pill}", "$type": "dimension" }
+    },
+    "secondary": {
+      "background": { "$value": "{color.background.surface}", "$type": "color" },
+      "border": { "$value": "{color.border.subtle}", "$type": "color" },
+      "text": { "$value": "{color.text.primary}", "$type": "color" },
+      "radius": { "$value": "{radius.pill}", "$type": "dimension" }
+    }
+  },
+  "input": {
+    "background": { "$value": "{color.background.surface}", "$type": "color" },
+    "border": { "$value": "{color.border.subtle}", "$type": "color" },
+    "borderFocus": { "$value": "{color.border.focus}", "$type": "color" },
+    "text": { "$value": "{color.text.primary}", "$type": "color" },
+    "radius": { "$value": "{radius.control}", "$type": "dimension" }
+  },
+  "card": {
+    "background": { "$value": "{color.background.surface}", "$type": "color" },
+    "border": { "$value": "{color.border.subtle}", "$type": "color" },
+    "radius": { "$value": "{radius.card}", "$type": "dimension" },
+    "padding": { "$value": "{spacing.cardPadding}", "$type": "dimension" }
+  },
+  "giftCard": {
+    "background": { "$value": "{color.background.accent}", "$type": "color" },
+    "accent": { "$value": "{color.action.highlight}", "$type": "color" },
+    "radius": { "$value": "{radius.card}", "$type": "dimension" }
+  }
+}

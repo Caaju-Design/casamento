@@ -1,0 +1,42 @@
+{
+  "color": {
+    "background": {
+      "page": { "$value": "{color.cream.50}", "$type": "color" },
+      "surface": { "$value": "{color.white}", "$type": "color" },
+      "accent": { "$value": "{color.blush.100}", "$type": "color" }
+    },
+    "text": {
+      "primary": { "$value": "{color.ink.900}", "$type": "color" },
+      "secondary": { "$value": "{color.ink.700}", "$type": "color" },
+      "onAccent": { "$value": "{color.white}", "$type": "color" }
+    },
+    "border": {
+      "subtle": { "$value": "{color.blush.300}", "$type": "color" },
+      "focus": { "$value": "{color.gold.500}", "$type": "color" }
+    },
+    "action": {
+      "primary": { "$value": "{color.blush.500}", "$type": "color" },
+      "primaryHover": { "$value": "{color.blush.700}", "$type": "color" },
+      "secondary": { "$value": "{color.sage.500}", "$type": "color" },
+      "highlight": { "$value": "{color.gold.500}", "$type": "color" }
+    },
+    "feedback": {
+      "error": { "$value": "{color.red.600}", "$type": "color" },
+      "success": { "$value": "{color.sage.500}", "$type": "color" }
+    }
+  },
+  "font": {
+    "heading": { "$value": "{fontFamily.display}", "$type": "fontFamily" },
+    "body": { "$value": "{fontFamily.body}", "$type": "fontFamily" }
+  },
+  "spacing": {
+    "sectionGap": { "$value": "{space.800}", "$type": "dimension" },
+    "cardPadding": { "$value": "{space.400}", "$type": "dimension" },
+    "fieldGap": { "$value": "{space.200}", "$type": "dimension" }
+  },
+  "radius": {
+    "card": { "$value": "{radius.400}", "$type": "dimension" },
+    "control": { "$value": "{radius.200}", "$type": "dimension" },
+    "pill": { "$value": "{radius.full}", "$type": "dimension" }
+  }
+}

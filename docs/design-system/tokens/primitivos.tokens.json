@@ -1,0 +1,56 @@
+{
+  "color": {
+    "blush": {
+      "50": { "$value": "#fdf3f2", "$type": "color" },
+      "100": { "$value": "#f8e1de", "$type": "color" },
+      "300": { "$value": "#eeb6ae", "$type": "color" },
+      "500": { "$value": "#d98a80", "$type": "color" },
+      "700": { "$value": "#a85a52", "$type": "color" }
+    },
+    "sage": {
+      "100": { "$value": "#eaf0e6", "$type": "color" },
+      "300": { "$value": "#c3d3ba", "$type": "color" },
+      "500": { "$value": "#8fa682", "$type": "color" }
+    },
+    "gold": {
+      "300": { "$value": "#e7cd8f", "$type": "color" },
+      "500": { "$value": "#c9a24d", "$type": "color" },
+      "700": { "$value": "#96772f", "$type": "color" }
+    },
+    "cream": {
+      "50": { "$value": "#fffaf3", "$type": "color" },
+      "100": { "$value": "#fbf1e2", "$type": "color" }
+    },
+    "ink": {
+      "700": { "$value": "#3a2f2c", "$type": "color" },
+      "900": { "$value": "#221b19", "$type": "color" }
+    },
+    "red": {
+      "600": { "$value": "#b3392f", "$type": "color" }
+    },
+    "white": { "$value": "#ffffff", "$type": "color" }
+  },
+  "fontFamily": {
+    "display": { "$value": "'Cormorant Garamond', serif", "$type": "fontFamily" },
+    "body": { "$value": "'Lora', serif", "$type": "fontFamily" }
+  },
+  "fontSize": {
+    "100": { "$value": "0.875rem", "$type": "dimension" },
+    "200": { "$value": "1rem", "$type": "dimension" },
+    "400": { "$value": "1.5rem", "$type": "dimension" },
+    "600": { "$value": "2.5rem", "$type": "dimension" },
+    "800": { "$value": "4rem", "$type": "dimension" }
+  },
+  "space": {
+    "100": { "$value": "0.5rem", "$type": "dimension" },
+    "200": { "$value": "1rem", "$type": "dimension" },
+    "400": { "$value": "2rem", "$type": "dimension" },
+    "600": { "$value": "4rem", "$type": "dimension" },
+    "800": { "$value": "6rem", "$type": "dimension" }
+  },
+  "radius": {
+    "200": { "$value": "0.5rem", "$type": "dimension" },
+    "400": { "$value": "1.5rem", "$type": "dimension" },
+    "full": { "$value": "9999px", "$type": "dimension" }
+  }
+}
