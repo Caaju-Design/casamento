@@ -56,4 +56,12 @@ describe("resolveInvite", () => {
     expect(result.status).toBe("invalid_format");
     expect(mockedGetInviteByToken).not.toHaveBeenCalled();
   });
+
+  it("falha da API do Google (credencial ausente, cota, indisponibilidade) retorna 'unavailable', não 'not_found'", async () => {
+    mockedGetInviteByToken.mockRejectedValue(new Error("Credenciais da conta de serviço do Google não configuradas"));
+
+    const result = await resolveInvite("abc123XYZ");
+
+    expect(result.status).toBe("unavailable");
+  });
 });

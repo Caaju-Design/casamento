@@ -18,19 +18,32 @@ export function hasPlausibleTokenFormat(token: string | null | undefined): token
 export type InviteLookupResult =
   | { status: "found"; invite: GuestInvite }
   | { status: "invalid_format" }
-  | { status: "not_found" };
+  | { status: "not_found" }
+  | { status: "unavailable" };
 
 /**
  * Resolve um token de convite em um convite de convidado, sempre validando
  * no servidor (nunca confiando em estado do cliente) — ver ADR-0003 e
  * docs/security/data-mapping.md.
+ *
+ * Falha da API do Google (credencial ausente, cota, indisponibilidade — ver
+ * docs/architecture/risks.md) é distinguida de "convite não encontrado":
+ * a primeira é um problema nosso, temporário; a segunda é do link em si.
+ * Conflar as duas mostraria "convite não encontrado" para um convidado
+ * legítimo só porque a planilha está fora do ar.
  */
 export async function resolveInvite(token: string | null | undefined): Promise<InviteLookupResult> {
   if (!hasPlausibleTokenFormat(token)) {
     return { status: "invalid_format" };
   }
 
-  const invite = await getInviteByToken(token);
+  let invite: GuestInvite | null;
+  try {
+    invite = await getInviteByToken(token);
+  } catch {
+    return { status: "unavailable" };
+  }
+
   if (!invite) {
     return { status: "not_found" };
   }

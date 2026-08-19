@@ -1,4 +1,4 @@
-import type { ElementType, HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement> {
   as?: "h1" | "h2" | "h3" | "h4";
@@ -15,7 +15,7 @@ const SIZE_CLASSES: Record<NonNullable<HeadingProps["size"]>, string> = {
 
 /** Atom `Heading` — tipografia de destaque (fonte "display") em todas as seções. */
 export function Heading({ as = "h2", size = "md", children, className, ...rest }: HeadingProps) {
-  const Tag = as as ElementType;
+  const Tag = as;
   return (
     <Tag
       className={["font-display text-text-primary", SIZE_CLASSES[size], className].filter(Boolean).join(" ")}

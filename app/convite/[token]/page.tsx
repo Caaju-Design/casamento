@@ -4,7 +4,7 @@ import { InvitePageTemplate } from "@/components/templates/InvitePageTemplate";
 import { resolveInvite } from "@/lib/invite/token";
 
 export const metadata: Metadata = {
-  title: "Seu convite — Nome & Nome",
+  title: "Seu convite — Emanuel & Gabriela",
 };
 
 // Sempre resolve o convite no servidor a cada requisição — nunca em cache
@@ -13,14 +13,19 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 interface InvitePageProps {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }
 
 export default async function InvitePage({ params }: InvitePageProps) {
-  const lookup = await resolveInvite(params.token);
+  const { token } = await params;
+  const lookup = await resolveInvite(token);
+
+  if (lookup.status === "unavailable") {
+    return <InviteNotFound reason="unavailable" />;
+  }
 
   if (lookup.status !== "found") {
-    return <InviteNotFound />;
+    return <InviteNotFound reason="not_found" />;
   }
 
   return <InvitePageTemplate token={lookup.invite.token} invite={lookup.invite} />;
