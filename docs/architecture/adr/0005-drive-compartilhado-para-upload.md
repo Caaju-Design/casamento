@@ -1,6 +1,6 @@
 # ADR-0005: Upload de foto/mensagem exige Drive compartilhado (Shared Drive)
 
-- Status: aceito
+- Status: aceito novamente (restaurado por ADR-0007), após uma tentativa intermediária de delegação de domínio no ADR-0006
 - Data: 2026-08-19
 - Dono: Emanuel
 - Impacto no Data Mapping: sim

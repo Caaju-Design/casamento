@@ -5,8 +5,8 @@ Registro de retomada do bootstrap deste produto — permite continuar em outra s
 - **Produto:** Site de casamento (RSVP, presentes via Pix, upload de fotos/depoimentos, recomendações de hospedagem).
 - **Casal:** Gabriela & Emanuel.
 - **Data, horário e local do casamento:** 17/04/2027, 16h00, Ed. Square 2 (salão de festa) — Rua Luís Correia de Melo, 86, Chácara Santo Antônio, São Paulo, CEP 04726-220.
-- **Etapa atual:** Etapa 4 (criação) — proposta aprovada em 2026-08-19.
-- **Próximo passo:** resolver a única pendência de infraestrutura restante em `docs/product/pendencias.md` (Drive compartilhado, para o upload de foto/mensagem funcionar), depois marcar esta etapa como concluída.
+- **Etapa atual:** Etapa 4 (criação) — proposta aprovada em 2026-08-19. Infraestrutura essencial concluída; falta só a Gabriela preencher a lista de presentes (ver `docs/product/pendencias.md`).
+- **Próximo passo:** marcar esta etapa como concluída assim que a lista de presentes tiver ao menos um item.
 
 ## Infraestrutura (progresso real, 2026-08-19)
 
@@ -14,9 +14,10 @@ Registro de retomada do bootstrap deste produto — permite continuar em outra s
 - Site em produção: **`https://casamento.caaju.com.br`** (domínio próprio configurado via Cloudflare, certificado HTTPS ativo).
 - Vercel: projeto `caajudesign/casamento`, GitHub conectado, variáveis de ambiente (Google, Pix, token) configuradas em Production e Preview.
 - Google Cloud: projeto `casamento-caaju`, APIs Sheets/Drive/Docs habilitadas, conta de serviço `casamento-rsvp@casamento-caaju.iam.gserviceaccount.com` criada, credenciais em `.env.local` (nunca versionado) e na Vercel.
+- Upload de foto/mensagem: resolvido via **Drive compartilhado** ("Casamento", ADR-0007 — restaura o ADR-0005 depois de uma tentativa intermediária de delegação de domínio no ADR-0006, descartada por dar acesso a todo o Drive/Docs pessoal do Emanuel em vez de só à pasta do casamento). Conta de serviço é membro do Drive compartilhado; delegação de domínio revogada em `admin.google.com`. Testado de ponta a ponta com registro descartável: pasta, foto e documento de mensagem criados e depois removidos.
 - Planilha de RSVP real: `1wGvjG-EfWcFaKOkIZxskoF3dAuINJ9N1_WsypCA53sc`, aba "Convidados" com 90 convidados e link gerado (`npm run invites:generate`), aba "Presentes" criada (coluna A: nome do presente) — ainda sem itens.
 - Pix: código real configurado como variável de ambiente (`PIX_CODE`), QR gerado automaticamente a partir dele — sem imagem estática.
-- Testado de ponta a ponta contra dado real: leitura do convite, confirmação de presença (RSVP) e seção de presentes (estado vazio) funcionam. Upload de foto/mensagem ainda bloqueado por limitação de cota de conta de serviço no Drive — ver ADR-0005, falta o casal mover "Convidados" para um Drive compartilhado.
+- Testado de ponta a ponta contra dado real: leitura do convite, confirmação de presença (RSVP), seção de presentes (estado vazio) e upload de foto/mensagem — todas as jornadas funcionais.
 
 ## Respostas da entrevista
 

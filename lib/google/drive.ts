@@ -6,6 +6,13 @@ import { Readable } from "node:stream";
  * do casal — uma subpasta por convidado dentro de `GOOGLE_DRIVE_ROOT_FOLDER_ID`
  * (ver docs/architecture/adr/0002-armazenamento-em-google-sheets-e-drive.md).
  *
+ * A conta de serviço não tem cota de armazenamento própria — por isso
+ * `GOOGLE_DRIVE_ROOT_FOLDER_ID` precisa estar dentro de um Drive
+ * compartilhado (Shared Drive) do Workspace, com a conta de serviço como
+ * membro (ver ADR-0007, que restaura essa abordagem no lugar da delegação
+ * de domínio do ADR-0006 — a delegação dava acesso a todo o Drive/Docs
+ * pessoal, não só à pasta do casamento).
+ *
  * O convidado nunca fala diretamente com a API do Google: o arquivo passa
  * pelo servidor (app/api/upload/route.ts), que valida tipo/tamanho antes de
  * reenviar para o Drive.
@@ -60,9 +67,9 @@ function getRootFolderId(): string {
  * pasta raiz; cria a subpasta caso a estrutura ainda não tenha sido
  * preparada pelo casal (ver docs/product/pendencias.md).
  *
- * `supportsAllDrives`/`includeItemsFromAllDrives` são obrigatórios para
- * operar dentro de um Drive compartilhado (ver ADR-0005) — sem eles a API
- * simplesmente ignora itens de Drive compartilhado, como se não existissem.
+ * `supportsAllDrives`/`includeItemsFromAllDrives` continuam inofensivos aqui
+ * mesmo sem Drive compartilhado (ver ADR-0006) — mantidos por robustez, caso
+ * a pasta raiz um dia mude para dentro de um.
  */
 async function findOrCreateGuestFolder(drive: drive_v3.Drive, token: string): Promise<string> {
   const rootFolderId = getRootFolderId();

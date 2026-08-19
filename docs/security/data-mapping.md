@@ -39,7 +39,7 @@
 | Finalidade específica | Confirmar presença no casamento; registrar foto/mensagem como lembrança para o casal; permitir visualização, pelo casal, do percentual de confirmação |
 | Base legal | Consentimento — a pessoa preenche o formulário voluntariamente ao acessar seu link. O casal optou por não buscar validação jurídica formal (todos os titulares são familiares) — decisão do casal, registrada em 2026-08-19. |
 | Sistemas e fluxo | Navegador do convidado → rota de API do Next.js (Vercel) → Google Sheets (linha de confirmação) e Google Drive (arquivo de foto/mensagem, pasta do convidado) |
-| Local de armazenamento/processamento | Google Sheets (Workspace do casal) e Google Drive compartilhado — "Shared Drive" (ver ADR-0005; necessário porque a conta de serviço não tem cota própria em pasta comum), infraestrutura Vercel para a aplicação |
+| Local de armazenamento/processamento | Google Sheets e Google Drive compartilhado ("Shared Drive") do Workspace do casal — a conta de serviço é membro só desse Drive compartilhado, sem acesso ao restante do Drive pessoal (ver ADR-0007), infraestrutura Vercel para a aplicação |
 | Compartilhamento e operadores | Google (Sheets, Drive, Docs) como operador de armazenamento; Google Looker Studio como operador de visualização (só leitura da planilha) |
 | Transferência internacional | Sim — infraestrutura do Google e da Vercel pode processar fora do Brasil; sem salvaguarda contratual adicional definida nesta v1 |
 | Retenção, descarte e backups | Até 17 de abril de 2027 (data do casamento); após o prazo, exclusão da planilha e das pastas do Drive |
@@ -60,7 +60,7 @@ Não há perfil de suporte, operador de cadastro ou admin técnico distinto do c
 
 ## 5. Segurança e operação
 
-- **Autenticação e autorização:** sem login; autorização por token de convite não sequencial, validado no servidor a cada requisição (ver ADR-0003).
+- **Autenticação e autorização:** sem login para convidados; autorização por token de convite não sequencial, validado no servidor a cada requisição (ver ADR-0003). A conta de serviço do backend é apenas membro do Drive compartilhado "Casamento" — sem delegação de domínio, sem acesso ao restante do Drive/Docs pessoal do casal (ver ADR-0007).
 - **Criptografia:** HTTPS/TLS em toda comunicação; dados em repouso protegidos pelas garantias do Google Workspace (Sheets/Drive) — sem criptografia adicional em nível de aplicação nesta v1.
 - **Logs e auditoria:** logs da aplicação não registram corpo de requisição com dado pessoal nem o token de convite; erros de integração com o Google são logados sem o payload.
 - **Incidentes:** dono é Emanuel; em caso de suspeita de vazamento do link de um convidado, o token correspondente é revogado (linha marcada como inválida na planilha de tokens).
