@@ -118,7 +118,10 @@ function useScrollScrubVideo(
         pendingSeekTime = time;
         return;
       }
-      if (Math.abs(video.currentTime - time) <= 0.033) return;
+      // 0.08s (não 0.033s) — cada seek força o decoder a trabalhar; um
+      // limiar maior dispara bem menos seeks por segundo de scroll,
+      // sobrando mais folga pro decoder de celular acompanhar.
+      if (Math.abs(video.currentTime - time) <= 0.08) return;
 
       isSeeking = true;
       video.currentTime = time;
@@ -270,6 +273,17 @@ export function HeroSection() {
             poster="/hero/banner-hero-poster.jpg"
             aria-hidden="true"
           >
+            {/*
+              Versão mais leve (1280px de largura, em vez de 1920px) pra
+              telas estreitas — celular é o cenário mais sensível ao
+              travamento no scroll-scrub, porque cada seek força o decoder
+              a decodificar de novo, e um vídeo menor decodifica bem mais
+              rápido. O navegador testa os `<source>` na ordem e usa o
+              primeiro cujo `media` bate, então as versões mobile vêm
+              primeiro.
+            */}
+            <source src="/hero/banner-hero-mobile.webm" type="video/webm" media="(max-width: 768px)" />
+            <source src="/hero/banner-hero-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
             <source src="/hero/banner-hero.webm" type="video/webm" />
             <source src="/hero/banner-hero.mp4" type="video/mp4" />
           </video>
@@ -298,18 +312,17 @@ export function HeroSection() {
           none` porque é só assinatura decorativa — nunca deve capturar
           clique, nem depois de sumir.
 
-          "Gabriela" / coração / "Emanuel" como 3 itens flex (não um texto
-          corrido com `&amp;` no meio) — com `flex-wrap`, o próprio
-          navegador decide se cabem os 3 numa linha só (telas largas) ou se
-          quebra (mobile), do mesmo jeito que quebraria palavras num
-          parágrafo, sem precisar de breakpoint fixo: no mobile estreito
-          sobra só espaço pra um item por linha, então sai natural
-          "Gabriela" em cima, coração no meio, "Emanuel" embaixo — que foi
-          o pedido.
+          Layout diferente por tamanho de tela, não um `flex-wrap` que
+          quebra sozinho: no mobile (padrão, sem prefixo) é
+          `flex-col items-start` — "Gabriela" e "Emanuel" alinhados à
+          esquerda, com o "&" (menor, `self-end`) jogado pra direita entre
+          os dois, tipo uma assinatura. A partir de `sm:` vira
+          `flex-row items-center justify-center` — os 3 numa linha só,
+          centralizados, "Gabriela & Emanuel" corrido (o texto original).
         */}
         <p
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-6 text-center font-script leading-none text-white"
+          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-start justify-center gap-1 px-6 text-left font-script leading-none text-white sm:flex-row sm:items-center sm:justify-center sm:gap-4 sm:text-center"
           style={{
             fontSize: "clamp(3.5rem, 12vw, 8rem)",
             textShadow: "0 2px 24px rgba(34,27,25,0.35)",
@@ -317,26 +330,8 @@ export function HeroSection() {
           }}
         >
           <span>Gabriela</span>
-          {/*
-            Coração vazado (só contorno, sem preenchimento) no lugar do
-            "&" — o interior transparente deixa o vídeo aparecer por
-            dentro do coração (é literalmente a ausência de fill, não uma
-            máscara ou recorte) e o "&" fica pequeno, centralizado por
-            cima, na mesma fonte script porém numa fração do tamanho dos
-            nomes ao redor.
-          */}
-          <span className="relative inline-flex shrink-0 items-center justify-center" style={{ width: "0.85em", height: "0.78em" }}>
-            <svg viewBox="0 0 32 29" className="absolute inset-0 h-full w-full" aria-hidden="true">
-              <path
-                d="M16 28.3C16 28.3 0 17.4 0 9.4 0 4.4 4 1 8 1c3.1 0 6 2 8 6 2-4 4.9-6 8-6 4 0 8 3.4 8 8.4 0 8-16 18.9-16 18.9Z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              />
-            </svg>
-            <span className="relative" style={{ fontSize: "0.42em" }}>
-              &amp;
-            </span>
+          <span className="self-end sm:self-auto" style={{ fontSize: "0.55em" }}>
+            &amp;
           </span>
           <span>Emanuel</span>
         </p>

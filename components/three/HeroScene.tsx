@@ -45,7 +45,7 @@ const PETAL_TEXTURE_URLS = ["/hero/petals/petal-1.png", "/hero/petals/petal-2.pn
 // sumiu por completo. O fade em si usa "smoothstep" (ver `SunRays` abaixo),
 // não uma reta linear — começa devagar, acelera no meio, desacelera no
 // fim, então não lê como um corte abrupto assim que a rolagem começa.
-const SUN_RAY_FADE_END = 0.4;
+const SUN_RAY_FADE_END = 0.5;
 // A partir de quanto do progresso a quantidade de pétalas já chegou no
 // mínimo (nunca some 100% — a cena continua viva o resto da rolagem).
 const PETAL_THINNING_END = 0.6;
@@ -68,7 +68,19 @@ function supportsWebGL(): boolean {
   }
 }
 
-/** Gera em canvas 2D (sem depender de nenhum asset externo) uma textura de brilho radial suave, usada no núcleo do sol. */
+/**
+ * Gera em canvas 2D (sem depender de nenhum asset externo) uma textura de
+ * brilho radial suave, usada no núcleo do sol.
+ *
+ * Gradiente com um "platô" largo de alta opacidade (até 55% do raio, não
+ * só o centro) em vez de cair suave desde o centro — sem isso, ao
+ * multiplicar a opacidade inteira do sprite por um fator (o fade do
+ * scroll), as bordas já fracas do gradiente ficam invisíveis primeiro,
+ * dando a impressão de o CÍRCULO ENCOLHENDO em vez de simplesmente
+ * clarear/apagar por igual (foi exatamente o "esmaecendo tipo fadeout...
+ * não diminuindo o tamanho" pedido) — com o platô, a maior parte do disco
+ * dima junto, só a franja externa (já fina) que reage antes.
+ */
 function makeGlowTexture(): THREE.Texture {
   const size = 256;
   const canvas = document.createElement("canvas");
@@ -78,7 +90,8 @@ function makeGlowTexture(): THREE.Texture {
   if (ctx) {
     const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
     gradient.addColorStop(0, "rgba(255,248,224,1)");
-    gradient.addColorStop(0.35, "rgba(255,226,158,0.55)");
+    gradient.addColorStop(0.55, "rgba(255,238,200,0.85)");
+    gradient.addColorStop(0.8, "rgba(255,226,158,0.35)");
     gradient.addColorStop(1, "rgba(255,226,158,0)");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, size, size);
@@ -169,6 +182,20 @@ function loadBlurredTexture(url: string, blurPx: number): THREE.Texture {
     texture.needsUpdate = true;
   };
   image.src = url;
+
+  // BUG real encontrado nesta revisão: o canvas dessa textura nunca tem
+  // dimensão potência de 2 (a foto original + a margem do blur somam um
+  // tamanho arbitrário, tipo 284×284) — sem isso, o filtro de minificação
+  // padrão do three.js (`LinearMipmapLinearFilter`) exige mipmaps, que só
+  // funcionam garantidamente em textura POT. Em contexto WebGL1 (comum em
+  // celular/navegador mais antigo — o WebGL2 tolera NPOT, mas nem todo
+  // aparelho/navegador roda WebGL2), isso faz a textura falhar
+  // silenciosamente: sem erro no console, ela simplesmente não aparece —
+  // bate exatamente com "as pétalas sumiram". Desligar mipmap e usar
+  // filtro linear simples resolve pra qualquer tamanho de canvas.
+  texture.generateMipmaps = false;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
 
   return texture;
 }
@@ -350,9 +377,10 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
     // Cintilação — o sol "vivo", não uma imagem estática. Roda sempre,
     // inclusive parado no topo (progress 0), que é quando mais dá pra
     // reparar nela — combina duas frequências pra não parecer um "pisca"
-    // mecânico e uniforme.
+    // mecânico e uniforme. Amplitude bem maior que a v1 (0.1+0.04, ficou
+    // "sutil demais" no feedback) — agora varia de ~55% a 100% do brilho.
     const flicker =
-      0.86 + Math.sin(state.clock.elapsedTime * 0.6) * 0.1 + Math.sin(state.clock.elapsedTime * 1.7) * 0.04;
+      0.775 + Math.sin(state.clock.elapsedTime * 0.6) * 0.175 + Math.sin(state.clock.elapsedTime * 1.9) * 0.05;
 
     if (glowRef.current) {
       const glowMaterial = glowRef.current.material as unknown as THREE.SpriteMaterial;
