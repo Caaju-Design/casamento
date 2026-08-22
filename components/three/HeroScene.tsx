@@ -106,6 +106,56 @@ function makeGlowTexture(): THREE.Texture {
 }
 
 /**
+ * Gera em canvas 2D as "pontas" espetadas de um brilho de lente de verdade
+ * (o efeito "estrela" que sai em todas as direções do núcleo — pedido
+ * explícito com fotos de referência de lens flare real, que sempre têm
+ * isso além do halo redondo). Um raio central (12 pontas, comprimentos
+ * alternados — 4 longas nos eixos, 8 curtas entre elas, igual toda foto de
+ * flare de verdade) desenhado com gradientes lineares finos saindo do
+ * centro, sem precisar de shader: cada ponta é só uma linha grossa com
+ * gradiente de opacidade ao longo do comprimento.
+ */
+function makeStarburstTexture(): THREE.Texture {
+  const size = 512;
+  const center = size / 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.translate(center, center);
+    const spikeCount = 12;
+    for (let i = 0; i < spikeCount; i += 1) {
+      // Pontas nos eixos (0°, 90°, 180°, 270°) mais longas que as
+      // diagonais entre elas — é essa alternância que lê como "estrela"
+      // em vez de uma roda de raios uniformes.
+      const isAxis = i % 3 === 0;
+      const length = isAxis ? center * 0.98 : center * 0.55;
+      const width = isAxis ? 3.5 : 1.6;
+      const angle = (i / spikeCount) * Math.PI * 2;
+
+      ctx.save();
+      ctx.rotate(angle);
+      const gradient = ctx.createLinearGradient(0, 0, 0, -length);
+      gradient.addColorStop(0, "rgba(255,250,235,0.9)");
+      gradient.addColorStop(0.15, "rgba(255,244,210,0.5)");
+      gradient.addColorStop(1, "rgba(255,244,210,0)");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.moveTo(-width / 2, 0);
+      ctx.lineTo(width / 2, 0);
+      ctx.lineTo(0, -length);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
  * Gera em canvas 2D um feixe de luz — claro na "fonte" (topo) e sumindo
  * gradualmente até o fim do comprimento, com as bordas laterais também
  * esmaecidas (senão o plano retangular aparece com corte reto nos lados,
@@ -137,6 +187,70 @@ function makeBeamTexture(): THREE.Texture {
     ctx.fillStyle = horizontalMask;
     ctx.fillRect(0, 0, w, h);
     ctx.globalCompositeOperation = "source-over";
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Gera em canvas 2D um anel fino e esmaecido — os "ghosts" circulares
+ * concêntricos que aparecem alinhados com o sol em fotos de lens flare de
+ * verdade (pedido explícito, com várias fotos de referência mandadas: uma
+ * trilha de círculos DIFERENTES — tamanhos e cores variados — saindo do
+ * brilho principal, alguns só o contorno/anel, outros disco cheio). Um
+ * anel só (não um disco): gradiente radial com um "vale" no meio
+ * (transparente) entre duas bordas claras.
+ *
+ * Em BRANCO neutro de propósito (não mais uma cor fixa embutida no
+ * gradiente): cada ghost tinge essa mesma textura com sua própria cor via
+ * `spriteMaterial color` (ver `LENS_GHOSTS`/`SunRays` abaixo) — assim dá
+ * pra ter vários tons diferentes (laranja, vermelho, verde, roxo — igual
+ * às referências) reaproveitando UMA textura só, sem gerar um canvas novo
+ * por cor.
+ */
+function makeRingTexture(): THREE.Texture {
+  const size = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    gradient.addColorStop(0, "rgba(255,255,255,0)");
+    gradient.addColorStop(0.6, "rgba(255,255,255,0)");
+    gradient.addColorStop(0.72, "rgba(255,255,255,0.9)");
+    gradient.addColorStop(0.82, "rgba(255,255,255,0.55)");
+    gradient.addColorStop(0.92, "rgba(255,255,255,0)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Gera em canvas 2D um disco cheio, macio nas bordas (sem o "vale" do
+ * anel) — a outra metade da variedade pedida: nas fotos de referência nem
+ * todo ghost é um contorno fino, vários são bolhas cheias e translúcidas.
+ * Mesma lógica de tingir via `color` do material que o anel.
+ */
+function makeDiscTexture(): THREE.Texture {
+  const size = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    gradient.addColorStop(0, "rgba(255,255,255,0.85)");
+    gradient.addColorStop(0.5, "rgba(255,255,255,0.55)");
+    gradient.addColorStop(0.85, "rgba(255,255,255,0.18)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
@@ -356,27 +470,74 @@ const SUN_BEAMS: SunBeamSpec[] = [-0.55, -0.3, -0.05, 0.2, 0.45].map((angle) => 
   baseOpacity: 0.5 - Math.abs(angle) * 0.35,
 }));
 
+interface LensGhostSpec {
+  // Posição LOCAL (relativa ao `group` do sol) — os ghosts de lens flare de
+  // verdade ficam alinhados ao longo da reta que liga a fonte de luz ao
+  // centro da tela (o "eixo óptico"); o grupo do sol fica no canto
+  // superior-esquerdo (ver `position={[-2.8, 2.5, -2]}` abaixo), então
+  // "andar" em x positivo/y negativo a partir dele é andar em direção ao
+  // centro da cena — replicando esse alinhamento sem precisar calcular
+  // vetores em runtime.
+  position: [number, number, number];
+  scale: number;
+  baseOpacity: number;
+  // "ring" = só o contorno (textura `makeRingTexture`), "disc" = bolha
+  // cheia (textura `makeDiscTexture`) — nas fotos de referência mandadas,
+  // a trilha de ghosts mistura os dois tipos, não é só anel.
+  type: "ring" | "disc";
+  // Cada ghost tinge a MESMA textura (anel ou disco, ambas neutras/brancas)
+  // com sua própria cor — é isso que dá a variedade "várias circunferências
+  // diferentes, cores diferentes" pedida, sem precisar gerar uma textura
+  // nova por cor.
+  color: string;
+}
+
+// Pedido explícito (2 rodadas de fotos de referência de lens flare real):
+// uma trilha de ghosts BEM variados — tamanhos bem diferentes entre si
+// (não uma progressão suave), tipos misturados (anel/disco) e cores
+// variando entre quente (laranja/vermelho, herdando a cor do sol) e fria
+// (azul/verde/roxo, que é como prismas de lente de verdade dispersam a
+// luz) — trilhando a partir do núcleo em direção ao centro da cena.
+const LENS_GHOSTS: LensGhostSpec[] = [
+  { position: [0.75, -0.62, 0.15], scale: 0.35, baseOpacity: 0.5, type: "disc", color: "#ffb37a" },
+  { position: [1.3, -1.08, 0.3], scale: 1.15, baseOpacity: 0.35, type: "ring", color: "#ff6a4d" },
+  { position: [1.85, -1.55, 0.42], scale: 0.5, baseOpacity: 0.45, type: "disc", color: "#8fd8c8" },
+  { position: [2.3, -1.9, 0.55], scale: 0.22, baseOpacity: 0.55, type: "disc", color: "#ffe08a" },
+  { position: [2.85, -2.35, 0.7], scale: 1.6, baseOpacity: 0.22, type: "ring", color: "#7a8fe0" },
+  { position: [3.15, -2.6, 0.8], scale: 0.85, baseOpacity: 0.3, type: "disc", color: "#c98fe0" },
+  { position: [3.55, -2.92, 0.9], scale: 0.4, baseOpacity: 0.4, type: "ring", color: "#ff9c6a" },
+];
+
 /**
- * "Raio de sol" sem post-processing: um sprite de brilho no núcleo +
- * alguns planos alongados (texturas geradas em canvas 2D) em leque,
- * blend aditivo — visualmente lê como luz, custa perto de nada pra GPU.
+ * "Raio de sol" sem post-processing: sprite de brilho no núcleo + estrela
+ * de pontas espetadas (`makeStarburstTexture`) + alguns planos alongados
+ * em leque + trilha de ghosts (anéis/discos coloridos) — tudo textura
+ * gerada em canvas 2D, blend aditivo, custa perto de nada pra GPU.
  * Posicionado no canto superior-esquerdo pra ecoar o sol que já aparece
  * no próprio vídeo do hero por trás.
  */
 function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
   const groupRef = useRef<ThreeGroup>(null);
   const glowRef = useRef<ThreeSprite>(null);
+  const starburstRef = useRef<ThreeSprite>(null);
   const beamRefs = useRef<Array<ThreeMesh | null>>([]);
+  const ghostRefs = useRef<Array<ThreeSprite | null>>([]);
 
   const glowTexture = useMemo(() => makeGlowTexture(), []);
+  const starburstTexture = useMemo(() => makeStarburstTexture(), []);
   const beamTexture = useMemo(() => makeBeamTexture(), []);
+  const ringTexture = useMemo(() => makeRingTexture(), []);
+  const discTexture = useMemo(() => makeDiscTexture(), []);
 
   useEffect(
     () => () => {
       glowTexture.dispose();
+      starburstTexture.dispose();
       beamTexture.dispose();
+      ringTexture.dispose();
+      discTexture.dispose();
     },
-    [glowTexture, beamTexture],
+    [glowTexture, starburstTexture, beamTexture, ringTexture, discTexture],
   );
 
   useFrame((state) => {
@@ -410,12 +571,31 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
       glowMaterial.opacity = visibility * flicker * 0.9;
     }
 
+    if (starburstRef.current) {
+      const starMaterial = starburstRef.current.material as unknown as THREE.SpriteMaterial;
+      starMaterial.opacity = visibility * flicker;
+      // Rotação bem lenta e contínua — um flare de verdade não gira, mas
+      // uma leve rotação aqui ajuda a disfarçar que é sempre a MESMA
+      // textura estática, sem custar quase nada.
+      starburstRef.current.material.rotation = state.clock.elapsedTime * 0.03;
+    }
+
     beamRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
       const beam = SUN_BEAMS[i];
       if (!beam) return;
       const material = mesh.material as unknown as THREE.MeshBasicMaterial;
       material.opacity = visibility * flicker * beam.baseOpacity;
+    });
+
+    // Ghosts cintilam mais discreto que o núcleo — só o essencial pra dar
+    // vida, sem competir com a cintilação principal do sol.
+    ghostRefs.current.forEach((sprite, i) => {
+      if (!sprite) return;
+      const ghost = LENS_GHOSTS[i];
+      if (!ghost) return;
+      const material = sprite.material as unknown as THREE.SpriteMaterial;
+      material.opacity = visibility * (0.85 + flicker * 0.15) * ghost.baseOpacity;
     });
   });
 
@@ -428,6 +608,15 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
           depthWrite={false}
           blending={THREE.AdditiveBlending}
           opacity={0.9}
+        />
+      </sprite>
+      <sprite ref={starburstRef} scale={[4.6, 4.6, 1]}>
+        <spriteMaterial
+          map={starburstTexture}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          opacity={0.85}
         />
       </sprite>
       {SUN_BEAMS.map((beam, i) => (
@@ -447,6 +636,25 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
             opacity={beam.baseOpacity}
           />
         </mesh>
+      ))}
+      {LENS_GHOSTS.map((ghost, i) => (
+        <sprite
+          key={i}
+          ref={(el) => {
+            ghostRefs.current[i] = el;
+          }}
+          position={ghost.position}
+          scale={[ghost.scale, ghost.scale, 1]}
+        >
+          <spriteMaterial
+            map={ghost.type === "ring" ? ringTexture : discTexture}
+            color={ghost.color}
+            transparent
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            opacity={ghost.baseOpacity}
+          />
+        </sprite>
       ))}
     </group>
   );
@@ -509,7 +717,6 @@ export interface HeroSceneProps {
 
 export function HeroScene({ progressRef }: HeroSceneProps) {
   const [status, setStatus] = useState<"checking" | "webgl" | "fallback">("checking");
-  const [isPageVisible, setIsPageVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const fallbackProgressRef = useRef(0);
   const resolvedProgressRef = progressRef ?? fallbackProgressRef;
@@ -518,35 +725,26 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
     setStatus(supportsWebGL() ? "webgl" : "fallback");
   }, []);
 
-  // BUG real encontrado nesta revisão (era a causa do "as pétalas sumiram" e
-  // "o raio de sol não faz nada" que se repetiu em duas rodadas de correção
-  // que só mexiam na aparência, não no loop de render): a versão anterior
-  // pausava `frameloop` (`"never"`) com base num `IntersectionObserver`
-  // observando se o hero "estava perto da viewport". Só que esse elemento
-  // observado vive dentro de uma `<section>` `position: sticky` dentro de
-  // um trilho de `300vh` (ver HeroSection.tsx) — testado ao vivo (Chrome,
-  // via automação), o PRIMEIRO callback do observer, nessa combinação de
-  // `sticky` + trilho gigante, disparava com `isIntersecting: false` mesmo
-  // com o hero ocupando a tela inteira, e como nada mais reavalia isso
-  // enquanto o usuário não rola pra FORA do hero (ele fica pinado ali o
-  // tempo todo), o `frameloop` ficava travado em `"never"` pra sempre —
-  // literalmente nenhum frame desenhado, daí pétalas e raio de sol
-  // simplesmente não apareciam nunca, em qualquer rolagem dentro do hero.
-  //
-  // Troca por `document.visibilitychange` (Page Visibility API nativa do
-  // navegador, sem depender de geometria/layout de elemento nenhum): só
-  // pausa quando a ABA inteira fica em segundo plano de verdade (troca de
-  // app, minimizado) — continua economizando bateria depois que o casal sai
-  // do site, sem o risco de "achar" que o hero não está visível estando ele
-  // ocupando a tela inteira.
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const handleVisibilityChange = () => setIsPageVisible(document.visibilityState === "visible");
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    handleVisibilityChange();
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []);
-
+  // HISTÓRICO (pra quem for mexer aqui depois): esta cena já teve duas
+  // versões de "pausa inteligente" do `frameloop` do R3F pra economizar
+  // bateria quando o hero não estava em uso — primeiro via
+  // `IntersectionObserver` (suspeito de travar em `"never"` pra sempre
+  // quando combinado com o `position: sticky` do hero, ver histórico do
+  // git), depois via `document.visibilitychange`. As duas foram removidas:
+  // eu não consegui confirmar com certeza absoluta qual delas (se alguma)
+  // era a causa raiz do "pétalas e raio de sol simplesmente não aparecem"
+  // relatado repetidas vezes, porque o ambiente onde eu testo essas coisas
+  // (navegador automatizado) tem uma limitação própria que me impede de
+  // simular com confiança uma aba "de verdade em primeiro plano" — o
+  // `frameloop` condicional é exatamente o tipo de lógica que essa
+  // limitação impede de validar direito. Em vez de arriscar uma TERCEIRA
+  // hipótese não testada, a cena agora roda sempre (`frameloop="always"`,
+  // que é o padrão do R3F) — sem nenhuma pausa condicionada a
+  // observer/visibilidade. Custo: um pouco mais de bateria depois que a
+  // pessoa já rolou passado o hero (a cena decorativa continua desenhando
+  // fora de tela). Ganho: elimina de vez qualquer bug nessa lógica de
+  // pausa como possível causa da cena não aparecer — o que importa mais
+  // aqui é a cena realmente aparecer sempre.
   if (status !== "webgl") {
     return <DecorativeFallback />;
   }
@@ -559,7 +757,6 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
           camera={{ position: [0, 0, 6], fov: 50 }}
           gl={{ antialias: false, alpha: true }}
           onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-          frameloop={isPageVisible ? "always" : "never"}
         >
           <ambientLight intensity={0.6} />
           <SunRays progressRef={resolvedProgressRef} />
