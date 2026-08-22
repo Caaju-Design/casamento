@@ -4,8 +4,23 @@
 
 html {
   scroll-behavior: smooth;
+  /*
+   * Sem isso, no iOS Safari (e em alguns Android), puxar a página pra baixo
+   * no topo — ou até só o "assentamento" do scroll ao carregar — abre uma
+   * fresta de "borracha" (rubber-band/overscroll) ACIMA do topo real do
+   * documento, e essa fresta mostra o `background-color` do body por
+   * baixo (o creme do site) por cima do vídeo, que é `position: sticky` e
+   * não cobre essa área — lia exatamente como "uma tarja creme que nunca
+   * sai da tela" mesmo com o layout do AnchorNav já corrigido (o AnchorNav
+   * nunca foi a causa raiz dessa segunda aparição da tarja; essa aqui é o
+   * próprio comportamento elástico do navegador, não um elemento nosso).
+   * `overscroll-behavior-y: none` desliga esse efeito elástico no
+   * documento inteiro.
+   */
+  overscroll-behavior-y: none;
 }
 
 body {
   background-color: theme("colors.page");
+  overscroll-behavior-y: none;
 }
