@@ -31,7 +31,16 @@ import { designTokens } from "@/lib/design-system/tokens";
  * brigar com o conteúdo que aparece por cima dela.
  */
 
-const PARTICLE_COUNT = 180;
+// Baixado de 180 pra 110: depois de ligar o `frameloop` sempre ativo (pra
+// corrigir o bug das pétalas somem, ver histórico do git), a cena passou a
+// competir de verdade por tempo de CPU/thread principal com o seek do
+// vídeo no mobile — reportado como o vídeo voltando a travar no fim da
+// rolagem, que já tinha sido resolvido antes. Menos partículas simuladas
+// por frame (a física de cada uma roda sempre, mesmo fora do auge visual)
+// é o jeito mais direto de sobrar mais fôlego pro vídeo sem reintroduzir
+// nenhuma lógica de pausa condicionada (essa é literalmente a causa do
+// bug anterior).
+const PARTICLE_COUNT = 110;
 
 // Pétalas de glicínia enviadas pelo casal (fotos recortadas, já com canal
 // alpha — não são as fotos de banco de imagem com marca d'água usadas só
@@ -465,7 +474,8 @@ interface SunBeamSpec {
   baseOpacity: number;
 }
 
-const SUN_BEAMS: SunBeamSpec[] = [-0.55, -0.3, -0.05, 0.2, 0.45].map((angle) => ({
+// Baixado de 5 pra 4 leques (menos um plano transparente pra compor).
+const SUN_BEAMS: SunBeamSpec[] = [-0.5, -0.15, 0.15, 0.45].map((angle) => ({
   angle,
   baseOpacity: 0.5 - Math.abs(angle) * 0.35,
 }));
@@ -498,43 +508,81 @@ interface LensGhostSpec {
 // variando entre quente (laranja/vermelho, herdando a cor do sol) e fria
 // (azul/verde/roxo, que é como prismas de lente de verdade dispersam a
 // luz) — trilhando a partir do núcleo em direção ao centro da cena.
+// Baixado de 7 pra 5 ghosts (mesma lógica do `PARTICLE_COUNT` acima:
+// menos objetos transparentes com blend aditivo empilhados é menos
+// trabalho de composição pra GPU do celular) — manteve a variedade de
+// tamanho/tipo/cor pedida, só cortou os dois mais fracos/redundantes da
+// trilha.
 const LENS_GHOSTS: LensGhostSpec[] = [
   { position: [0.75, -0.62, 0.15], scale: 0.35, baseOpacity: 0.5, type: "disc", color: "#ffb37a" },
   { position: [1.3, -1.08, 0.3], scale: 1.15, baseOpacity: 0.35, type: "ring", color: "#ff6a4d" },
-  { position: [1.85, -1.55, 0.42], scale: 0.5, baseOpacity: 0.45, type: "disc", color: "#8fd8c8" },
   { position: [2.3, -1.9, 0.55], scale: 0.22, baseOpacity: 0.55, type: "disc", color: "#ffe08a" },
   { position: [2.85, -2.35, 0.7], scale: 1.6, baseOpacity: 0.22, type: "ring", color: "#7a8fe0" },
-  { position: [3.15, -2.6, 0.8], scale: 0.85, baseOpacity: 0.3, type: "disc", color: "#c98fe0" },
   { position: [3.55, -2.92, 0.9], scale: 0.4, baseOpacity: 0.4, type: "ring", color: "#ff9c6a" },
 ];
 
 // Profundidade FIXA do grupo do sol (eixo z) — só a posição x/y é
-// recalculada por frame (ver `SUN_SCREEN_FX`/`SUN_SCREEN_FY` abaixo).
+// recalculada por frame (ver `sunScreenFraction` abaixo).
 const SUN_GROUP_DEPTH = -2;
 
-// Onde o sol aparece no VÍDEO, como fração da tela (0 a 1: `fx` esquerda→
-// direita, `fy` topo→baixo) — não uma coordenada 3D fixa. Calibrado pra
-// bater com o sol que já aparece no vídeo do hero (canto superior-esquerdo
-// da árvore). Uma coordenada 3D fixa (a versão anterior) só fica alinhada
-// no tamanho de tela em que foi calibrada: o vídeo usa `object-cover`
-// (corta as bordas de forma diferente dependendo da proporção da tela) e a
-// câmera do three.js reajusta o próprio campo de visão pela proporção do
-// canvas — as duas coisas mudam com a tela, então um x/y fixo desalinha
-// nitidamente entre desktop e mobile (foi exatamente o "alinhado no
-// desktop, torto no mobile" relatado). Guardando como FRAÇÃO da tela e
-// recalculando a posição 3D a cada frame (ver `useFrame` abaixo,
-// `screenFractionToWorld`) o efeito acompanha esse recorte em qualquer
-// tamanho de tela.
-const SUN_SCREEN_FX = 0.29;
-const SUN_SCREEN_FY = 0.15;
+// Onde o sol aparece dentro do QUADRO NATIVO do vídeo (0 a 1, não é
+// fração de tela) — medido de verdade extraindo um frame do
+// `banner-hero.mp4` e achando o centro de massa dos pixels mais claros
+// (`ffmpeg` + `PIL`, top 0.5% de brilho), não chutado a olho numa captura
+// de tela já cortada. `VIDEO_NATIVE_ASPECT` é a proporção original do
+// vídeo (1920×1080 — a versão mobile de 854×480 é a mesma proporção,
+// só reescalada).
+const VIDEO_SUN_U = 0.36;
+const VIDEO_SUN_V = 0.13;
+const VIDEO_NATIVE_ASPECT = 1920 / 1080;
+
+/**
+ * Traduz um ponto do quadro NATIVO do vídeo (`u`,`v`, 0 a 1) pra fração de
+ * TELA (0 a 1), levando em conta como `object-cover` corta o vídeo pra
+ * caber num container de proporção diferente da nativa.
+ *
+ * A primeira tentativa (fração de tela fixa, calibrada só olhando uma
+ * captura no desktop) desalinhava feio no mobile — foi reportado
+ * literalmente assim: "a lens flare está posicionada errada" depois de eu
+ * ter "consertado" com uma fração fixa. O motivo: `object-cover` NÃO
+ * preserva a fração de tela de um ponto do vídeo entre proporções
+ * diferentes — ele escala o vídeo pra cobrir o container inteiro e corta
+ * o excesso IGUALMENTE dos dois lados do eixo que sobra. Se o container é
+ * mais largo que o vídeo (`containerAspect >= videoAspect`, ex.: desktop
+ * bem panorâmico), o corte é em cima/embaixo; se é mais estreito (mobile
+ * retrato, `containerAspect < videoAspect`), o corte é dos lados — e como
+ * o sol está longe do centro horizontal do quadro (u=0.36), um corte
+ * lateral agressivo desloca MUITO a posição dele na tela, exatamente o
+ * "errado no mobile" relatado. Essa função reproduz a matemática real do
+ * `object-cover` pra achar a fração de tela correta em qualquer proporção.
+ */
+function objectCoverVideoPointToScreenFraction(
+  u: number,
+  v: number,
+  videoAspect: number,
+  containerAspect: number,
+): { fx: number; fy: number } {
+  if (containerAspect >= videoAspect) {
+    // Vídeo escalado pra cobrir a LARGURA do container — sem corte
+    // horizontal (u mapeia direto), corte em cima/embaixo.
+    const visibleVFraction = videoAspect / containerAspect;
+    const vCropStart = (1 - visibleVFraction) / 2;
+    return { fx: u, fy: (v - vCropStart) / visibleVFraction };
+  }
+  // Vídeo escalado pra cobrir a ALTURA do container — sem corte vertical
+  // (v mapeia direto), corte dos lados.
+  const visibleUFraction = containerAspect / videoAspect;
+  const uCropStart = (1 - visibleUFraction) / 2;
+  return { fx: (u - uCropStart) / visibleUFraction, fy: v };
+}
 
 /**
  * "Raio de sol" sem post-processing: sprite de brilho no núcleo + estrela
  * de pontas espetadas (`makeStarburstTexture`) + alguns planos alongados
  * em leque + trilha de ghosts (anéis/discos coloridos) — tudo textura
  * gerada em canvas 2D, blend aditivo, custa perto de nada pra GPU.
- * Posição (x/y) recalculada por frame pra acompanhar o sol de verdade do
- * vídeo em qualquer tamanho de tela — ver `SUN_SCREEN_FX`/`SUN_SCREEN_FY`.
+ * Posição (x/y) calculada pra acompanhar o sol de verdade do vídeo em
+ * qualquer tamanho de tela — ver `objectCoverVideoPointToScreenFraction`.
  */
 function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
   const groupRef = useRef<ThreeGroup>(null);
@@ -560,22 +608,45 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
     [glowTexture, starburstTexture, beamTexture, ringTexture, discTexture],
   );
 
+  // Posição x/y calculada (cache) — só recalcula de verdade quando o
+  // tamanho do canvas muda (ver `useEffect` abaixo), não a cada frame.
+  // Depois do relato de que a tela ficou travando no fim do vídeo no
+  // mobile: fazer essa trigonometria (mesmo sendo barata) 60x por segundo
+  // pra sempre, junto com o resto da cena, é trabalho puro sem
+  // necessidade — a posição só muda quando a tela muda de tamanho.
+  const sunScreenPosition = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const recompute = () => {
+      const containerAspect = window.innerWidth / window.innerHeight;
+      const { fx, fy } = objectCoverVideoPointToScreenFraction(
+        VIDEO_SUN_U,
+        VIDEO_SUN_V,
+        VIDEO_NATIVE_ASPECT,
+        containerAspect,
+      );
+      const distanceToGroup = 6 - SUN_GROUP_DEPTH; // camera.position.z (ver <Canvas camera={{ position: [0, 0, 6] }}>) menos a profundidade do grupo
+      const verticalFovRad = (50 * Math.PI) / 180; // mesmo fov do <Canvas camera={{ fov: 50 }}>
+      const visibleHeight = 2 * Math.tan(verticalFovRad / 2) * distanceToGroup;
+      const visibleWidth = visibleHeight * containerAspect;
+      sunScreenPosition.current = {
+        x: (fx - 0.5) * visibleWidth,
+        y: (0.5 - fy) * visibleHeight,
+      };
+    };
+    recompute();
+    window.addEventListener("resize", recompute);
+    return () => window.removeEventListener("resize", recompute);
+  }, []);
+
   useFrame((state) => {
     const group = groupRef.current;
     if (!group) return;
 
-    // Recalcula x/y a partir da fração de tela (ver comentário de
-    // `SUN_SCREEN_FX`/`SUN_SCREEN_FY`) — acompanha resize e diferença de
-    // proporção de tela sem precisar de listener nenhum, já que roda todo
-    // frame (custo irrelevante: só trigonometria simples).
-    const cam = state.camera as THREE.PerspectiveCamera;
-    const distanceToGroup = cam.position.z - SUN_GROUP_DEPTH;
-    const verticalFovRad = (cam.fov * Math.PI) / 180;
-    const visibleHeight = 2 * Math.tan(verticalFovRad / 2) * distanceToGroup;
-    const visibleWidth = visibleHeight * (state.size.width / state.size.height);
     group.position.set(
-      (SUN_SCREEN_FX - 0.5) * visibleWidth,
-      (0.5 - SUN_SCREEN_FY) * visibleHeight,
+      sunScreenPosition.current.x,
+      sunScreenPosition.current.y,
       SUN_GROUP_DEPTH,
     );
 
