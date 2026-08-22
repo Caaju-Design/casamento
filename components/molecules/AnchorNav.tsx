@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Icon } from "@/components/atoms/Icon";
 
 export interface AnchorNavItem {
@@ -12,12 +12,29 @@ export interface AnchorNavProps {
   items: AnchorNavItem[];
 }
 
-/** Molecule `AnchorNav` (menu de âncoras) — topo da página one-page. */
+/**
+ * Molecule `AnchorNav` (menu de âncoras) — topo da página one-page.
+ *
+ * Quando renderizado logo acima de `HeroSection` (ver `HomePageTemplate`),
+ * fica invisível e não-clicável durante toda a rolagem do vídeo do hero,
+ * aparecendo só no fim dele — lendo `--hero-reveal` /
+ * `--hero-reveal-pointer-events`, que `HeroSection` escreve em
+ * `document.documentElement` (por herança de CSS, funciona mesmo os dois
+ * sendo irmãos no DOM, não pai/filho). Os valores de fallback (`1` / `auto`)
+ * mantêm o menu sempre visível e clicável em qualquer página sem hero acima
+ * dele (ex.: `/convite/[token]`), onde essas variáveis nunca são setadas.
+ */
 export function AnchorNav({ items }: AnchorNavProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-30 flex items-center justify-between bg-page/95 px-6 py-4 backdrop-blur">
+    <nav
+      className="sticky top-0 z-30 flex items-center justify-between bg-page/95 px-6 py-4 backdrop-blur transition-opacity duration-300"
+      style={{
+        opacity: "var(--hero-reveal, 1)",
+        pointerEvents: "var(--hero-reveal-pointer-events, auto)" as CSSProperties["pointerEvents"],
+      }}
+    >
       <a href="#topo" className="font-display text-400 text-text-primary">
         Gabriela &amp; Emanuel
       </a>

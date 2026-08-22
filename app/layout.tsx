@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 /**
  * Layout raiz — só um visual (claro, estilo Bridgerton/Regência), sem
  * alternância claro/escuro (ver docs/architecture/adr/0001-origem-design-system.md).
- * As fontes (Cormorant Garamond / Lora / Pinyon Script) espelham
+ * As fontes (Cormorant Garamond / Lora / Fleur De Leah) espelham
  * docs/design-system/tokens/primitivos.tokens.json (fontFamily.display/body/script).
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -25,13 +25,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           página; aqui o layout já é global.
           Ver https://nextjs.org/docs/app/getting-started/fonts#google-fonts.
 
-          Pinyon Script entrou pra dar a assinatura caligráfica dos nomes no
+          Fleur De Leah entrou pra dar a assinatura caligráfica dos nomes no
           overlay do hero (ver components/organisms/HeroSection.tsx) —
           mapeada em fontFamily.script (docs/design-system/tokens/primitivos.tokens.json).
         */}
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Fleur+De+Leah&display=swap"
           rel="stylesheet"
         />
       </head>

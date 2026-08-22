@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, type CSSProperties, type RefObject } from "react";
+import { useLayoutEffect, useRef, type CSSProperties, type RefObject } from "react";
 import { Heading } from "@/components/atoms/Heading";
 import { Text } from "@/components/atoms/Text";
 
@@ -27,20 +27,23 @@ const SCROLL_TRACK_VH = 300;
 
 /**
  * Fração do progresso de rolagem (0 a 1) em que a caligrafia de entrada
- * termina de sumir e o bloco de conteúdo padrão termina de aparecer — os
- * dois lêem a mesma `--hero-progress` setada por `useScrollScrubVideo` e
- * fazem o crossfade em CSS puro (`clamp()`), sem re-render do React a cada
- * frame de scroll.
+ * termina de sumir — lê `--hero-progress` (setada em `document.documentElement`
+ * por `useScrollScrubVideo`) e faz o próprio fade em CSS puro (`clamp()`),
+ * sem re-render do React a cada frame de scroll. Ao contrário do bloco de
+ * conteúdo padrão (ver `--hero-reveal` abaixo), a caligrafia só tem essa
+ * janela de saída — ela não volta a aparecer depois.
  */
 const CALLIGRAPHY_FADE_END = 0.12;
 
 /**
  * Segundo do vídeo (não fração de progresso — segundo de verdade, porque é
  * assim que o casal pensa nisso: "a partir do 8º segundo") a partir do qual
- * o hero inteiro (vídeo, cena three.js, texto) começa a dissolver em
- * direção ao resto do site, terminando exatamente no último frame do
- * vídeo. Calculado contra `video.duration` em tempo real, então continua
- * correto se um dia o vídeo do hero for trocado por um de outra duração.
+ * a camada do vídeo (vídeo + scrim + cena three.js) começa a dissolver,
+ * revelando o bloco de conteúdo padrão do site (título, data, menu de
+ * âncoras) por trás — os dois lados dessa dissolução terminam exatamente no
+ * último frame do vídeo. Calculado contra `video.duration` em tempo real,
+ * então continua correto se um dia o vídeo do hero for trocado por um de
+ * outra duração.
  */
 const VIDEO_FADE_START_SECONDS = 8;
 
@@ -51,19 +54,33 @@ const VIDEO_FADE_START_SECONDS = 8;
  * carregamento (progress = 0) ele fica parado no primeiro frame até o
  * usuário começar a rolar.
  *
- * Retorna o próprio progresso (0 a 1) através de uma CSS custom property
- * (`--hero-progress`) no elemento do trilho, pra outros elementos (overlay
- * caligráfico, fade final) lerem sem re-render do React a cada frame de
- * scroll.
+ * Publica o estado de rolagem em CSS custom properties no
+ * `document.documentElement` (não num elemento local do hero!) — assim tanto
+ * o conteúdo interno do próprio `HeroSection` quanto o `AnchorNav`, que é
+ * renderizado como *irmão* dele em `HomePageTemplate` (não descendente, então
+ * não herdaria de uma custom property só do trilho), conseguem ler o mesmo
+ * estado por herança de CSS, sem precisar de nenhum React context:
+ *
+ *  - `--hero-progress`: 0→1, progresso bruto de rolagem pelo trilho inteiro.
+ *  - `--hero-video-opacity`: 1 durante toda a rolagem principal, dissolvendo
+ *    pra 0 só na janela final (8º segundo → fim do vídeo).
+ *  - `--hero-reveal`: o inverso do anterior (0→1) — o bloco de conteúdo
+ *    padrão e o menu de âncoras usam essa variável, então ficam invisíveis
+ *    durante toda a rolagem do vídeo e só aparecem, em sincronia, na mesma
+ *    janela final em que o vídeo se dissolve.
+ *  - `--hero-reveal-pointer-events`: "none" até o reveal estar quase
+ *    completo, pra menu/links não ficarem clicáveis (nem focáveis por tab)
+ *    enquanto ainda estão (quase) transparentes.
  */
 function useScrollScrubVideo(
   trackRef: RefObject<HTMLDivElement | null>,
   videoRef: RefObject<HTMLVideoElement | null>,
   progressRef: RefObject<number>,
 ) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const video = videoRef.current;
     const track = trackRef.current;
+    const root = document.documentElement;
     if (!video || !track) return;
 
     let duration = 0;
@@ -75,7 +92,7 @@ function useScrollScrubVideo(
       const scrollableDistance = rect.height - window.innerHeight;
       const progress = scrollableDistance > 0 ? Math.min(1, Math.max(0, -rect.top / scrollableDistance)) : 0;
 
-      track.style.setProperty("--hero-progress", progress.toString());
+      root.style.setProperty("--hero-progress", progress.toString());
       // Mesmo valor, mas como número puro numa ref — a cena three.js
       // (HeroScene) lê isso a cada frame do próprio loop de render dela,
       // sem precisar reler CSS nem re-renderizar o React.
@@ -89,18 +106,22 @@ function useScrollScrubVideo(
           video.currentTime = targetTime;
         }
 
-        // Dissolve final: 1 do início do 8º segundo até 0 no último frame.
-        // Antes do 8º segundo o hero fica 100% opaco — só nesse trecho
-        // final é que ele começa a sumir, revelando o resto do site por
-        // trás (a section é `position: sticky`; ao terminar de dissolver,
-        // o scroll já passou do trilho dela e a próxima seção sobe atrás).
+        // Dissolve final: vídeo em opacidade 1 até o início do 8º segundo,
+        // depois cai pra 0 no último frame — só nesse trecho final é que a
+        // camada do vídeo começa a sumir, revelando o bloco de conteúdo
+        // padrão (título, data, menu) que sobe por trás em sincronia
+        // (`--hero-reveal` é sempre `1 - videoOpacity`).
         const fadeWindow = Math.max(0.001, duration - VIDEO_FADE_START_SECONDS);
-        const fadeOpacity = targetTime <= VIDEO_FADE_START_SECONDS ? 1 : Math.max(0, 1 - (targetTime - VIDEO_FADE_START_SECONDS) / fadeWindow);
-        track.style.setProperty("--hero-fade-opacity", fadeOpacity.toString());
-        // Quase invisível (opacity < 5%) também não deve mais capturar
-        // clique — sem isso, os links do menu ficariam "fantasmas" por
-        // cima da próxima seção bem no fim da dissolução.
-        track.style.setProperty("--hero-pointer-events", fadeOpacity < 0.05 ? "none" : "auto");
+        const videoOpacity =
+          targetTime <= VIDEO_FADE_START_SECONDS ? 1 : Math.max(0, 1 - (targetTime - VIDEO_FADE_START_SECONDS) / fadeWindow);
+        const reveal = 1 - videoOpacity;
+
+        root.style.setProperty("--hero-video-opacity", videoOpacity.toString());
+        root.style.setProperty("--hero-reveal", reveal.toString());
+        // Só fica clicável (e focável por tab) quando o reveal já está
+        // visualmente quase completo — antes disso os links do menu e do
+        // bloco de conteúdo ficariam "fantasmas" por cima do vídeo.
+        root.style.setProperty("--hero-reveal-pointer-events", reveal > 0.5 ? "auto" : "none");
       }
     };
 
@@ -127,6 +148,14 @@ function useScrollScrubVideo(
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
       if (rafId !== null) cancelAnimationFrame(rafId);
+      // Ao desmontar o hero (nunca acontece nesta página hoje, mas evita
+      // deixar `document.documentElement` com variáveis "presas" caso o
+      // componente algum dia passe a ser condicional), devolve o menu ao
+      // estado visível/clicável padrão.
+      root.style.removeProperty("--hero-progress");
+      root.style.removeProperty("--hero-video-opacity");
+      root.style.removeProperty("--hero-reveal");
+      root.style.removeProperty("--hero-reveal-pointer-events");
     };
   }, [trackRef, videoRef, progressRef]);
 }
@@ -144,38 +173,47 @@ export function HeroSection() {
       <section
         id="topo"
         className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-6 text-center"
-        style={{
-          opacity: "var(--hero-fade-opacity, 1)",
-          pointerEvents: "var(--hero-pointer-events, auto)" as CSSProperties["pointerEvents"],
-        }}
       >
-        <video
-          ref={videoRef}
-          className="absolute inset-0 -z-20 h-full w-full object-cover"
-          muted
-          playsInline
-          preload="auto"
-          poster="/hero/banner-hero-poster.jpg"
-          aria-hidden="true"
-        >
-          <source src="/hero/banner-hero.webm" type="video/webm" />
-          <source src="/hero/banner-hero.mp4" type="video/mp4" />
-        </video>
         {/*
-          Scrim gradiente (mais escuro no centro/base, onde fica o texto;
-          quase transparente nas bordas) — garante contraste em qualquer
-          frame do vídeo sem esconder o vídeo inteiro atrás de um véu chapado.
+          Camada do vídeo — vídeo + scrim + cena three.js viajam juntos:
+          opacidade 1 durante toda a rolagem principal, dissolvendo só na
+          janela final (8º segundo → fim). `pointer-events: none` porque é
+          puramente decorativa, nunca deve capturar clique nem enquanto
+          visível.
         */}
         <div
-          className="absolute inset-0 -z-10"
-          style={{
-            background:
-              "radial-gradient(ellipse 70% 60% at 50% 65%, rgba(34,27,25,0.55) 0%, rgba(34,27,25,0.25) 45%, rgba(34,27,25,0.05) 75%)",
-          }}
+          className="absolute inset-0 -z-20"
+          style={{ opacity: "var(--hero-video-opacity, 1)", pointerEvents: "none" }}
           aria-hidden="true"
-        />
+        >
+          <video
+            ref={videoRef}
+            className="absolute inset-0 h-full w-full object-cover"
+            muted
+            playsInline
+            preload="auto"
+            poster="/hero/banner-hero-poster.jpg"
+            aria-hidden="true"
+          >
+            <source src="/hero/banner-hero.webm" type="video/webm" />
+            <source src="/hero/banner-hero.mp4" type="video/mp4" />
+          </video>
+          {/*
+            Scrim gradiente (mais escuro no centro/base, onde fica o texto;
+            quase transparente nas bordas) — garante contraste em qualquer
+            frame do vídeo sem esconder o vídeo inteiro atrás de um véu chapado.
+          */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 70% 60% at 50% 65%, rgba(34,27,25,0.55) 0%, rgba(34,27,25,0.25) 45%, rgba(34,27,25,0.05) 75%)",
+            }}
+            aria-hidden="true"
+          />
 
-        <HeroScene progressRef={progressRef} />
+          <HeroScene progressRef={progressRef} />
+        </div>
 
         {/*
           Caligrafia de entrada — só existe no primeiro momento (progress
@@ -198,10 +236,12 @@ export function HeroSection() {
         </p>
 
         {/*
-          Bloco de conteúdo padrão — some no primeiro frame (junto com a
-          caligrafia acima) e some *dentro* (fade-in) assim que a rolagem
-          começa, no mesmo intervalo (`CALLIGRAPHY_FADE_END`) em que a
-          caligrafia se apaga: um crossfade, não uma sobreposição das duas.
+          Bloco de conteúdo padrão — fica invisível durante toda a rolagem
+          principal do vídeo e só aparece (fade-in) na janela final (8º
+          segundo → fim), em sincronia exata com a dissolução da camada do
+          vídeo acima (`--hero-reveal` é sempre `1 - videoOpacity`).
+          `pointerEvents` some junto: só fica clicável quando o reveal já
+          está visualmente quase completo.
 
           `style={{ color }}` em vez de uma classe Tailwind `text-white` nos
           filhos: Text/Heading já aplicam sua própria classe de cor por
@@ -212,7 +252,10 @@ export function HeroSection() {
         */}
         <div
           className="relative z-10 flex max-w-2xl flex-col items-center gap-field-gap"
-          style={{ opacity: `clamp(0, calc(var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END}), 1)` }}
+          style={{
+            opacity: "var(--hero-reveal, 0)",
+            pointerEvents: "var(--hero-reveal-pointer-events, none)" as CSSProperties["pointerEvents"],
+          }}
         >
           {/*
             `textShadow` em todo o bloco, não só na caligrafia: o vídeo se

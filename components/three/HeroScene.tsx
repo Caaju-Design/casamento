@@ -72,7 +72,16 @@ function makeGlowTexture(): THREE.Texture {
   return texture;
 }
 
-/** Gera em canvas 2D um feixe de luz (elipse alongada, clara na "fonte" e sumindo nas bordas) — cada raio do sol é um plano com essa textura. */
+/**
+ * Gera em canvas 2D um feixe de luz — claro na "fonte" (topo) e sumindo
+ * gradualmente até o fim do comprimento, com as bordas laterais também
+ * esmaecidas (senão o plano retangular aparece com corte reto nos lados,
+ * lendo como um "raio quadrado" em vez de luz).
+ *
+ * Duas passadas: 1) gradiente vertical define o brilho ao longo do
+ * comprimento; 2) `destination-in` usa um gradiente radial horizontal como
+ * máscara de alpha, arredondando as bordas esquerda/direita.
+ */
 function makeBeamTexture(): THREE.Texture {
   const w = 128;
   const h = 512;
@@ -81,12 +90,52 @@ function makeBeamTexture(): THREE.Texture {
   canvas.height = h;
   const ctx = canvas.getContext("2d");
   if (ctx) {
-    const gradient = ctx.createRadialGradient(w / 2, h * 0.08, 0, w / 2, h * 0.08, h * 0.78);
-    gradient.addColorStop(0, "rgba(255,241,214,0.9)");
-    gradient.addColorStop(0.35, "rgba(255,224,150,0.4)");
-    gradient.addColorStop(1, "rgba(255,224,150,0)");
-    ctx.fillStyle = gradient;
+    const vertical = ctx.createLinearGradient(0, 0, 0, h);
+    vertical.addColorStop(0, "rgba(255,241,214,0.95)");
+    vertical.addColorStop(0.45, "rgba(255,224,150,0.45)");
+    vertical.addColorStop(1, "rgba(255,224,150,0)");
+    ctx.fillStyle = vertical;
     ctx.fillRect(0, 0, w, h);
+
+    ctx.globalCompositeOperation = "destination-in";
+    const horizontalMask = ctx.createRadialGradient(w / 2, 0, 0, w / 2, 0, w * 0.62);
+    horizontalMask.addColorStop(0, "rgba(0,0,0,1)");
+    horizontalMask.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = horizontalMask;
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalCompositeOperation = "source-over";
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Gera em canvas 2D uma pétala solta — não é uma foto (as referências que o
+ * casal mandou são banco de imagem com marca d'água, licenciadas, não dá
+ * pra usar), é uma forma oval suave, achatada com `ctx.scale`, em tom lilás
+ * com um realce claro no topo (mesma paleta das fotos de referência: lilás
+ * com um brilho branco-amarelado no miolo) — troca os "quadrados" das
+ * partículas por algo que já lê como pétala de glicínia caindo.
+ */
+function makePetalTexture(): THREE.Texture {
+  const size = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.translate(size / 2, size / 2);
+    ctx.scale(0.6, 1);
+    const gradient = ctx.createRadialGradient(0, -size * 0.12, 0, 0, 0, size / 2);
+    gradient.addColorStop(0, "rgba(255,250,240,0.95)");
+    gradient.addColorStop(0.3, "rgba(224,196,224,0.9)");
+    gradient.addColorStop(0.7, "rgba(178,140,190,0.6)");
+    gradient.addColorStop(1, "rgba(178,140,190,0)");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
+    ctx.fill();
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
@@ -107,6 +156,9 @@ function makeBeamTexture(): THREE.Texture {
  */
 function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
   const pointsRef = useRef<ThreePoints>(null);
+  const petalTexture = useMemo(() => makePetalTexture(), []);
+
+  useEffect(() => () => petalTexture.dispose(), [petalTexture]);
 
   const { positions, fallSpeed, swayPhase, swaySpeed } = useMemo(() => {
     const positions = new Float32Array(PARTICLE_COUNT * 3);
@@ -117,7 +169,9 @@ function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
       positions[i * 3] = (Math.random() - 0.5) * 12;
       positions[i * 3 + 1] = Math.random() * 10 - 3;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 6;
-      fallSpeed[i] = 0.35 + Math.random() * 0.45;
+      // Queda bem mais lenta que a v1 (0.35–0.8 lia como "chuva") — pétala
+      // de glicínia paira, não despenca.
+      fallSpeed[i] = 0.08 + Math.random() * 0.14;
       swayPhase[i] = Math.random() * Math.PI * 2;
       swaySpeed[i] = 0.25 + Math.random() * 0.5;
     }
@@ -181,12 +235,14 @@ function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.09}
+        map={petalTexture}
+        size={0.16}
         color={designTokens.color.blush300}
         transparent
-        opacity={0.9}
+        opacity={0.95}
         sizeAttenuation
         depthWrite={false}
+        alphaTest={0.02}
       />
     </points>
   );
