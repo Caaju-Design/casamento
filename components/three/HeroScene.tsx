@@ -136,24 +136,38 @@ function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
     const visibleRatio = 1 - thinning * (1 - PETAL_MIN_VISIBLE_RATIO);
     points.geometry.setDrawRange(0, Math.max(4, Math.round(PARTICLE_COUNT * visibleRatio)));
 
+    // `tsconfig.json` liga `noUncheckedIndexedAccess` — todo acesso por
+    // índice (array[i], attributes.position) volta tipado como "| undefined"
+    // pro TypeScript, mesmo quando a gente sabe (pelo laço `i < PARTICLE_COUNT`,
+    // sempre dentro do tamanho dos buffers) que nunca é. Guard explícito +
+    // `?? 0` de fallback deixam isso são pro compilador sem mudar o
+    // comportamento em runtime.
     const positionAttribute = points.geometry.attributes.position;
+    if (!positionAttribute) return;
     const array = positionAttribute.array as Float32Array;
     const time = state.clock.elapsedTime;
 
     for (let i = 0; i < PARTICLE_COUNT; i += 1) {
       const idx = i * 3;
+      const fall = fallSpeed[i] ?? 0;
+      const phase = swayPhase[i] ?? 0;
+      const sway = swaySpeed[i] ?? 0;
 
       // Gravidade — cada pétala cai numa velocidade própria.
-      array[idx + 1] -= fallSpeed[i] * delta;
+      const nextY = (array[idx + 1] ?? 0) - fall * delta;
       // Vento — deriva lateral senoidal, própria de cada pétala (não sincronizada).
-      array[idx] += Math.sin(time * swaySpeed[i] + swayPhase[i]) * 0.15 * delta;
-      array[idx + 2] += Math.cos(time * swaySpeed[i] * 0.7 + swayPhase[i]) * 0.1 * delta;
+      const nextX = (array[idx] ?? 0) + Math.sin(time * sway + phase) * 0.15 * delta;
+      const nextZ = (array[idx + 2] ?? 0) + Math.cos(time * sway * 0.7 + phase) * 0.1 * delta;
 
       // Reciclagem: quando sai da cena por baixo, volta pro topo.
-      if (array[idx + 1] < -4.5) {
+      if (nextY < -4.5) {
         array[idx + 1] = 4.5 + Math.random() * 2;
         array[idx] = (Math.random() - 0.5) * 12;
         array[idx + 2] = (Math.random() - 0.5) * 6;
+      } else {
+        array[idx + 1] = nextY;
+        array[idx] = nextX;
+        array[idx + 2] = nextZ;
       }
     }
     positionAttribute.needsUpdate = true;
@@ -224,8 +238,10 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
 
     beamRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
+      const beam = SUN_BEAMS[i];
+      if (!beam) return;
       const material = mesh.material as unknown as THREE.MeshBasicMaterial;
-      material.opacity = visibility * flicker * SUN_BEAMS[i].baseOpacity;
+      material.opacity = visibility * flicker * beam.baseOpacity;
     });
   });
 
@@ -343,7 +359,10 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
     // observer depois que a div aparecesse.
     const node = containerRef.current;
     if (!node || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver(([entry]) => setIsNearViewport(entry.isIntersecting), {
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setIsNearViewport(entry.isIntersecting);
+    }, {
       rootMargin: "200px 0px",
     });
     observer.observe(node);
