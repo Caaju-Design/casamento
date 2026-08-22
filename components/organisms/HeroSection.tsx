@@ -319,12 +319,13 @@ export function HeroSection() {
 
           Layout diferente por tamanho de tela, não um `flex-wrap` que
           quebra sozinho: no mobile (padrão, sem prefixo) é
-          `flex-col items-start` — "Gabriela" e "Emanuel" alinhados à
-          esquerda, com o "&" (menor, `self-center`) centralizado
-          horizontalmente entre os dois, tipo uma assinatura. A partir de
-          `sm:` vira `flex-row items-center justify-center` — os 3 numa
-          linha só, centralizados, "Gabriela & Emanuel" corrido (o texto
-          original).
+          `flex-col items-center text-center` — "Gabriela" e "Emanuel"
+          empilhados e centralizados horizontalmente (era `items-start
+          text-left`, ficava tudo grudado na margem esquerda — pedido
+          explícito pra centralizar), com o "&" (menor) entre os dois,
+          também centralizado, tipo uma assinatura. A partir de `sm:` vira
+          `flex-row items-center justify-center` — os 3 numa linha só,
+          centralizados, "Gabriela & Emanuel" corrido (o texto original).
 
           `sm:gap-10` (não mais `sm:gap-4`) no desktop: com a fonte
           script gigante (`clamp(..., 8rem)`) 1rem de respiro entre os
@@ -338,7 +339,7 @@ export function HeroSection() {
         */}
         <p
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-start justify-center gap-1 px-6 text-left font-script leading-none text-white sm:flex-row sm:items-center sm:justify-center sm:gap-10 sm:text-center"
+          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-1 px-6 text-center font-script leading-none text-white sm:flex-row sm:gap-10"
           style={{
             fontSize: "clamp(3.5rem, 12vw, 8rem)",
             textShadow: "0 2px 24px rgba(34,27,25,0.35)",

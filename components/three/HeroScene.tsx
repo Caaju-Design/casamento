@@ -508,13 +508,33 @@ const LENS_GHOSTS: LensGhostSpec[] = [
   { position: [3.55, -2.92, 0.9], scale: 0.4, baseOpacity: 0.4, type: "ring", color: "#ff9c6a" },
 ];
 
+// Profundidade FIXA do grupo do sol (eixo z) — só a posição x/y é
+// recalculada por frame (ver `SUN_SCREEN_FX`/`SUN_SCREEN_FY` abaixo).
+const SUN_GROUP_DEPTH = -2;
+
+// Onde o sol aparece no VÍDEO, como fração da tela (0 a 1: `fx` esquerda→
+// direita, `fy` topo→baixo) — não uma coordenada 3D fixa. Calibrado pra
+// bater com o sol que já aparece no vídeo do hero (canto superior-esquerdo
+// da árvore). Uma coordenada 3D fixa (a versão anterior) só fica alinhada
+// no tamanho de tela em que foi calibrada: o vídeo usa `object-cover`
+// (corta as bordas de forma diferente dependendo da proporção da tela) e a
+// câmera do three.js reajusta o próprio campo de visão pela proporção do
+// canvas — as duas coisas mudam com a tela, então um x/y fixo desalinha
+// nitidamente entre desktop e mobile (foi exatamente o "alinhado no
+// desktop, torto no mobile" relatado). Guardando como FRAÇÃO da tela e
+// recalculando a posição 3D a cada frame (ver `useFrame` abaixo,
+// `screenFractionToWorld`) o efeito acompanha esse recorte em qualquer
+// tamanho de tela.
+const SUN_SCREEN_FX = 0.29;
+const SUN_SCREEN_FY = 0.15;
+
 /**
  * "Raio de sol" sem post-processing: sprite de brilho no núcleo + estrela
  * de pontas espetadas (`makeStarburstTexture`) + alguns planos alongados
  * em leque + trilha de ghosts (anéis/discos coloridos) — tudo textura
  * gerada em canvas 2D, blend aditivo, custa perto de nada pra GPU.
- * Posicionado no canto superior-esquerdo pra ecoar o sol que já aparece
- * no próprio vídeo do hero por trás.
+ * Posição (x/y) recalculada por frame pra acompanhar o sol de verdade do
+ * vídeo em qualquer tamanho de tela — ver `SUN_SCREEN_FX`/`SUN_SCREEN_FY`.
  */
 function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
   const groupRef = useRef<ThreeGroup>(null);
@@ -543,6 +563,21 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
   useFrame((state) => {
     const group = groupRef.current;
     if (!group) return;
+
+    // Recalcula x/y a partir da fração de tela (ver comentário de
+    // `SUN_SCREEN_FX`/`SUN_SCREEN_FY`) — acompanha resize e diferença de
+    // proporção de tela sem precisar de listener nenhum, já que roda todo
+    // frame (custo irrelevante: só trigonometria simples).
+    const cam = state.camera as THREE.PerspectiveCamera;
+    const distanceToGroup = cam.position.z - SUN_GROUP_DEPTH;
+    const verticalFovRad = (cam.fov * Math.PI) / 180;
+    const visibleHeight = 2 * Math.tan(verticalFovRad / 2) * distanceToGroup;
+    const visibleWidth = visibleHeight * (state.size.width / state.size.height);
+    group.position.set(
+      (SUN_SCREEN_FX - 0.5) * visibleWidth,
+      (0.5 - SUN_SCREEN_FY) * visibleHeight,
+      SUN_GROUP_DEPTH,
+    );
 
     const progress = progressRef.current ?? 0;
     // Ease-out cúbico (`(1-t)³`) em vez de `smoothstep`: a velocidade de
@@ -574,10 +609,9 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
     if (starburstRef.current) {
       const starMaterial = starburstRef.current.material as unknown as THREE.SpriteMaterial;
       starMaterial.opacity = visibility * flicker;
-      // Rotação bem lenta e contínua — um flare de verdade não gira, mas
-      // uma leve rotação aqui ajuda a disfarçar que é sempre a MESMA
-      // textura estática, sem custar quase nada.
-      starburstRef.current.material.rotation = state.clock.elapsedTime * 0.03;
+      // Sem rotação de propósito (pedido explícito: "NÃO deixa ele
+      // girando") — um flare de verdade também não gira, então isso é o
+      // comportamento certo, não só uma simplificação.
     }
 
     beamRefs.current.forEach((mesh, i) => {
@@ -600,7 +634,8 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
   });
 
   return (
-    <group ref={groupRef} position={[-2.8, 2.5, -2]}>
+    {/* position inicial só é um placeholder — `useFrame` acima já sobrescreve todo frame */}
+    <group ref={groupRef} position={[0, 0, SUN_GROUP_DEPTH]}>
       <sprite ref={glowRef} scale={[3.4, 3.4, 1]}>
         <spriteMaterial
           map={glowTexture}
