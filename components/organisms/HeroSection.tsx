@@ -95,6 +95,64 @@ function useScrollScrubVideo(
     let duration = 0;
     let rafId: number | null = null;
 
+    // Guarda contra seeks sobrepostos — a causa mais provável do "trava
+    // mas a rolagem continua" relatado no mobile (iPhone/Brave): sem essa
+    // guarda, cada frame de scroll dispara `video.currentTime = X` na
+    // hora, mesmo que o seek anterior ainda não tenha terminado de
+    // decodificar. Em decoders mais lentos (celular) isso enfileira vários
+    // pedidos de seek mais rápido do que o vídeo consegue processar — a
+    // imagem fica presa no frame do PRIMEIRO seek da fila enquanto
+    // `--hero-progress` (e o resto da UI) já avançou muito além, e quando
+    // o decoder enfim libera, ele pula direto pro último pedido, lendo
+    // como "travou e depois deu um salto". A correção é nunca sobrepor:
+    // só disparar um novo `currentTime` depois que o evento `seeked`
+    // confirmar que o anterior terminou; se a rolagem mudou nesse meio
+    // tempo, guarda só o alvo mais recente (`pendingSeekTime`) e aplica
+    // ele assim que der, sem empilhar seeks intermediários.
+    let isSeeking = false;
+    let pendingSeekTime: number | null = null;
+    let seekWatchdogId: ReturnType<typeof setTimeout> | null = null;
+
+    const seekTo = (time: number) => {
+      if (isSeeking) {
+        pendingSeekTime = time;
+        return;
+      }
+      if (Math.abs(video.currentTime - time) <= 0.033) return;
+
+      isSeeking = true;
+      video.currentTime = time;
+
+      // Watchdog: em tese todo `currentTime` dispara `seeked` mais cedo ou
+      // mais tarde, mas navegadores têm bug (principalmente mobile) onde o
+      // evento às vezes não dispara — sem isso, `isSeeking` ficaria preso
+      // em `true` pra sempre e o vídeo pararia de responder ao scroll até
+      // um recarregamento de página.
+      if (seekWatchdogId !== null) clearTimeout(seekWatchdogId);
+      seekWatchdogId = setTimeout(() => {
+        isSeeking = false;
+        if (pendingSeekTime !== null) {
+          const next = pendingSeekTime;
+          pendingSeekTime = null;
+          seekTo(next);
+        }
+      }, 400);
+    };
+
+    const handleSeeked = () => {
+      isSeeking = false;
+      if (seekWatchdogId !== null) {
+        clearTimeout(seekWatchdogId);
+        seekWatchdogId = null;
+      }
+      if (pendingSeekTime !== null) {
+        const next = pendingSeekTime;
+        pendingSeekTime = null;
+        seekTo(next);
+      }
+    };
+    video.addEventListener("seeked", handleSeeked);
+
     const updateScrub = () => {
       rafId = null;
       const rect = track.getBoundingClientRect();
@@ -109,11 +167,7 @@ function useScrollScrubVideo(
 
       if (duration > 0) {
         const targetTime = progress * duration;
-        // Só re-seeka se a diferença for perceptível — evita brigar com o
-        // decoder do vídeo a cada pixel de scroll.
-        if (Math.abs(video.currentTime - targetTime) > 0.033) {
-          video.currentTime = targetTime;
-        }
+        seekTo(targetTime);
 
         // Dissolve final: vídeo em opacidade 1 até `VIDEO_FADE_START_SECONDS`,
         // depois cai pra 0 no último frame — só nesse trecho final é que a
@@ -154,9 +208,11 @@ function useScrollScrubVideo(
 
     return () => {
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      video.removeEventListener("seeked", handleSeeked);
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
       if (rafId !== null) cancelAnimationFrame(rafId);
+      if (seekWatchdogId !== null) clearTimeout(seekWatchdogId);
       // Ao desmontar o hero (nunca acontece nesta página hoje, mas evita
       // deixar `document.documentElement` com variáveis "presas" caso o
       // componente algum dia passe a ser condicional), devolve o menu ao
@@ -241,17 +297,48 @@ export function HeroSection() {
           no scroll 1:1, sem esperar um re-render do React. `pointer-events:
           none` porque é só assinatura decorativa — nunca deve capturar
           clique, nem depois de sumir.
+
+          "Gabriela" / coração / "Emanuel" como 3 itens flex (não um texto
+          corrido com `&amp;` no meio) — com `flex-wrap`, o próprio
+          navegador decide se cabem os 3 numa linha só (telas largas) ou se
+          quebra (mobile), do mesmo jeito que quebraria palavras num
+          parágrafo, sem precisar de breakpoint fixo: no mobile estreito
+          sobra só espaço pra um item por linha, então sai natural
+          "Gabriela" em cima, coração no meio, "Emanuel" embaixo — que foi
+          o pedido.
         */}
         <p
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-6 text-center font-script leading-none text-white"
+          className="pointer-events-none absolute inset-0 z-20 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-6 text-center font-script leading-none text-white"
           style={{
             fontSize: "clamp(3.5rem, 12vw, 8rem)",
             textShadow: "0 2px 24px rgba(34,27,25,0.35)",
             opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)`,
           }}
         >
-          Gabriela &amp; Emanuel
+          <span>Gabriela</span>
+          {/*
+            Coração vazado (só contorno, sem preenchimento) no lugar do
+            "&" — o interior transparente deixa o vídeo aparecer por
+            dentro do coração (é literalmente a ausência de fill, não uma
+            máscara ou recorte) e o "&" fica pequeno, centralizado por
+            cima, na mesma fonte script porém numa fração do tamanho dos
+            nomes ao redor.
+          */}
+          <span className="relative inline-flex shrink-0 items-center justify-center" style={{ width: "0.85em", height: "0.78em" }}>
+            <svg viewBox="0 0 32 29" className="absolute inset-0 h-full w-full" aria-hidden="true">
+              <path
+                d="M16 28.3C16 28.3 0 17.4 0 9.4 0 4.4 4 1 8 1c3.1 0 6 2 8 6 2-4 4.9-6 8-6 4 0 8 3.4 8 8.4 0 8-16 18.9-16 18.9Z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              />
+            </svg>
+            <span className="relative" style={{ fontSize: "0.42em" }}>
+              &amp;
+            </span>
+          </span>
+          <span>Emanuel</span>
         </p>
 
         {/*
