@@ -118,10 +118,10 @@ function useScrollScrubVideo(
         pendingSeekTime = time;
         return;
       }
-      // 0.08s (não 0.033s) — cada seek força o decoder a trabalhar; um
-      // limiar maior dispara bem menos seeks por segundo de scroll,
+      // 0.12s (não mais 0.08s) — cada seek força o decoder a trabalhar; um
+      // limiar maior dispara ainda menos seeks por segundo de scroll,
       // sobrando mais folga pro decoder de celular acompanhar.
-      if (Math.abs(video.currentTime - time) <= 0.08) return;
+      if (Math.abs(video.currentTime - time) <= 0.12) return;
 
       isSeeking = true;
       video.currentTime = time;
@@ -130,7 +130,10 @@ function useScrollScrubVideo(
       // mais tarde, mas navegadores têm bug (principalmente mobile) onde o
       // evento às vezes não dispara — sem isso, `isSeeking` ficaria preso
       // em `true` pra sempre e o vídeo pararia de responder ao scroll até
-      // um recarregamento de página.
+      // um recarregamento de página. Baixado de 400ms pra 180ms: era
+      // exatamente esse tempo de espera que lia como "trava" no relato do
+      // mobile — quando o `seeked` de fato não disparava, o vídeo ficava
+      // 400ms sem reagir a scroll nenhum antes do watchdog liberar de novo.
       if (seekWatchdogId !== null) clearTimeout(seekWatchdogId);
       seekWatchdogId = setTimeout(() => {
         isSeeking = false;
@@ -139,7 +142,7 @@ function useScrollScrubVideo(
           pendingSeekTime = null;
           seekTo(next);
         }
-      }, 400);
+      }, 180);
     };
 
     const handleSeeked = () => {
@@ -274,7 +277,9 @@ export function HeroSection() {
             aria-hidden="true"
           >
             {/*
-              Versão mais leve (1280px de largura, em vez de 1920px) pra
+              Versão bem mais leve (854px de largura, em vez de 1920px —
+              baixado de uma tentativa anterior de 1280px que ainda não foi
+              suficiente pra sumir com o travamento relatado no iPhone) pra
               telas estreitas — celular é o cenário mais sensível ao
               travamento no scroll-scrub, porque cada seek força o decoder
               a decodificar de novo, e um vídeo menor decodifica bem mais
@@ -315,14 +320,25 @@ export function HeroSection() {
           Layout diferente por tamanho de tela, não um `flex-wrap` que
           quebra sozinho: no mobile (padrão, sem prefixo) é
           `flex-col items-start` — "Gabriela" e "Emanuel" alinhados à
-          esquerda, com o "&" (menor, `self-end`) jogado pra direita entre
-          os dois, tipo uma assinatura. A partir de `sm:` vira
-          `flex-row items-center justify-center` — os 3 numa linha só,
-          centralizados, "Gabriela & Emanuel" corrido (o texto original).
+          esquerda, com o "&" (menor, `self-center`) centralizado
+          horizontalmente entre os dois, tipo uma assinatura. A partir de
+          `sm:` vira `flex-row items-center justify-center` — os 3 numa
+          linha só, centralizados, "Gabriela & Emanuel" corrido (o texto
+          original).
+
+          `sm:gap-10` (não mais `sm:gap-4`) no desktop: com a fonte
+          script gigante (`clamp(..., 8rem)`) 1rem de respiro entre os
+          `<span>` lia como colado — as curvas do "a" final de "Gabriela"
+          quase encostavam no "&", e o "&" quase encostava no "E" de
+          "Emanuel" (reportado como "falta espaço"). Faixa maior de gap dá
+          folga visível nesse tamanho de fonte. `mx-1` extra direto no "&"
+          (que já é 0.55em menor que o resto) reforça essa respiração dos
+          dois lados independente do `gap`, porque o próprio glifo "&" da
+          Fleur De Leah tem bastante peso visual grudado nas bordas.
         */}
         <p
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-start justify-center gap-1 px-6 text-left font-script leading-none text-white sm:flex-row sm:items-center sm:justify-center sm:gap-4 sm:text-center"
+          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-start justify-center gap-1 px-6 text-left font-script leading-none text-white sm:flex-row sm:items-center sm:justify-center sm:gap-10 sm:text-center"
           style={{
             fontSize: "clamp(3.5rem, 12vw, 8rem)",
             textShadow: "0 2px 24px rgba(34,27,25,0.35)",
@@ -330,7 +346,7 @@ export function HeroSection() {
           }}
         >
           <span>Gabriela</span>
-          <span className="self-end sm:self-auto" style={{ fontSize: "0.55em" }}>
+          <span className="mx-1 self-center sm:self-auto" style={{ fontSize: "0.55em" }}>
             &amp;
           </span>
           <span>Emanuel</span>

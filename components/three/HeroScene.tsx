@@ -42,10 +42,14 @@ const PARTICLE_COUNT = 180;
 const PETAL_TEXTURE_URLS = ["/hero/petals/petal-1.png", "/hero/petals/petal-2.png", "/hero/petals/petal-3.png"];
 
 // A partir de quanto do progresso de rolagem (0 a 1) o raio de sol já
-// sumiu por completo. O fade em si usa "smoothstep" (ver `SunRays` abaixo),
-// não uma reta linear — começa devagar, acelera no meio, desacelera no
-// fim, então não lê como um corte abrupto assim que a rolagem começa.
-const SUN_RAY_FADE_END = 0.5;
+// sumiu por completo. Baixado de 0.5 pra 0.28 — pedido explícito pra ele
+// sumir mais cedo na rolagem, em vez de continuar visível até a metade do
+// scroll. O fade em si usa uma curva "ease-out" cúbica (ver `SunRays`
+// abaixo, `Math.pow(1 - t, 3)`), não `smoothstep`: dispara mais rápido
+// logo que a rolagem começa (é aí que o brilho precisa começar a sumir
+// "de verdade", não só de leve) e só desacelera perto do fim — o oposto
+// de um corte seco, mas também sem demorar pra sair de cena.
+const SUN_RAY_FADE_END = 0.28;
 // A partir de quanto do progresso a quantidade de pétalas já chegou no
 // mínimo (nunca some 100% — a cena continua viva o resto da rolagem).
 const PETAL_THINNING_END = 0.6;
@@ -140,8 +144,15 @@ function makeBeamTexture(): THREE.Texture {
 }
 
 // Quanto de desfoque (em px, na escala original da imagem — 256px) aplicar
-// em cada foto de pétala antes de virar textura.
-const PETAL_BLUR_PX = 3.5;
+// em cada foto de pétala antes de virar textura. Baixado de 3.5 pra 2.2:
+// mesmo com o bug de textura (NPOT/mipmap) corrigido, as pétalas relatadas
+// como "sumidas" de novo provavelmente é isso — desfocadas demais e
+// pequenas, elas se perdem visualmente dentro do próprio vídeo de fundo
+// (que já tem glicínias e bokeh desfocados), fica difícil de notar mesmo
+// estando lá. Menos desfoque + mais brilho/saturação (ver
+// `loadBlurredTexture`) + partícula maior dão mais presença sem virar
+// sticker nítido colado por cima.
+const PETAL_BLUR_PX = 2.2;
 
 /**
  * Carrega uma imagem e devolve uma `THREE.Texture` já desfocada — em vez de
@@ -176,7 +187,12 @@ function loadBlurredTexture(url: string, blurPx: number): THREE.Texture {
     canvas.width = image.width + margin * 2;
     canvas.height = image.height + margin * 2;
     if (ctx) {
-      ctx.filter = `blur(${blurPx}px)`;
+      // `brightness`/`saturate` além do `blur`: as fotos originais, depois
+      // de desfocadas e reduzidas a pontos pequenos na cena, ficavam
+      // esmaecidas demais pra se destacar contra um vídeo de fundo já
+      // cheio de cor — um empurrão de brilho/saturação aqui compensa isso
+      // sem precisar aumentar opacidade (que já estava no máximo).
+      ctx.filter = `blur(${blurPx}px) brightness(1.25) saturate(1.35)`;
       ctx.drawImage(image, margin, margin);
     }
     texture.needsUpdate = true;
@@ -260,8 +276,10 @@ function FallingPetals({
     const progress = progressRef.current ?? 0;
 
     // Reduz aos poucos a quantidade de pétalas desenhadas conforme a
-    // rolagem avança (nunca chega a zero — mantém a cena viva).
-    const thinning = Math.min(1, progress / PETAL_THINNING_END);
+    // rolagem avança (nunca chega a zero — mantém a cena viva). `smoothstep`
+    // (mesma easing do raio de sol, ver `SUN_RAY_FADE_END`) em vez de reta
+    // linear, pra não ligar/desligar pétalas num ritmo mecânico.
+    const thinning = smoothstep(progress / PETAL_THINNING_END);
     const visibleRatio = 1 - thinning * (1 - PETAL_MIN_VISIBLE_RATIO);
     points.geometry.setDrawRange(0, Math.max(2, Math.round(count * visibleRatio)));
 
@@ -317,12 +335,12 @@ function FallingPetals({
       */}
       <pointsMaterial
         map={petalTexture}
-        size={0.25}
+        size={0.34}
         transparent
-        opacity={0.95}
+        opacity={1}
         sizeAttenuation
         depthWrite={false}
-        alphaTest={0.02}
+        alphaTest={0.01}
       />
     </points>
   );
@@ -366,21 +384,26 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
     if (!group) return;
 
     const progress = progressRef.current ?? 0;
-    // `smoothstep` em vez de reta linear: o raio de sol começa a sumir aos
-    // poucos assim que a rolagem começa (não instantâneo) e desacelera
-    // perto do fim, em vez de cortar seco — era exatamente o "saindo da
-    // tela de forma abrupta" reportado.
-    const visibility = 1 - smoothstep(progress / SUN_RAY_FADE_END);
+    // Ease-out cúbico (`(1-t)³`) em vez de `smoothstep`: a velocidade de
+    // queda é máxima logo no início (t=0) e vai desacelerando até o fim —
+    // ao contrário do `smoothstep` (que começa devagar), aqui o brilho já
+    // cai visivelmente nos primeiros % de rolagem, e só nos últimos % que
+    // a queda desacelera pra não cortar seco em zero. Resolve os dois
+    // pedidos juntos: sumir mais cedo (`SUN_RAY_FADE_END` menor) E ter uma
+    // sensação de "ease out" de verdade, não uma curva simétrica.
+    const fadeT = Math.min(1, Math.max(0, progress / SUN_RAY_FADE_END));
+    const visibility = Math.pow(1 - fadeT, 3);
     group.visible = visibility > 0.01;
     if (!group.visible) return;
 
     // Cintilação — o sol "vivo", não uma imagem estática. Roda sempre,
     // inclusive parado no topo (progress 0), que é quando mais dá pra
     // reparar nela — combina duas frequências pra não parecer um "pisca"
-    // mecânico e uniforme. Amplitude bem maior que a v1 (0.1+0.04, ficou
-    // "sutil demais" no feedback) — agora varia de ~55% a 100% do brilho.
+    // mecânico e uniforme. Amplitude bem maior que a rodada anterior
+    // (ainda lida como "oscila pouco" no feedback) — agora varia de ~30%
+    // a 100% do brilho, com a frequência principal também mais rápida.
     const flicker =
-      0.775 + Math.sin(state.clock.elapsedTime * 0.6) * 0.175 + Math.sin(state.clock.elapsedTime * 1.9) * 0.05;
+      0.65 + Math.sin(state.clock.elapsedTime * 1.1) * 0.25 + Math.sin(state.clock.elapsedTime * 3.2) * 0.1;
 
     if (glowRef.current) {
       const glowMaterial = glowRef.current.material as unknown as THREE.SpriteMaterial;
