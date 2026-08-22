@@ -126,7 +126,52 @@ function makeBeamTexture(): THREE.Texture {
   return texture;
 }
 
-const textureLoader = new THREE.TextureLoader();
+// Quanto de desfoque (em px, na escala original da imagem — 256px) aplicar
+// em cada foto de pétala antes de virar textura.
+const PETAL_BLUR_PX = 3.5;
+
+/**
+ * Carrega uma imagem e devolve uma `THREE.Texture` já desfocada — em vez de
+ * post-processing (proibido pelo orçamento de performance deste componente,
+ * ver topo do arquivo) ou um shader customizado, o desfoque é aplicado UMA
+ * VEZ em canvas 2D (`ctx.filter = "blur(...)"`), antes de subir pra GPU, do
+ * mesmo jeito que `makeGlowTexture`/`makeBeamTexture` já geram as texturas
+ * do raio de sol em canvas — só que aqui carregando uma foto em vez de
+ * desenhar uma forma. Sem isso as pétalas (nítidas, recortadas) destoavam
+ * do resto da cena, que já tem desfoque em várias camadas (o próprio vídeo
+ * do hero tem glicínias desfocadas ao fundo) — o desfoque aqui é o que dá
+ * a sensação de profundidade e faz as pétalas lerem como parte do mesmo
+ * ambiente, não como stickers colados por cima.
+ *
+ * Carregamento é assíncrono (`Image.onload`); a textura já existe desde o
+ * início (canvas em branco) e é atualizada (`needsUpdate`) quando a imagem
+ * termina de carregar — o `<points>` já pode montar sem esperar.
+ */
+function loadBlurredTexture(url: string, blurPx: number): THREE.Texture {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  const image = new Image();
+  image.onload = () => {
+    // Canvas um pouco maior que a imagem original: o `blur()` do canvas
+    // espalha os pixels da borda pra fora do próprio desenho — sem essa
+    // margem extra, o desfoque ficaria cortado seco nas bordas do canvas,
+    // lendo como um degrau em vez de um esmaecimento suave.
+    const margin = blurPx * 4;
+    canvas.width = image.width + margin * 2;
+    canvas.height = image.height + margin * 2;
+    if (ctx) {
+      ctx.filter = `blur(${blurPx}px)`;
+      ctx.drawImage(image, margin, margin);
+    }
+    texture.needsUpdate = true;
+  };
+  image.src = url;
+
+  return texture;
+}
 
 /**
  * Um grupo de pétalas caindo com física simples: gravidade (queda constante
@@ -159,11 +204,7 @@ function FallingPetals({
   count: number;
 }) {
   const pointsRef = useRef<ThreePoints>(null);
-  const petalTexture = useMemo(() => {
-    const texture = textureLoader.load(textureUrl);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    return texture;
-  }, [textureUrl]);
+  const petalTexture = useMemo(() => loadBlurredTexture(textureUrl, PETAL_BLUR_PX), [textureUrl]);
 
   useEffect(() => () => petalTexture.dispose(), [petalTexture]);
 
@@ -249,12 +290,12 @@ function FallingPetals({
       */}
       <pointsMaterial
         map={petalTexture}
-        size={0.22}
+        size={0.25}
         transparent
         opacity={0.95}
         sizeAttenuation
         depthWrite={false}
-        alphaTest={0.05}
+        alphaTest={0.02}
       />
     </points>
   );
