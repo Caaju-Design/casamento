@@ -633,8 +633,9 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
     });
   });
 
+  // `position` aqui embaixo é só um placeholder inicial — o `useFrame`
+  // acima já sobrescreve x/y/z todo frame antes do primeiro paint.
   return (
-    {/* position inicial só é um placeholder — `useFrame` acima já sobrescreve todo frame */}
     <group ref={groupRef} position={[0, 0, SUN_GROUP_DEPTH]}>
       <sprite ref={glowRef} scale={[3.4, 3.4, 1]}>
         <spriteMaterial
