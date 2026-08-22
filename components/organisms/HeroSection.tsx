@@ -36,16 +36,25 @@ const SCROLL_TRACK_VH = 300;
 const CALLIGRAPHY_FADE_END = 0.12;
 
 /**
- * Segundo do vídeo (não fração de progresso — segundo de verdade, porque é
- * assim que o casal pensa nisso: "a partir do 8º segundo") a partir do qual
- * a camada do vídeo (vídeo + scrim + cena three.js) começa a dissolver,
- * revelando o bloco de conteúdo padrão do site (título, data, menu de
- * âncoras) por trás — os dois lados dessa dissolução terminam exatamente no
- * último frame do vídeo. Calculado contra `video.duration` em tempo real,
- * então continua correto se um dia o vídeo do hero for trocado por um de
- * outra duração.
+ * Segundo do vídeo (não fração de progresso — segundo de verdade) a partir
+ * do qual a camada do vídeo (vídeo + scrim, a cena three.js fica de fora,
+ * ver comentário mais abaixo) começa a dissolver, revelando o bloco de
+ * conteúdo padrão do site (título, data, menu de âncoras) por trás — os
+ * dois lados dessa dissolução terminam exatamente no último frame do
+ * vídeo. Calculado contra `video.duration` em tempo real, então continua
+ * correto se um dia o vídeo do hero for trocado por um de outra duração.
+ *
+ * Ajustado pra 6.8s (não os 8s originais) depois de conferir o material
+ * bruto quadro a quadro: o casal já está praticamente na pose do beijo a
+ * partir do 7º segundo e segura essa pose até o fim (10.04s) — é assim
+ * mesmo a gravação, não é bug. Com o fade começando só no 8º segundo sobrava
+ * pouco menos de 2s de dissolução pra cobrir os últimos 20% da rolagem
+ * inteira, e a pose "parada" lia como o vídeo tendo travado. Começar a
+ * dissolver um pouco antes (bem quando os dois se aproximam) faz o
+ * "segurar a pose" virar parte do próprio efeito, em vez de um
+ * congelamento antes dele.
  */
-const VIDEO_FADE_START_SECONDS = 8;
+const VIDEO_FADE_START_SECONDS = 6.8;
 
 /**
  * Amarra o `currentTime` de um `<video>` à posição de rolagem de um
@@ -63,7 +72,7 @@ const VIDEO_FADE_START_SECONDS = 8;
  *
  *  - `--hero-progress`: 0→1, progresso bruto de rolagem pelo trilho inteiro.
  *  - `--hero-video-opacity`: 1 durante toda a rolagem principal, dissolvendo
- *    pra 0 só na janela final (8º segundo → fim do vídeo).
+ *    pra 0 só na janela final (`VIDEO_FADE_START_SECONDS` → fim do vídeo).
  *  - `--hero-reveal`: o inverso do anterior (0→1) — o bloco de conteúdo
  *    padrão e o menu de âncoras usam essa variável, então ficam invisíveis
  *    durante toda a rolagem do vídeo e só aparecem, em sincronia, na mesma
@@ -106,7 +115,7 @@ function useScrollScrubVideo(
           video.currentTime = targetTime;
         }
 
-        // Dissolve final: vídeo em opacidade 1 até o início do 8º segundo,
+        // Dissolve final: vídeo em opacidade 1 até `VIDEO_FADE_START_SECONDS`,
         // depois cai pra 0 no último frame — só nesse trecho final é que a
         // camada do vídeo começa a sumir, revelando o bloco de conteúdo
         // padrão (título, data, menu) que sobe por trás em sincronia
@@ -175,11 +184,21 @@ export function HeroSection() {
         className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-6 text-center"
       >
         {/*
-          Camada do vídeo — vídeo + scrim + cena three.js viajam juntos:
-          opacidade 1 durante toda a rolagem principal, dissolvendo só na
-          janela final (8º segundo → fim). `pointer-events: none` porque é
+          Camada do vídeo — só vídeo + scrim, opacidade 1 durante toda a
+          rolagem principal, dissolvendo na janela final (ver
+          `VIDEO_FADE_START_SECONDS` → fim). `pointer-events: none` porque é
           puramente decorativa, nunca deve capturar clique nem enquanto
           visível.
+
+          A cena three.js (pétalas + raio de sol) FICA DE FORA desta div de
+          propósito: ela já reage ao progresso de rolagem com a própria
+          lógica dela (`FallingPetals`/`SunRays` em HeroScene.tsx reduzem
+          partículas e apagam o raio de sol conforme o scroll avança) — se
+          ela ficasse dentro desta camada, herdaria TAMBÉM a opacidade do
+          vídeo e sumiria de vez assim que o vídeo começasse a dissolver
+          (foi exatamente o bug reportado: "sumiram as pétalas e o raio de
+          sol"). Como componente próprio, continua viva e visível mesmo
+          depois do vídeo já ter sumido de vez.
         */}
         <div
           className="absolute inset-0 -z-20"
@@ -211,9 +230,9 @@ export function HeroSection() {
             }}
             aria-hidden="true"
           />
-
-          <HeroScene progressRef={progressRef} />
         </div>
+
+        <HeroScene progressRef={progressRef} />
 
         {/*
           Caligrafia de entrada — só existe no primeiro momento (progress
@@ -237,70 +256,55 @@ export function HeroSection() {
 
         {/*
           Bloco de conteúdo padrão — fica invisível durante toda a rolagem
-          principal do vídeo e só aparece (fade-in) na janela final (8º
-          segundo → fim), em sincronia exata com a dissolução da camada do
-          vídeo acima (`--hero-reveal` é sempre `1 - videoOpacity`).
-          `pointerEvents` some junto: só fica clicável quando o reveal já
-          está visualmente quase completo.
+          principal do vídeo e só aparece (fade-in) na janela final
+          (`VIDEO_FADE_START_SECONDS` → fim), em sincronia exata com a
+          dissolução da camada do vídeo (`--hero-reveal` é sempre
+          `1 - videoOpacity`). `pointerEvents` some junto: só fica clicável
+          quando o reveal já está visualmente quase completo.
 
-          `style={{ color }}` em vez de uma classe Tailwind `text-white` nos
-          filhos: Text/Heading já aplicam sua própria classe de cor por
-          `tone` (mesma especificidade CSS de qualquer outra classe de cor),
-          então a ordem de precedência entre duas classes de utilitário não
-          é garantida pela ordem em que aparecem no `className` — só o
-          atributo `style` tem prioridade garantida sobre elas.
+          Cores normais do design system (não mais branco com sombra): a
+          essa altura da rolagem o vídeo já sumiu quase por completo, então
+          o fundo por trás é o `bg-page` (creme) normal do site — texto
+          branco ficava ilegível (branco sobre quase-branco). O fundo
+          (`bg-page/90` + blur) garante leitura mesmo no meio da transição,
+          quando ainda sobra um resto do vídeo por trás.
         */}
         <div
-          className="relative z-10 flex max-w-2xl flex-col items-center gap-field-gap"
+          className="relative z-10 flex max-w-2xl flex-col items-center gap-field-gap rounded-card bg-page/90 px-8 py-10 shadow-lg backdrop-blur-sm"
           style={{
             opacity: "var(--hero-reveal, 0)",
             pointerEvents: "var(--hero-reveal-pointer-events, none)" as CSSProperties["pointerEvents"],
           }}
         >
-          {/*
-            `textShadow` em todo o bloco, não só na caligrafia: o vídeo se
-            move (o scrim sozinho é mais fraco nas bordas da elipse), então
-            sem isso o texto ficaria pouco legível em trechos mais claros do
-            vídeo (ex.: céu aberto atrás da árvore) — visto num preview
-            estático do primeiro frame durante a revisão final.
-          */}
-          <Text
-            tone="secondary"
-            className="uppercase tracking-[0.3em] text-100"
-            style={{ color: "rgba(255,255,255,0.9)", textShadow: "0 1px 12px rgba(34,27,25,0.5)" }}
-          >
+          <Text tone="secondary" className="uppercase tracking-[0.3em] text-100">
             Vamos nos casar
           </Text>
-          <Heading as="h1" size="xl" style={{ color: "#ffffff", textShadow: "0 2px 20px rgba(34,27,25,0.5)" }}>
+          <Heading as="h1" size="xl">
             Gabriela &amp; Emanuel
           </Heading>
-          <Text
-            tone="secondary"
-            className="text-400"
-            style={{ color: "rgba(255,255,255,0.9)", textShadow: "0 1px 12px rgba(34,27,25,0.5)" }}
-          >
+          <Text tone="secondary" className="text-400">
             17 de abril de 2027
           </Text>
-          <Text className="max-w-lg" style={{ color: "rgba(255,255,255,0.95)", textShadow: "0 1px 10px rgba(34,27,25,0.45)" }}>
+          <Text className="max-w-lg">
             Com o coração cheio de alegria, convidamos você para celebrar ao nosso lado o começo de uma nova
             história. Sua presença é o presente que mais desejamos.
           </Text>
           <nav className="mt-4 flex flex-wrap justify-center gap-4 font-body text-100">
             <a
               href="#historia"
-              className="rounded-pill border border-white/60 bg-white/10 px-5 py-2 text-white backdrop-blur-sm hover:bg-white/20"
+              className="rounded-pill border border-border-subtle bg-surface px-5 py-2 text-text-primary transition-colors hover:bg-blush-50"
             >
               Nossa história
             </a>
             <a
               href="#evento"
-              className="rounded-pill border border-white/60 bg-white/10 px-5 py-2 text-white backdrop-blur-sm hover:bg-white/20"
+              className="rounded-pill border border-border-subtle bg-surface px-5 py-2 text-text-primary transition-colors hover:bg-blush-50"
             >
               O evento
             </a>
             <a
               href="#recomendacoes"
-              className="rounded-pill border border-white/60 bg-white/10 px-5 py-2 text-white backdrop-blur-sm hover:bg-white/20"
+              className="rounded-pill border border-border-subtle bg-surface px-5 py-2 text-text-primary transition-colors hover:bg-blush-50"
             >
               Hospedagem e restaurantes
             </a>
