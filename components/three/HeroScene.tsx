@@ -42,14 +42,14 @@ const PARTICLE_COUNT = 180;
 const PETAL_TEXTURE_URLS = ["/hero/petals/petal-1.png", "/hero/petals/petal-2.png", "/hero/petals/petal-3.png"];
 
 // A partir de quanto do progresso de rolagem (0 a 1) o raio de sol já
-// sumiu por completo. Baixado de 0.5 pra 0.28 — pedido explícito pra ele
-// sumir mais cedo na rolagem, em vez de continuar visível até a metade do
-// scroll. O fade em si usa uma curva "ease-out" cúbica (ver `SunRays`
-// abaixo, `Math.pow(1 - t, 3)`), não `smoothstep`: dispara mais rápido
-// logo que a rolagem começa (é aí que o brilho precisa começar a sumir
-// "de verdade", não só de leve) e só desacelera perto do fim — o oposto
-// de um corte seco, mas também sem demorar pra sair de cena.
-const SUN_RAY_FADE_END = 0.28;
+// sumiu por completo. Baixado de 0.28 pra 0.02 — pedido explícito de novo
+// pra sumir ainda mais cedo (era 5% antes, agora 2%). O fade em si usa uma
+// curva "ease-out" cúbica (ver `SunRays` abaixo, `Math.pow(1 - t, 3)`), não
+// `smoothstep`: dispara mais rápido logo que a rolagem começa (é aí que o
+// brilho precisa começar a sumir "de verdade", não só de leve) e só
+// desacelera perto do fim — o oposto de um corte seco, mas também sem
+// demorar pra sair de cena.
+const SUN_RAY_FADE_END = 0.02;
 // A partir de quanto do progresso a quantidade de pétalas já chegou no
 // mínimo (nunca some 100% — a cena continua viva o resto da rolagem).
 const PETAL_THINNING_END = 0.6;
@@ -509,7 +509,7 @@ export interface HeroSceneProps {
 
 export function HeroScene({ progressRef }: HeroSceneProps) {
   const [status, setStatus] = useState<"checking" | "webgl" | "fallback">("checking");
-  const [isNearViewport, setIsNearViewport] = useState(true);
+  const [isPageVisible, setIsPageVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const fallbackProgressRef = useRef(0);
   const resolvedProgressRef = progressRef ?? fallbackProgressRef;
@@ -518,30 +518,34 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
     setStatus(supportsWebGL() ? "webgl" : "fallback");
   }, []);
 
-  // Pendência da revisão de performance: o loop de render do R3F (`frameloop`)
-  // por padrão nunca para — sem isso, depois que o casal já rolou 3, 4
-  // telas pra dentro do site, a GPU continuaria desenhando pétalas e sol
-  // fora de tela pro resto da visita, gastando bateria à toa. Aqui a gente
-  // observa se o hero ainda está perto da viewport e, se não estiver, pausa
-  // o loop (`frameloop="never"`) sem desmontar o Canvas — retoma na hora se
-  // o usuário rolar de volta pra cima.
+  // BUG real encontrado nesta revisão (era a causa do "as pétalas sumiram" e
+  // "o raio de sol não faz nada" que se repetiu em duas rodadas de correção
+  // que só mexiam na aparência, não no loop de render): a versão anterior
+  // pausava `frameloop` (`"never"`) com base num `IntersectionObserver`
+  // observando se o hero "estava perto da viewport". Só que esse elemento
+  // observado vive dentro de uma `<section>` `position: sticky` dentro de
+  // um trilho de `300vh` (ver HeroSection.tsx) — testado ao vivo (Chrome,
+  // via automação), o PRIMEIRO callback do observer, nessa combinação de
+  // `sticky` + trilho gigante, disparava com `isIntersecting: false` mesmo
+  // com o hero ocupando a tela inteira, e como nada mais reavalia isso
+  // enquanto o usuário não rola pra FORA do hero (ele fica pinado ali o
+  // tempo todo), o `frameloop` ficava travado em `"never"` pra sempre —
+  // literalmente nenhum frame desenhado, daí pétalas e raio de sol
+  // simplesmente não apareciam nunca, em qualquer rolagem dentro do hero.
+  //
+  // Troca por `document.visibilitychange` (Page Visibility API nativa do
+  // navegador, sem depender de geometria/layout de elemento nenhum): só
+  // pausa quando a ABA inteira fica em segundo plano de verdade (troca de
+  // app, minimizado) — continua economizando bateria depois que o casal sai
+  // do site, sem o risco de "achar" que o hero não está visível estando ele
+  // ocupando a tela inteira.
   useEffect(() => {
-    // `containerRef` só existe de fato depois que `status` vira "webgl" (é
-    // quando a div observada é montada) — por isso `status` entra nas
-    // dependências: sem isso, esse efeito rodaria uma vez só no mount,
-    // ainda com `containerRef.current` nulo, e nunca reconectaria o
-    // observer depois que a div aparecesse.
-    const node = containerRef.current;
-    if (!node || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      if (entry) setIsNearViewport(entry.isIntersecting);
-    }, {
-      rootMargin: "200px 0px",
-    });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [status]);
+    if (typeof document === "undefined") return;
+    const handleVisibilityChange = () => setIsPageVisible(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    handleVisibilityChange();
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   if (status !== "webgl") {
     return <DecorativeFallback />;
@@ -555,7 +559,7 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
           camera={{ position: [0, 0, 6], fov: 50 }}
           gl={{ antialias: false, alpha: true }}
           onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-          frameloop={isNearViewport ? "always" : "never"}
+          frameloop={isPageVisible ? "always" : "never"}
         >
           <ambientLight intensity={0.6} />
           <SunRays progressRef={resolvedProgressRef} />
