@@ -27,7 +27,8 @@
   },
   "font": {
     "heading": { "$value": "{fontFamily.display}", "$type": "fontFamily" },
-    "body": { "$value": "{fontFamily.body}", "$type": "fontFamily" }
+    "body": { "$value": "{fontFamily.body}", "$type": "fontFamily" },
+    "script": { "$value": "{fontFamily.script}", "$type": "fontFamily" }
   },
   "spacing": {
     "sectionGap": { "$value": "{space.800}", "$type": "dimension" },

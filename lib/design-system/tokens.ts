@@ -128,6 +128,7 @@ export const designTokens = {
   font: {
     heading: token("font.heading"),
     body: token("font.body"),
+    script: token("font.script"),
   },
   fontSize: {
     100: token("fontSize.100"),

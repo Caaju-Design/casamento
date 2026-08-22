@@ -32,7 +32,8 @@
   },
   "fontFamily": {
     "display": { "$value": "'Cormorant Garamond', serif", "$type": "fontFamily" },
-    "body": { "$value": "'Lora', serif", "$type": "fontFamily" }
+    "body": { "$value": "'Lora', serif", "$type": "fontFamily" },
+    "script": { "$value": "'Pinyon Script', cursive", "$type": "fontFamily" }
   },
   "fontSize": {
     "100": { "$value": "0.875rem", "$type": "dimension" },

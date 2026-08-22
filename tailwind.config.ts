@@ -58,6 +58,7 @@ const config: Config = {
       fontFamily: {
         display: [designTokens.font.heading],
         body: [designTokens.font.body],
+        script: [designTokens.font.script],
       },
       fontSize: {
         100: designTokens.fontSize[100],
