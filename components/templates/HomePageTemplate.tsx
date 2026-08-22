@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 export function HomePageTemplate() {
   return (
     <div className="flex flex-col">
-      <AnchorNav items={NAV_ITEMS} />
+      <AnchorNav items={NAV_ITEMS} startHiddenForHero />
       <HeroSection />
 
       <section id="historia" className="mx-auto max-w-3xl px-6 py-section-gap text-center">

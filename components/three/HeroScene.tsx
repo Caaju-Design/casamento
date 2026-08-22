@@ -3,7 +3,7 @@
 import { Component, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import type { Points as ThreePoints, Group as ThreeGroup, Mesh as ThreeMesh } from "three";
+import type { Points as ThreePoints, Group as ThreeGroup, Mesh as ThreeMesh, Sprite as ThreeSprite } from "three";
 import { designTokens } from "@/lib/design-system/tokens";
 
 /**
@@ -33,13 +33,29 @@ import { designTokens } from "@/lib/design-system/tokens";
 
 const PARTICLE_COUNT = 180;
 
+// Pétalas de glicínia enviadas pelo casal (fotos recortadas, já com canal
+// alpha — não são as fotos de banco de imagem com marca d'água usadas só
+// como referência visual antes; essas aqui foram preparadas pelo casal
+// especificamente pra virar sprite) — 3 variações, divididas em partes
+// iguais do total de partículas pra dar variedade sem repetir sempre a
+// mesma pétala.
+const PETAL_TEXTURE_URLS = ["/hero/petals/petal-1.png", "/hero/petals/petal-2.png", "/hero/petals/petal-3.png"];
+
 // A partir de quanto do progresso de rolagem (0 a 1) o raio de sol já
-// sumiu por completo.
-const SUN_RAY_FADE_END = 0.35;
+// sumiu por completo. O fade em si usa "smoothstep" (ver `SunRays` abaixo),
+// não uma reta linear — começa devagar, acelera no meio, desacelera no
+// fim, então não lê como um corte abrupto assim que a rolagem começa.
+const SUN_RAY_FADE_END = 0.4;
 // A partir de quanto do progresso a quantidade de pétalas já chegou no
 // mínimo (nunca some 100% — a cena continua viva o resto da rolagem).
 const PETAL_THINNING_END = 0.6;
 const PETAL_MIN_VISIBLE_RATIO = 0.15;
+
+/** `t*t*(3-2t)` — easing suave (sem começo/fim abruptos) pra qualquer transição 0→1 desta cena. */
+function smoothstep(t: number): number {
+  const clamped = Math.min(1, Math.max(0, t));
+  return clamped * clamped * (3 - 2 * clamped);
+}
 
 function supportsWebGL(): boolean {
   if (typeof window === "undefined" || typeof document === "undefined") return false;
@@ -110,62 +126,53 @@ function makeBeamTexture(): THREE.Texture {
   return texture;
 }
 
-/**
- * Gera em canvas 2D uma pétala solta — não é uma foto (as referências que o
- * casal mandou são banco de imagem com marca d'água, licenciadas, não dá
- * pra usar), é uma forma oval suave, achatada com `ctx.scale`, em tom lilás
- * com um realce claro no topo (mesma paleta das fotos de referência: lilás
- * com um brilho branco-amarelado no miolo) — troca os "quadrados" das
- * partículas por algo que já lê como pétala de glicínia caindo.
- */
-function makePetalTexture(): THREE.Texture {
-  const size = 64;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    ctx.translate(size / 2, size / 2);
-    ctx.scale(0.6, 1);
-    const gradient = ctx.createRadialGradient(0, -size * 0.12, 0, 0, 0, size / 2);
-    gradient.addColorStop(0, "rgba(255,250,240,0.95)");
-    gradient.addColorStop(0.3, "rgba(224,196,224,0.9)");
-    gradient.addColorStop(0.7, "rgba(178,140,190,0.6)");
-    gradient.addColorStop(1, "rgba(178,140,190,0)");
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.needsUpdate = true;
-  return texture;
-}
+const textureLoader = new THREE.TextureLoader();
 
 /**
- * Pétalas caindo com física simples: gravidade (queda constante por
- * partícula) + vento (deriva lateral senoidal, com fase própria por
+ * Um grupo de pétalas caindo com física simples: gravidade (queda constante
+ * por partícula) + vento (deriva lateral senoidal, com fase própria por
  * partícula pra não caírem todas em sincronia) + reciclagem (quando sai da
  * cena por baixo, volta pro topo com posição nova) — looping contínuo,
  * nunca para, independente da rolagem.
  *
- * A quantidade *visível* de pétalas (não a física, que roda igual pras 180
- * o tempo todo — o custo de simular 180 pontos é desprezível) diminui
- * conforme o scroll avança, via `geometry.setDrawRange`: corta quantos
- * vértices do buffer são desenhados sem recriar geometria a cada frame.
+ * Recebe `textureUrl` porque a cena inteira usa 3 grupos em paralelo, um
+ * pra cada foto de pétala de glicínia que o casal mandou (ver
+ * `PETAL_TEXTURE_URLS`) — `THREE.Points` desenha todos os pontos de um
+ * mesmo objeto com a MESMA textura num único draw call, então pra ter as 3
+ * variações ao mesmo tempo (em vez de repetir sempre a mesma pétala) a
+ * saída é ter 3 objetos `<points>` separados, cada um com sua textura e uma
+ * fração do total de partículas — mais barato pra GPU do que trocar pra
+ * `InstancedMesh` só por causa disso.
+ *
+ * A quantidade *visível* de pétalas (não a física, que roda igual o tempo
+ * todo — o custo de simular esses pontos é desprezível) diminui conforme o
+ * scroll avança, via `geometry.setDrawRange`: corta quantos vértices do
+ * buffer são desenhados sem recriar geometria a cada frame.
  */
-function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
+function FallingPetals({
+  progressRef,
+  textureUrl,
+  count,
+}: {
+  progressRef: RefObject<number>;
+  textureUrl: string;
+  count: number;
+}) {
   const pointsRef = useRef<ThreePoints>(null);
-  const petalTexture = useMemo(() => makePetalTexture(), []);
+  const petalTexture = useMemo(() => {
+    const texture = textureLoader.load(textureUrl);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }, [textureUrl]);
 
   useEffect(() => () => petalTexture.dispose(), [petalTexture]);
 
   const { positions, fallSpeed, swayPhase, swaySpeed } = useMemo(() => {
-    const positions = new Float32Array(PARTICLE_COUNT * 3);
-    const fallSpeed = new Float32Array(PARTICLE_COUNT);
-    const swayPhase = new Float32Array(PARTICLE_COUNT);
-    const swaySpeed = new Float32Array(PARTICLE_COUNT);
-    for (let i = 0; i < PARTICLE_COUNT; i += 1) {
+    const positions = new Float32Array(count * 3);
+    const fallSpeed = new Float32Array(count);
+    const swayPhase = new Float32Array(count);
+    const swaySpeed = new Float32Array(count);
+    for (let i = 0; i < count; i += 1) {
       positions[i * 3] = (Math.random() - 0.5) * 12;
       positions[i * 3 + 1] = Math.random() * 10 - 3;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 6;
@@ -176,7 +183,7 @@ function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
       swaySpeed[i] = 0.25 + Math.random() * 0.5;
     }
     return { positions, fallSpeed, swayPhase, swaySpeed };
-  }, []);
+  }, [count]);
 
   useFrame((state, delta) => {
     const points = pointsRef.current;
@@ -188,11 +195,11 @@ function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
     // rolagem avança (nunca chega a zero — mantém a cena viva).
     const thinning = Math.min(1, progress / PETAL_THINNING_END);
     const visibleRatio = 1 - thinning * (1 - PETAL_MIN_VISIBLE_RATIO);
-    points.geometry.setDrawRange(0, Math.max(4, Math.round(PARTICLE_COUNT * visibleRatio)));
+    points.geometry.setDrawRange(0, Math.max(2, Math.round(count * visibleRatio)));
 
     // `tsconfig.json` liga `noUncheckedIndexedAccess` — todo acesso por
     // índice (array[i], attributes.position) volta tipado como "| undefined"
-    // pro TypeScript, mesmo quando a gente sabe (pelo laço `i < PARTICLE_COUNT`,
+    // pro TypeScript, mesmo quando a gente sabe (pelo laço `i < count`,
     // sempre dentro do tamanho dos buffers) que nunca é. Guard explícito +
     // `?? 0` de fallback deixam isso são pro compilador sem mudar o
     // comportamento em runtime.
@@ -201,7 +208,7 @@ function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
     const array = positionAttribute.array as Float32Array;
     const time = state.clock.elapsedTime;
 
-    for (let i = 0; i < PARTICLE_COUNT; i += 1) {
+    for (let i = 0; i < count; i += 1) {
       const idx = i * 3;
       const fall = fallSpeed[i] ?? 0;
       const phase = swayPhase[i] ?? 0;
@@ -234,15 +241,20 @@ function FallingPetals({ progressRef }: { progressRef: RefObject<number> }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
+      {/*
+        Sem `color` aqui de propósito: é uma foto de verdade (não mais um
+        gradiente gerado em canvas), então tingir por cima com um token de
+        cor deixaria tudo com a mesma tonalidade lilás plana — a variação
+        natural de cor de cada foto é que dá o efeito de pétala de verdade.
+      */}
       <pointsMaterial
         map={petalTexture}
-        size={0.16}
-        color={designTokens.color.blush300}
+        size={0.22}
         transparent
         opacity={0.95}
         sizeAttenuation
         depthWrite={false}
-        alphaTest={0.02}
+        alphaTest={0.05}
       />
     </points>
   );
@@ -267,6 +279,7 @@ const SUN_BEAMS: SunBeamSpec[] = [-0.55, -0.3, -0.05, 0.2, 0.45].map((angle) => 
  */
 function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
   const groupRef = useRef<ThreeGroup>(null);
+  const glowRef = useRef<ThreeSprite>(null);
   const beamRefs = useRef<Array<ThreeMesh | null>>([]);
 
   const glowTexture = useMemo(() => makeGlowTexture(), []);
@@ -285,12 +298,25 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
     if (!group) return;
 
     const progress = progressRef.current ?? 0;
-    const visibility = Math.max(0, 1 - progress / SUN_RAY_FADE_END);
+    // `smoothstep` em vez de reta linear: o raio de sol começa a sumir aos
+    // poucos assim que a rolagem começa (não instantâneo) e desacelera
+    // perto do fim, em vez de cortar seco — era exatamente o "saindo da
+    // tela de forma abrupta" reportado.
+    const visibility = 1 - smoothstep(progress / SUN_RAY_FADE_END);
     group.visible = visibility > 0.01;
     if (!group.visible) return;
 
-    // Leve cintilação — o sol "vivo", não uma imagem estática.
-    const flicker = 0.92 + Math.sin(state.clock.elapsedTime * 0.6) * 0.08;
+    // Cintilação — o sol "vivo", não uma imagem estática. Roda sempre,
+    // inclusive parado no topo (progress 0), que é quando mais dá pra
+    // reparar nela — combina duas frequências pra não parecer um "pisca"
+    // mecânico e uniforme.
+    const flicker =
+      0.86 + Math.sin(state.clock.elapsedTime * 0.6) * 0.1 + Math.sin(state.clock.elapsedTime * 1.7) * 0.04;
+
+    if (glowRef.current) {
+      const glowMaterial = glowRef.current.material as unknown as THREE.SpriteMaterial;
+      glowMaterial.opacity = visibility * flicker * 0.9;
+    }
 
     beamRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
@@ -303,7 +329,7 @@ function SunRays({ progressRef }: { progressRef: RefObject<number> }) {
 
   return (
     <group ref={groupRef} position={[-2.8, 2.5, -2]}>
-      <sprite scale={[3.4, 3.4, 1]}>
+      <sprite ref={glowRef} scale={[3.4, 3.4, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
@@ -441,7 +467,14 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
         >
           <ambientLight intensity={0.6} />
           <SunRays progressRef={resolvedProgressRef} />
-          <FallingPetals progressRef={resolvedProgressRef} />
+          {PETAL_TEXTURE_URLS.map((url) => (
+            <FallingPetals
+              key={url}
+              progressRef={resolvedProgressRef}
+              textureUrl={url}
+              count={Math.round(PARTICLE_COUNT / PETAL_TEXTURE_URLS.length)}
+            />
+          ))}
         </Canvas>
       </WebglErrorBoundary>
     </div>
