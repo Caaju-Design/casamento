@@ -938,27 +938,59 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
     return <DecorativeFallback />;
   }
 
+  // DUAS camadas 3D separadas, não mais uma só — pedido explícito: as
+  // pétalas precisam ficar POR CIMA da caligrafia (`Gabriela & Emanuel`,
+  // `z-20` em `HeroSection.tsx`), enquanto o raio de sol continua por
+  // TRÁS de tudo, igual sempre foi. Um único `<canvas>` não consegue ter
+  // metade do desenho atrás de um elemento HTML e a outra metade na
+  // frente — o `z-index` vale pro elemento inteiro. A saída é ter dois
+  // `<Canvas>` do R3F independentes, cada um com seu próprio `z-index`:
+  // um atrás (`-z-10`, só o sol) e outro na frente (`z-30`, só as
+  // pétalas, maior que o `z-20` do texto). Os dois leem o MESMO
+  // `resolvedProgressRef`, então continuam sincronizados com a rolagem
+  // como uma cena só, mesmo sendo tecnicamente duas.
+  //
+  // Custo: um segundo contexto WebGL (mais um `<canvas>` na página) — a
+  // cena já tinha sido enxugada antes (menos partículas/ghosts, ver
+  // `PARTICLE_COUNT`) especificamente por causa de orçamento de
+  // performance no mobile, então isso pesa um pouco mais. Como cada
+  // camada sozinha é bem leve (só esferas/sprites simples, sem
+  // pós-processamento), o total ainda fica dentro do orçamento.
   return (
-    <div ref={containerRef} aria-hidden="true" className="absolute inset-0 -z-10">
-      <WebglErrorBoundary onFailure={() => setStatus("fallback")}>
-        <Canvas
-          dpr={[1, 1.5]}
-          camera={{ position: [0, 0, 6], fov: 50 }}
-          gl={{ antialias: false, alpha: true }}
-          onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-        >
-          <ambientLight intensity={0.6} />
-          <SunRays progressRef={resolvedProgressRef} />
-          {PETAL_TEXTURE_URLS.map((url) => (
-            <FallingPetals
-              key={url}
-              progressRef={resolvedProgressRef}
-              textureUrl={url}
-              count={Math.round(PARTICLE_COUNT / PETAL_TEXTURE_URLS.length)}
-            />
-          ))}
-        </Canvas>
-      </WebglErrorBoundary>
-    </div>
+    <>
+      <div ref={containerRef} aria-hidden="true" className="absolute inset-0 -z-10">
+        <WebglErrorBoundary onFailure={() => setStatus("fallback")}>
+          <Canvas
+            dpr={[1, 1.5]}
+            camera={{ position: [0, 0, 6], fov: 50 }}
+            gl={{ antialias: false, alpha: true }}
+            onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+          >
+            <ambientLight intensity={0.6} />
+            <SunRays progressRef={resolvedProgressRef} />
+          </Canvas>
+        </WebglErrorBoundary>
+      </div>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-30">
+        <WebglErrorBoundary onFailure={() => setStatus("fallback")}>
+          <Canvas
+            dpr={[1, 1.5]}
+            camera={{ position: [0, 0, 6], fov: 50 }}
+            gl={{ antialias: false, alpha: true }}
+            onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+          >
+            <ambientLight intensity={0.6} />
+            {PETAL_TEXTURE_URLS.map((url) => (
+              <FallingPetals
+                key={url}
+                progressRef={resolvedProgressRef}
+                textureUrl={url}
+                count={Math.round(PARTICLE_COUNT / PETAL_TEXTURE_URLS.length)}
+              />
+            ))}
+          </Canvas>
+        </WebglErrorBoundary>
+      </div>
+    </>
   );
 }
