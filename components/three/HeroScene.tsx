@@ -840,18 +840,46 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
   // git), depois via `document.visibilitychange`. As duas foram removidas:
   // eu não consegui confirmar com certeza absoluta qual delas (se alguma)
   // era a causa raiz do "pétalas e raio de sol simplesmente não aparecem"
-  // relatado repetidas vezes, porque o ambiente onde eu testo essas coisas
-  // (navegador automatizado) tem uma limitação própria que me impede de
-  // simular com confiança uma aba "de verdade em primeiro plano" — o
-  // `frameloop` condicional é exatamente o tipo de lógica que essa
-  // limitação impede de validar direito. Em vez de arriscar uma TERCEIRA
-  // hipótese não testada, a cena agora roda sempre (`frameloop="always"`,
-  // que é o padrão do R3F) — sem nenhuma pausa condicionada a
-  // observer/visibilidade. Custo: um pouco mais de bateria depois que a
-  // pessoa já rolou passado o hero (a cena decorativa continua desenhando
-  // fora de tela). Ganho: elimina de vez qualquer bug nessa lógica de
-  // pausa como possível causa da cena não aparecer — o que importa mais
-  // aqui é a cena realmente aparecer sempre.
+  // relatado repetidas vezes — o frameloop condicional foi trocado pro
+  // padrão do R3F (`"always"`), sem nenhuma pausa condicionada a
+  // observer/visibilidade.
+  //
+  // A causa raiz DE VERDADE (achada só nesta revisão, depurando ao vivo no
+  // Chrome): o `<canvas>` nascia no tamanho PADRÃO do HTML — 300×150px, um
+  // selo no canto — porque a auto-medida embutida do R3F (via
+  // `react-use-measure`, biblioteca que o `<Canvas>` usa por baixo dos
+  // panos pra saber o tamanho do container) não tinha rodado a tempo.
+  // Confirmado ao vivo, sobrescrevendo `window.dispatchEvent` pra logar:
+  // o canvas ficava travado em 300×150 por 20+ segundos sem nenhuma
+  // correção espontânea.
+  //
+  // A CAUSA disso, olhando o código-fonte do `react-use-measure`
+  // instalado (`node_modules/react-use-measure/dist/index.js`): ele
+  // depende de duas coisas pra medir o container — um `ResizeObserver`
+  // (que aqui simplesmente não disparava, motivo ainda incerto) E um
+  // listener de `window.addEventListener("resize", ...)` que ele mesmo
+  // registra — mas SÓ DENTRO DE UM `useEffect` PRÓPRIO, que só roda
+  // depois que o React termina de "commitar" o componente na tela. Um
+  // evento de `resize` disparado de fora (console) sempre corrigia na
+  // hora porque, a essa altura, aquele listener interno já estava
+  // registrado. A tentativa anterior (ver git) disparava o mesmo evento
+  // de dentro do `onCreated` do `<Canvas>` — só que o R3F chama
+  // `onCreated` MUITO cedo (antes do React terminar de rodar os efeitos),
+  // então o listener do `react-use-measure` ainda nem existia quando o
+  // disparo acontecia — o evento saía no vácuo, sem ninguém ouvindo.
+  //
+  // Fix: mover o disparo pra um `useEffect` deste componente PAI
+  // (`HeroScene`), não mais de dentro do `onCreated` do filho. O React
+  // garante que os efeitos dos componentes FILHOS (`<Canvas>` e tudo que
+  // ele monta por baixo, incluindo o `react-use-measure`) sempre rodam
+  // ANTES do efeito do componente PAI — então, a essa altura, o listener
+  // de `resize` já está garantidamente registrado, e o disparo funciona
+  // de verdade (não só no teste manual isolado).
+  useEffect(() => {
+    if (status !== "webgl") return;
+    window.dispatchEvent(new Event("resize"));
+  }, [status]);
+
   if (status !== "webgl") {
     return <DecorativeFallback />;
   }
@@ -863,46 +891,7 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
           dpr={[1, 1.5]}
           camera={{ position: [0, 0, 6], fov: 50 }}
           gl={{ antialias: false, alpha: true }}
-          onCreated={({ gl }) => {
-            gl.setClearColor(0x000000, 0);
-            // BUG real encontrado nesta revisão (a causa raiz de "as pétalas
-            // sumiram", relatado repetidas vezes ao longo de várias rodadas
-            // de tentativas — nenhuma delas era o problema real): o
-            // `<canvas>` do R3F nasce no tamanho PADRÃO do HTML
-            // (300×150px, um selo no canto) porque o `ResizeObserver`
-            // interno do R3F, que deveria medir o container assim que
-            // monta, não dispara a tempo aqui — confirmado ao vivo no
-            // Chrome: o canvas ficava travado em 300×150 por vários
-            // segundos depois do carregamento, e só saltava pro tamanho
-            // certo da tela quando eu disparava manualmente um evento de
-            // `resize` na janela. Ou seja, a cena inteira (pétalas, sol)
-            // sempre esteve funcionando — só desenhando dentro de um
-            // retângulo minúsculo e praticamente invisível no canto da
-            // tela, não algo quebrado na física/textura/opacidade das
-            // partículas em si (que já tinham sido mexidas várias vezes à
-            // toa em rodadas anteriores tentando resolver isso).
-            //
-            // Provável causa raiz: este componente só monta o `<Canvas>`
-            // depois de um `useEffect` (`status` começa como "checking",
-            // vira "webgl" só depois — ver `HeroScene` abaixo), então o
-            // `ResizeObserver` do R3F se conecta a um container cujo
-            // layout (dentro da `section` com `position: sticky`) ainda
-            // pode não ter "assentado" de verdade no navegador naquele
-            // exato instante — um caso conhecido de borda do
-            // `ResizeObserver` com elementos posicionados via `sticky`.
-            //
-            // Fix: forçar manualmente o R3F a re-medir o container assim
-            // que o WebGL termina de inicializar, disparando um evento de
-            // `resize` sintético (o mesmo evento que, ao testar ao vivo,
-            // corrigia o tamanho na hora) — duas vezes por segurança (um
-            // frame depois, e de novo em 150ms) pra cobrir o caso de o
-            // layout ainda estar se ajustando (fonte carregando, altura da
-            // section mudando) no primeiro disparo.
-            if (typeof window !== "undefined") {
-              requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
-              setTimeout(() => window.dispatchEvent(new Event("resize")), 150);
-            }
-          }}
+          onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
         >
           <ambientLight intensity={0.6} />
           <SunRays progressRef={resolvedProgressRef} />
