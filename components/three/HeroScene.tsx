@@ -59,13 +59,18 @@ const PETAL_TEXTURE_URLS = ["/hero/petals/petal-1.png", "/hero/petals/petal-2.pn
 // desacelera perto do fim — o oposto de um corte seco, mas também sem
 // demorar pra sair de cena.
 const SUN_RAY_FADE_END = 0.02;
-// A partir de quanto do progresso a quantidade de pétalas já chegou no
-// mínimo (nunca some 100% — a cena continua viva o resto da rolagem).
+// A partir de quanto do progresso a quantidade/opacidade de pétalas já
+// chegou no mínimo. Pedido explícito: ao contrário do resto da cena (sol,
+// que também nunca soma 100%), as pétalas devem sumir de vez conforme a
+// rolagem começa — feedback direto: "esmaece todas ao iniciar a rolagem...
+// vai ficar melhor do que manter elas sem o giro horizontal do vídeo" (ou
+// seja, competir com a rotação da câmera do vídeo enquanto ele gira reads
+// pior do que simplesmente deixar a cena decorativa sumir).
 const PETAL_THINNING_END = 0.6;
-const PETAL_MIN_VISIBLE_RATIO = 0.15;
-// Opacidade mínima do material das pétalas no fim do esmaecimento (nunca
-// zero — mesma lógica de "nunca deixar a cena 100% morta" do resto daqui).
-const PETAL_MIN_OPACITY = 0.25;
+const PETAL_MIN_VISIBLE_RATIO = 0;
+// Opacidade mínima do material das pétalas no fim do esmaecimento — 0
+// (sumem de vez), não mais um piso de 25%.
+const PETAL_MIN_OPACITY = 0;
 
 /** `t*t*(3-2t)` — easing suave (sem começo/fim abruptos) pra qualquer transição 0→1 desta cena. */
 function smoothstep(t: number): number {
