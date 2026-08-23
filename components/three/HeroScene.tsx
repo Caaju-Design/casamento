@@ -294,21 +294,32 @@ const PETAL_BLUR_PX = 2.2;
  * início (canvas em branco) e é atualizada (`needsUpdate`) quando a imagem
  * termina de carregar — o `<points>` já pode montar sem esperar.
  */
+// Tamanho de verdade das fotos de pétala em `public/hero/petals/` (as 3 são
+// 256×256 — conferido com PIL). Usado pra pré-alocar o canvas da textura no
+// tamanho FINAL desde o início (ver bug/fix abaixo) em vez de descobrir o
+// tamanho certo só depois que a imagem termina de carregar.
+const PETAL_SOURCE_SIZE = 256;
+
 function loadBlurredTexture(url: string, blurPx: number): THREE.Texture {
+  // Canvas um pouco maior que a imagem original: o `blur()` do canvas
+  // espalha os pixels da borda pra fora do próprio desenho — sem essa
+  // margem extra, o desfoque ficaria cortado seco nas bordas do canvas,
+  // lendo como um degrau em vez de um esmaecimento suave.
+  const margin = blurPx * 4;
+  const size = PETAL_SOURCE_SIZE + margin * 2;
+
   const canvas = document.createElement("canvas");
+  // TAMANHO FINAL definido AQUI, antes de qualquer desenho ou de criar a
+  // `THREE.CanvasTexture` — ver o bug real explicado abaixo, é exatamente
+  // isso que ele exige pra não acontecer.
+  canvas.width = size;
+  canvas.height = size;
   const ctx = canvas.getContext("2d");
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
 
   const image = new Image();
   image.onload = () => {
-    // Canvas um pouco maior que a imagem original: o `blur()` do canvas
-    // espalha os pixels da borda pra fora do próprio desenho — sem essa
-    // margem extra, o desfoque ficaria cortado seco nas bordas do canvas,
-    // lendo como um degrau em vez de um esmaecimento suave.
-    const margin = blurPx * 4;
-    canvas.width = image.width + margin * 2;
-    canvas.height = image.height + margin * 2;
     if (ctx) {
       // `brightness`/`saturate` além do `blur`: as fotos originais, depois
       // de desfocadas e reduzidas a pontos pequenos na cena, ficavam
@@ -316,22 +327,50 @@ function loadBlurredTexture(url: string, blurPx: number): THREE.Texture {
       // cheio de cor — um empurrão de brilho/saturação aqui compensa isso
       // sem precisar aumentar opacidade (que já estava no máximo).
       ctx.filter = `blur(${blurPx}px) brightness(1.25) saturate(1.35)`;
-      ctx.drawImage(image, margin, margin);
+      // Desenha na mesma escala pro tamanho conhecido (`PETAL_SOURCE_SIZE`),
+      // não no tamanho natural do arquivo — assim funciona igual mesmo se
+      // algum dia alguém trocar a foto por uma de dimensão levemente
+      // diferente, sem precisar redimensionar o canvas (ver bug abaixo).
+      ctx.drawImage(image, margin, margin, PETAL_SOURCE_SIZE, PETAL_SOURCE_SIZE);
     }
     texture.needsUpdate = true;
   };
   image.src = url;
 
-  // BUG real encontrado nesta revisão: o canvas dessa textura nunca tem
-  // dimensão potência de 2 (a foto original + a margem do blur somam um
-  // tamanho arbitrário, tipo 284×284) — sem isso, o filtro de minificação
-  // padrão do three.js (`LinearMipmapLinearFilter`) exige mipmaps, que só
-  // funcionam garantidamente em textura POT. Em contexto WebGL1 (comum em
-  // celular/navegador mais antigo — o WebGL2 tolera NPOT, mas nem todo
-  // aparelho/navegador roda WebGL2), isso faz a textura falhar
-  // silenciosamente: sem erro no console, ela simplesmente não aparece —
-  // bate exatamente com "as pétalas sumiram". Desligar mipmap e usar
-  // filtro linear simples resolve pra qualquer tamanho de canvas.
+  // BUG REAL encontrado nesta revisão (a causa de verdade de "as pétalas
+  // sumiram" — confirmado ao vivo pelo console do próprio Manu, 3 erros
+  // idênticos, um por textura: `GL_INVALID_VALUE: glCopySubTextureCHROMIUM:
+  // Offset overflows texture dimensions`): esta função criava a
+  // `THREE.CanvasTexture` com o canvas AINDA no tamanho padrão do HTML
+  // (300×150) — o redimensionamento pro tamanho de verdade (foto + margem
+  // do blur, tipo 273×273) só acontecia DEPOIS, dentro do `image.onload`,
+  // mudando `canvas.width`/`canvas.height` de um objeto de textura que o
+  // Chrome já tinha alocado na GPU no tamanho antigo. Quando o desenho novo
+  // chegava (`texture.needsUpdate = true`), o Chrome tentava um caminho
+  // otimizado de upload (`glCopySubTextureCHROMIUM`, que copia só a região
+  // que mudou em vez de realocar a textura inteira) assumindo que o
+  // tamanho da textura na GPU era o mesmo de antes — só que não era mais,
+  // e o offset dessa cópia "estourava" as dimensões reais, gerando o erro
+  // e fazendo o upload falhar EM SILÊNCIO (sem exceção JS, só o warning no
+  // console) — a textura ficava pra sempre com o conteúdo antigo (o canvas
+  // em branco/transparente do momento da criação), invisível na prática
+  // (falha o `alphaTest` do material por opacidade zero em todo pixel).
+  // Isso não acontecia com NENHUMA outra textura da cena (sol, estrela,
+  // anéis, feixes) porque todas elas são desenhadas em canvas 2D já no
+  // tamanho FINAL, de uma vez só, na hora de criar a textura — só esta
+  // função (a única que carrega uma FOTO, de forma assíncrona) tinha esse
+  // padrão de "criar pequeno, redimensionar depois".
+  //
+  // Fix: o canvas já nasce no tamanho final (`size`, calculado ali em
+  // cima), a `THREE.CanvasTexture` é criada só depois disso — nunca mais
+  // muda de tamanho depois de criada, então não existe mais nenhum
+  // "realocamento" pro Chrome tentar (e falhar) otimizar.
+  //
+  // O canvas também nunca tem dimensão potência de 2 (273×273, não
+  // 256×256) — sem isso, o filtro de minificação padrão do three.js
+  // (`LinearMipmapLinearFilter`) exige mipmaps, que só funcionam
+  // garantidamente em textura POT. Desligar mipmap e usar filtro linear
+  // simples resolve pra qualquer tamanho de canvas.
   texture.generateMipmaps = false;
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
