@@ -66,7 +66,11 @@ const SUN_RAY_FADE_END = 0.02;
 // vai ficar melhor do que manter elas sem o giro horizontal do vídeo" (ou
 // seja, competir com a rotação da câmera do vídeo enquanto ele gira reads
 // pior do que simplesmente deixar a cena decorativa sumir).
-const PETAL_THINNING_END = 0.6;
+// Baixado de 0.6 pra 0.12 — feedback: "está demorando ainda, pode retirar
+// antes" (o sumiço em 60% de rolagem ainda lia como lento). Fica bem mais
+// rápido, ainda com a mesma curva suave (`smoothstep`), só que comprimida
+// num intervalo bem mais curto de rolagem.
+const PETAL_THINNING_END = 0.12;
 const PETAL_MIN_VISIBLE_RATIO = 0;
 // Opacidade mínima do material das pétalas no fim do esmaecimento — 0
 // (sumem de vez), não mais um piso de 25%.
