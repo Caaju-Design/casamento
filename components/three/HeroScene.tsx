@@ -63,6 +63,9 @@ const SUN_RAY_FADE_END = 0.02;
 // mínimo (nunca some 100% — a cena continua viva o resto da rolagem).
 const PETAL_THINNING_END = 0.6;
 const PETAL_MIN_VISIBLE_RATIO = 0.15;
+// Opacidade mínima do material das pétalas no fim do esmaecimento (nunca
+// zero — mesma lógica de "nunca deixar a cena 100% morta" do resto daqui).
+const PETAL_MIN_OPACITY = 0.25;
 
 /** `t*t*(3-2t)` — easing suave (sem começo/fim abruptos) pra qualquer transição 0→1 desta cena. */
 function smoothstep(t: number): number {
@@ -266,16 +269,15 @@ function makeDiscTexture(): THREE.Texture {
   return texture;
 }
 
-// Quanto de desfoque (em px, na escala original da imagem — 256px) aplicar
-// em cada foto de pétala antes de virar textura. Baixado de 3.5 pra 2.2:
-// mesmo com o bug de textura (NPOT/mipmap) corrigido, as pétalas relatadas
-// como "sumidas" de novo provavelmente é isso — desfocadas demais e
-// pequenas, elas se perdem visualmente dentro do próprio vídeo de fundo
-// (que já tem glicínias e bokeh desfocados), fica difícil de notar mesmo
-// estando lá. Menos desfoque + mais brilho/saturação (ver
-// `loadBlurredTexture`) + partícula maior dão mais presença sem virar
-// sticker nítido colado por cima.
-const PETAL_BLUR_PX = 2.2;
+// Desfoque + brilho/saturação agora vêm PRÉ-APLICADOS direto no arquivo
+// (`public/hero/petals/petal-N.png`, gerados com o mesmo tratamento visual
+// — blur, +25% brilho, +35% saturação — que antes era feito em tempo real
+// aqui via `ctx.filter`, ver `loadBlurredTexture` abaixo). Pedido explícito
+// do casal: queriam o desfoque mais forte/visível de verdade nas pétalas do
+// site, igual às referências que mandaram. Ficou zerado aqui (não mais
+// aplicado de novo em cima em tempo real) pra não desfocar/saturar em
+// dobro — a imagem já sai do arquivo do jeito que precisa aparecer.
+const PETAL_BLUR_PX = 0;
 
 /**
  * Carrega uma imagem e devolve uma `THREE.Texture` já desfocada — em vez de
@@ -321,12 +323,11 @@ function loadBlurredTexture(url: string, blurPx: number): THREE.Texture {
   const image = new Image();
   image.onload = () => {
     if (ctx) {
-      // `brightness`/`saturate` além do `blur`: as fotos originais, depois
-      // de desfocadas e reduzidas a pontos pequenos na cena, ficavam
-      // esmaecidas demais pra se destacar contra um vídeo de fundo já
-      // cheio de cor — um empurrão de brilho/saturação aqui compensa isso
-      // sem precisar aumentar opacidade (que já estava no máximo).
-      ctx.filter = `blur(${blurPx}px) brightness(1.25) saturate(1.35)`;
+      // Só aplica filtro de desfoque/brilho/saturação em tempo real se
+      // `blurPx > 0` — hoje o arquivo já vem com isso pré-aplicado (ver
+      // `PETAL_BLUR_PX` acima), então por padrão `ctx.filter` fica "none"
+      // e a foto é desenhada como está, sem borrar/saturar em cima de novo.
+      ctx.filter = blurPx > 0 ? `blur(${blurPx}px) brightness(1.25) saturate(1.35)` : "none";
       // Desenha na mesma escala pro tamanho conhecido (`PETAL_SOURCE_SIZE`),
       // não no tamanho natural do arquivo — assim funciona igual mesmo se
       // algum dia alguém trocar a foto por uma de dimensão levemente
@@ -409,6 +410,7 @@ function FallingPetals({
   count: number;
 }) {
   const pointsRef = useRef<ThreePoints>(null);
+  const materialRef = useRef<THREE.PointsMaterial>(null);
   const petalTexture = useMemo(() => loadBlurredTexture(textureUrl, PETAL_BLUR_PX), [textureUrl]);
 
   useEffect(() => () => petalTexture.dispose(), [petalTexture]);
@@ -444,6 +446,18 @@ function FallingPetals({
     const thinning = smoothstep(progress / PETAL_THINNING_END);
     const visibleRatio = 1 - thinning * (1 - PETAL_MIN_VISIBLE_RATIO);
     points.geometry.setDrawRange(0, Math.max(2, Math.round(count * visibleRatio)));
+
+    // Pedido explícito: além de reduzir a quantidade, a rolagem também
+    // precisa ESMAECER as pétalas suavemente — antes, cada uma simplesmente
+    // "piscava" e desaparecia de repente assim que saía do `drawRange`
+    // acima, sem nenhum fade visual (só sumia). Usando a MESMA curva
+    // (`thinning`) pra também baixar a opacidade do material, o
+    // desaparecimento fica sincronizado e suave, não abrupto — nunca chega
+    // a opacidade zero (`PETAL_MIN_OPACITY`), pela mesma lógica de "nunca
+    // deixar a cena 100% morta" usada em todo o resto daqui.
+    if (materialRef.current) {
+      materialRef.current.opacity = 1 - thinning * (1 - PETAL_MIN_OPACITY);
+    }
 
     // `tsconfig.json` liga `noUncheckedIndexedAccess` — todo acesso por
     // índice (array[i], attributes.position) volta tipado como "| undefined"
@@ -496,6 +510,7 @@ function FallingPetals({
         natural de cor de cada foto é que dá o efeito de pétala de verdade.
       */}
       <pointsMaterial
+        ref={materialRef}
         map={petalTexture}
         size={0.34}
         transparent
