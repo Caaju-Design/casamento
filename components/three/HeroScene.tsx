@@ -863,7 +863,46 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
           dpr={[1, 1.5]}
           camera={{ position: [0, 0, 6], fov: 50 }}
           gl={{ antialias: false, alpha: true }}
-          onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0);
+            // BUG real encontrado nesta revisão (a causa raiz de "as pétalas
+            // sumiram", relatado repetidas vezes ao longo de várias rodadas
+            // de tentativas — nenhuma delas era o problema real): o
+            // `<canvas>` do R3F nasce no tamanho PADRÃO do HTML
+            // (300×150px, um selo no canto) porque o `ResizeObserver`
+            // interno do R3F, que deveria medir o container assim que
+            // monta, não dispara a tempo aqui — confirmado ao vivo no
+            // Chrome: o canvas ficava travado em 300×150 por vários
+            // segundos depois do carregamento, e só saltava pro tamanho
+            // certo da tela quando eu disparava manualmente um evento de
+            // `resize` na janela. Ou seja, a cena inteira (pétalas, sol)
+            // sempre esteve funcionando — só desenhando dentro de um
+            // retângulo minúsculo e praticamente invisível no canto da
+            // tela, não algo quebrado na física/textura/opacidade das
+            // partículas em si (que já tinham sido mexidas várias vezes à
+            // toa em rodadas anteriores tentando resolver isso).
+            //
+            // Provável causa raiz: este componente só monta o `<Canvas>`
+            // depois de um `useEffect` (`status` começa como "checking",
+            // vira "webgl" só depois — ver `HeroScene` abaixo), então o
+            // `ResizeObserver` do R3F se conecta a um container cujo
+            // layout (dentro da `section` com `position: sticky`) ainda
+            // pode não ter "assentado" de verdade no navegador naquele
+            // exato instante — um caso conhecido de borda do
+            // `ResizeObserver` com elementos posicionados via `sticky`.
+            //
+            // Fix: forçar manualmente o R3F a re-medir o container assim
+            // que o WebGL termina de inicializar, disparando um evento de
+            // `resize` sintético (o mesmo evento que, ao testar ao vivo,
+            // corrigia o tamanho na hora) — duas vezes por segurança (um
+            // frame depois, e de novo em 150ms) pra cobrir o caso de o
+            // layout ainda estar se ajustando (fonte carregando, altura da
+            // section mudando) no primeiro disparo.
+            if (typeof window !== "undefined") {
+              requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+              setTimeout(() => window.dispatchEvent(new Event("resize")), 150);
+            }
+          }}
         >
           <ambientLight intensity={0.6} />
           <SunRays progressRef={resolvedProgressRef} />
