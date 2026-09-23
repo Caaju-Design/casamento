@@ -20,3 +20,6 @@
 npm-debug.log*
 .vercel
 .env*
+
+# arquivos temporários de transferência (Claude/Cowork) — nunca versionar
+prototypes/_transfer/

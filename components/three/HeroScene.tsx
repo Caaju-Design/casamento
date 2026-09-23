@@ -5,6 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { Points as ThreePoints, Group as ThreeGroup, Mesh as ThreeMesh, Sprite as ThreeSprite } from "three";
 import { designTokens } from "@/lib/design-system/tokens";
+import { FallingMapleLeaves } from "@/components/three/MapleLeaves";
 
 /**
  * Cena decorativa em three.js para o hero da home — puramente estética, sem
@@ -31,25 +32,6 @@ import { designTokens } from "@/lib/design-system/tokens";
  * brigar com o conteúdo que aparece por cima dela.
  */
 
-// Baixado de 180 pra 110: depois de ligar o `frameloop` sempre ativo (pra
-// corrigir o bug das pétalas somem, ver histórico do git), a cena passou a
-// competir de verdade por tempo de CPU/thread principal com o seek do
-// vídeo no mobile — reportado como o vídeo voltando a travar no fim da
-// rolagem, que já tinha sido resolvido antes. Menos partículas simuladas
-// por frame (a física de cada uma roda sempre, mesmo fora do auge visual)
-// é o jeito mais direto de sobrar mais fôlego pro vídeo sem reintroduzir
-// nenhuma lógica de pausa condicionada (essa é literalmente a causa do
-// bug anterior).
-const PARTICLE_COUNT = 110;
-
-// Pétalas de glicínia enviadas pelo casal (fotos recortadas, já com canal
-// alpha — não são as fotos de banco de imagem com marca d'água usadas só
-// como referência visual antes; essas aqui foram preparadas pelo casal
-// especificamente pra virar sprite) — 3 variações, divididas em partes
-// iguais do total de partículas pra dar variedade sem repetir sempre a
-// mesma pétala.
-const PETAL_TEXTURE_URLS = ["/hero/petals/petal-1.png", "/hero/petals/petal-2.png", "/hero/petals/petal-3.png"];
-
 // A partir de quanto do progresso de rolagem (0 a 1) o raio de sol já
 // sumiu por completo. Baixado de 0.28 pra 0.02 — pedido explícito de novo
 // pra sumir ainda mais cedo (era 5% antes, agora 2%). O fade em si usa uma
@@ -59,23 +41,6 @@ const PETAL_TEXTURE_URLS = ["/hero/petals/petal-1.png", "/hero/petals/petal-2.pn
 // desacelera perto do fim — o oposto de um corte seco, mas também sem
 // demorar pra sair de cena.
 const SUN_RAY_FADE_END = 0.02;
-// A partir de quanto do progresso a quantidade/opacidade de pétalas já
-// chegou no mínimo. Pedido explícito: ao contrário do resto da cena (sol,
-// que também nunca soma 100%), as pétalas devem sumir de vez conforme a
-// rolagem começa — feedback direto: "esmaece todas ao iniciar a rolagem...
-// vai ficar melhor do que manter elas sem o giro horizontal do vídeo" (ou
-// seja, competir com a rotação da câmera do vídeo enquanto ele gira reads
-// pior do que simplesmente deixar a cena decorativa sumir).
-// Baixado de 0.6 pra 0.12 — feedback: "está demorando ainda, pode retirar
-// antes" (o sumiço em 60% de rolagem ainda lia como lento). Fica bem mais
-// rápido, ainda com a mesma curva suave (`smoothstep`), só que comprimida
-// num intervalo bem mais curto de rolagem.
-const PETAL_THINNING_END = 0.12;
-const PETAL_MIN_VISIBLE_RATIO = 0;
-// Opacidade mínima do material das pétalas no fim do esmaecimento — 0
-// (sumem de vez), não mais um piso de 25%.
-const PETAL_MIN_OPACITY = 0;
-
 /** `t*t*(3-2t)` — easing suave (sem começo/fim abruptos) pra qualquer transição 0→1 desta cena. */
 function smoothstep(t: number): number {
   const clamped = Math.min(1, Math.max(0, t));
@@ -276,260 +241,6 @@ function makeDiscTexture(): THREE.Texture {
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
   return texture;
-}
-
-// Desfoque + brilho/saturação agora vêm PRÉ-APLICADOS direto no arquivo
-// (`public/hero/petals/petal-N.png`, gerados com o mesmo tratamento visual
-// — blur, +25% brilho, +35% saturação — que antes era feito em tempo real
-// aqui via `ctx.filter`, ver `loadBlurredTexture` abaixo). Pedido explícito
-// do casal: queriam o desfoque mais forte/visível de verdade nas pétalas do
-// site, igual às referências que mandaram. Ficou zerado aqui (não mais
-// aplicado de novo em cima em tempo real) pra não desfocar/saturar em
-// dobro — a imagem já sai do arquivo do jeito que precisa aparecer.
-const PETAL_BLUR_PX = 0;
-
-/**
- * Carrega uma imagem e devolve uma `THREE.Texture` já desfocada — em vez de
- * post-processing (proibido pelo orçamento de performance deste componente,
- * ver topo do arquivo) ou um shader customizado, o desfoque é aplicado UMA
- * VEZ em canvas 2D (`ctx.filter = "blur(...)"`), antes de subir pra GPU, do
- * mesmo jeito que `makeGlowTexture`/`makeBeamTexture` já geram as texturas
- * do raio de sol em canvas — só que aqui carregando uma foto em vez de
- * desenhar uma forma. Sem isso as pétalas (nítidas, recortadas) destoavam
- * do resto da cena, que já tem desfoque em várias camadas (o próprio vídeo
- * do hero tem glicínias desfocadas ao fundo) — o desfoque aqui é o que dá
- * a sensação de profundidade e faz as pétalas lerem como parte do mesmo
- * ambiente, não como stickers colados por cima.
- *
- * Carregamento é assíncrono (`Image.onload`); a textura já existe desde o
- * início (canvas em branco) e é atualizada (`needsUpdate`) quando a imagem
- * termina de carregar — o `<points>` já pode montar sem esperar.
- */
-// Tamanho de verdade das fotos de pétala em `public/hero/petals/` (as 3 são
-// 256×256 — conferido com PIL). Usado pra pré-alocar o canvas da textura no
-// tamanho FINAL desde o início (ver bug/fix abaixo) em vez de descobrir o
-// tamanho certo só depois que a imagem termina de carregar.
-const PETAL_SOURCE_SIZE = 256;
-
-function loadBlurredTexture(url: string, blurPx: number): THREE.Texture {
-  // Canvas um pouco maior que a imagem original: o `blur()` do canvas
-  // espalha os pixels da borda pra fora do próprio desenho — sem essa
-  // margem extra, o desfoque ficaria cortado seco nas bordas do canvas,
-  // lendo como um degrau em vez de um esmaecimento suave.
-  const margin = blurPx * 4;
-  const size = PETAL_SOURCE_SIZE + margin * 2;
-
-  const canvas = document.createElement("canvas");
-  // TAMANHO FINAL definido AQUI, antes de qualquer desenho ou de criar a
-  // `THREE.CanvasTexture` — ver o bug real explicado abaixo, é exatamente
-  // isso que ele exige pra não acontecer.
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-
-  const image = new Image();
-  image.onload = () => {
-    if (ctx) {
-      // Só aplica filtro de desfoque/brilho/saturação em tempo real se
-      // `blurPx > 0` — hoje o arquivo já vem com isso pré-aplicado (ver
-      // `PETAL_BLUR_PX` acima), então por padrão `ctx.filter` fica "none"
-      // e a foto é desenhada como está, sem borrar/saturar em cima de novo.
-      ctx.filter = blurPx > 0 ? `blur(${blurPx}px) brightness(1.25) saturate(1.35)` : "none";
-      // Desenha na mesma escala pro tamanho conhecido (`PETAL_SOURCE_SIZE`),
-      // não no tamanho natural do arquivo — assim funciona igual mesmo se
-      // algum dia alguém trocar a foto por uma de dimensão levemente
-      // diferente, sem precisar redimensionar o canvas (ver bug abaixo).
-      ctx.drawImage(image, margin, margin, PETAL_SOURCE_SIZE, PETAL_SOURCE_SIZE);
-    }
-    texture.needsUpdate = true;
-  };
-  image.src = url;
-
-  // BUG REAL encontrado nesta revisão (a causa de verdade de "as pétalas
-  // sumiram" — confirmado ao vivo pelo console do próprio Manu, 3 erros
-  // idênticos, um por textura: `GL_INVALID_VALUE: glCopySubTextureCHROMIUM:
-  // Offset overflows texture dimensions`): esta função criava a
-  // `THREE.CanvasTexture` com o canvas AINDA no tamanho padrão do HTML
-  // (300×150) — o redimensionamento pro tamanho de verdade (foto + margem
-  // do blur, tipo 273×273) só acontecia DEPOIS, dentro do `image.onload`,
-  // mudando `canvas.width`/`canvas.height` de um objeto de textura que o
-  // Chrome já tinha alocado na GPU no tamanho antigo. Quando o desenho novo
-  // chegava (`texture.needsUpdate = true`), o Chrome tentava um caminho
-  // otimizado de upload (`glCopySubTextureCHROMIUM`, que copia só a região
-  // que mudou em vez de realocar a textura inteira) assumindo que o
-  // tamanho da textura na GPU era o mesmo de antes — só que não era mais,
-  // e o offset dessa cópia "estourava" as dimensões reais, gerando o erro
-  // e fazendo o upload falhar EM SILÊNCIO (sem exceção JS, só o warning no
-  // console) — a textura ficava pra sempre com o conteúdo antigo (o canvas
-  // em branco/transparente do momento da criação), invisível na prática
-  // (falha o `alphaTest` do material por opacidade zero em todo pixel).
-  // Isso não acontecia com NENHUMA outra textura da cena (sol, estrela,
-  // anéis, feixes) porque todas elas são desenhadas em canvas 2D já no
-  // tamanho FINAL, de uma vez só, na hora de criar a textura — só esta
-  // função (a única que carrega uma FOTO, de forma assíncrona) tinha esse
-  // padrão de "criar pequeno, redimensionar depois".
-  //
-  // Fix: o canvas já nasce no tamanho final (`size`, calculado ali em
-  // cima), a `THREE.CanvasTexture` é criada só depois disso — nunca mais
-  // muda de tamanho depois de criada, então não existe mais nenhum
-  // "realocamento" pro Chrome tentar (e falhar) otimizar.
-  //
-  // O canvas também nunca tem dimensão potência de 2 (273×273, não
-  // 256×256) — sem isso, o filtro de minificação padrão do three.js
-  // (`LinearMipmapLinearFilter`) exige mipmaps, que só funcionam
-  // garantidamente em textura POT. Desligar mipmap e usar filtro linear
-  // simples resolve pra qualquer tamanho de canvas.
-  texture.generateMipmaps = false;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-
-  return texture;
-}
-
-/**
- * Um grupo de pétalas caindo com física simples: gravidade (queda constante
- * por partícula) + vento (deriva lateral senoidal, com fase própria por
- * partícula pra não caírem todas em sincronia) + reciclagem (quando sai da
- * cena por baixo, volta pro topo com posição nova) — looping contínuo,
- * nunca para, independente da rolagem.
- *
- * Recebe `textureUrl` porque a cena inteira usa 3 grupos em paralelo, um
- * pra cada foto de pétala de glicínia que o casal mandou (ver
- * `PETAL_TEXTURE_URLS`) — `THREE.Points` desenha todos os pontos de um
- * mesmo objeto com a MESMA textura num único draw call, então pra ter as 3
- * variações ao mesmo tempo (em vez de repetir sempre a mesma pétala) a
- * saída é ter 3 objetos `<points>` separados, cada um com sua textura e uma
- * fração do total de partículas — mais barato pra GPU do que trocar pra
- * `InstancedMesh` só por causa disso.
- *
- * A quantidade *visível* de pétalas (não a física, que roda igual o tempo
- * todo — o custo de simular esses pontos é desprezível) diminui conforme o
- * scroll avança, via `geometry.setDrawRange`: corta quantos vértices do
- * buffer são desenhados sem recriar geometria a cada frame.
- */
-function FallingPetals({
-  progressRef,
-  textureUrl,
-  count,
-}: {
-  progressRef: RefObject<number>;
-  textureUrl: string;
-  count: number;
-}) {
-  const pointsRef = useRef<ThreePoints>(null);
-  const materialRef = useRef<THREE.PointsMaterial>(null);
-  const petalTexture = useMemo(() => loadBlurredTexture(textureUrl, PETAL_BLUR_PX), [textureUrl]);
-
-  useEffect(() => () => petalTexture.dispose(), [petalTexture]);
-
-  const { positions, fallSpeed, swayPhase, swaySpeed } = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    const fallSpeed = new Float32Array(count);
-    const swayPhase = new Float32Array(count);
-    const swaySpeed = new Float32Array(count);
-    for (let i = 0; i < count; i += 1) {
-      positions[i * 3] = (Math.random() - 0.5) * 12;
-      positions[i * 3 + 1] = Math.random() * 10 - 3;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 6;
-      // Queda bem mais lenta que a v1 (0.35–0.8 lia como "chuva") — pétala
-      // de glicínia paira, não despenca.
-      fallSpeed[i] = 0.08 + Math.random() * 0.14;
-      swayPhase[i] = Math.random() * Math.PI * 2;
-      swaySpeed[i] = 0.25 + Math.random() * 0.5;
-    }
-    return { positions, fallSpeed, swayPhase, swaySpeed };
-  }, [count]);
-
-  useFrame((state, delta) => {
-    const points = pointsRef.current;
-    if (!points) return;
-
-    const progress = progressRef.current ?? 0;
-
-    // Reduz aos poucos a quantidade de pétalas desenhadas conforme a
-    // rolagem avança (nunca chega a zero — mantém a cena viva). `smoothstep`
-    // (mesma easing do raio de sol, ver `SUN_RAY_FADE_END`) em vez de reta
-    // linear, pra não ligar/desligar pétalas num ritmo mecânico.
-    const thinning = smoothstep(progress / PETAL_THINNING_END);
-    const visibleRatio = 1 - thinning * (1 - PETAL_MIN_VISIBLE_RATIO);
-    points.geometry.setDrawRange(0, Math.max(2, Math.round(count * visibleRatio)));
-
-    // Pedido explícito: além de reduzir a quantidade, a rolagem também
-    // precisa ESMAECER as pétalas suavemente — antes, cada uma simplesmente
-    // "piscava" e desaparecia de repente assim que saía do `drawRange`
-    // acima, sem nenhum fade visual (só sumia). Usando a MESMA curva
-    // (`thinning`) pra também baixar a opacidade do material, o
-    // desaparecimento fica sincronizado e suave, não abrupto — nunca chega
-    // a opacidade zero (`PETAL_MIN_OPACITY`), pela mesma lógica de "nunca
-    // deixar a cena 100% morta" usada em todo o resto daqui.
-    if (materialRef.current) {
-      materialRef.current.opacity = 1 - thinning * (1 - PETAL_MIN_OPACITY);
-    }
-
-    // `tsconfig.json` liga `noUncheckedIndexedAccess` — todo acesso por
-    // índice (array[i], attributes.position) volta tipado como "| undefined"
-    // pro TypeScript, mesmo quando a gente sabe (pelo laço `i < count`,
-    // sempre dentro do tamanho dos buffers) que nunca é. Guard explícito +
-    // `?? 0` de fallback deixam isso são pro compilador sem mudar o
-    // comportamento em runtime.
-    const positionAttribute = points.geometry.attributes.position;
-    if (!positionAttribute) return;
-    const array = positionAttribute.array as Float32Array;
-    const time = state.clock.elapsedTime;
-
-    for (let i = 0; i < count; i += 1) {
-      const idx = i * 3;
-      const fall = fallSpeed[i] ?? 0;
-      const phase = swayPhase[i] ?? 0;
-      const sway = swaySpeed[i] ?? 0;
-
-      // Gravidade — cada pétala cai numa velocidade própria.
-      const nextY = (array[idx + 1] ?? 0) - fall * delta;
-      // Vento — deriva lateral senoidal, própria de cada pétala (não sincronizada).
-      const nextX = (array[idx] ?? 0) + Math.sin(time * sway + phase) * 0.15 * delta;
-      const nextZ = (array[idx + 2] ?? 0) + Math.cos(time * sway * 0.7 + phase) * 0.1 * delta;
-
-      // Reciclagem: quando sai da cena por baixo, volta pro topo.
-      if (nextY < -4.5) {
-        array[idx + 1] = 4.5 + Math.random() * 2;
-        array[idx] = (Math.random() - 0.5) * 12;
-        array[idx + 2] = (Math.random() - 0.5) * 6;
-      } else {
-        array[idx + 1] = nextY;
-        array[idx] = nextX;
-        array[idx + 2] = nextZ;
-      }
-    }
-    positionAttribute.needsUpdate = true;
-
-    points.rotation.y += delta * 0.008;
-  });
-
-  return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      {/*
-        Sem `color` aqui de propósito: é uma foto de verdade (não mais um
-        gradiente gerado em canvas), então tingir por cima com um token de
-        cor deixaria tudo com a mesma tonalidade lilás plana — a variação
-        natural de cor de cada foto é que dá o efeito de pétala de verdade.
-      */}
-      <pointsMaterial
-        ref={materialRef}
-        map={petalTexture}
-        size={0.34}
-        transparent
-        opacity={1}
-        sizeAttenuation
-        depthWrite={false}
-        alphaTest={0.01}
-      />
-    </points>
-  );
 }
 
 interface SunBeamSpec {
@@ -883,9 +594,15 @@ export interface HeroSceneProps {
    * for usado fora do hero algum dia.
    */
   progressRef?: RefObject<number>;
+  /**
+   * Liga a camada de trás (raio de sol). Desligada no hero em aquarela: o
+   * fundo agora é papel pintado, e um brilho de lente por cima da tinta
+   * quebrava a ilusão de pintura. Só as pétalas (camada da frente) ficam.
+   */
+  showSun?: boolean;
 }
 
-export function HeroScene({ progressRef }: HeroSceneProps) {
+export function HeroScene({ progressRef, showSun = true }: HeroSceneProps) {
   const [status, setStatus] = useState<"checking" | "webgl" | "fallback">("checking");
   const containerRef = useRef<HTMLDivElement>(null);
   const fallbackProgressRef = useRef(0);
@@ -944,7 +661,8 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
   }, [status]);
 
   if (status !== "webgl") {
-    return <DecorativeFallback />;
+    // Sem o sol, o gradiente de fallback cobriria o fundo pintado do hero.
+    return showSun ? <DecorativeFallback /> : null;
   }
 
   // DUAS camadas 3D separadas, não mais uma só — pedido explícito: as
@@ -967,19 +685,21 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
   // pós-processamento), o total ainda fica dentro do orçamento.
   return (
     <>
-      <div ref={containerRef} aria-hidden="true" className="absolute inset-0 -z-10">
-        <WebglErrorBoundary onFailure={() => setStatus("fallback")}>
-          <Canvas
-            dpr={[1, 1.5]}
-            camera={{ position: [0, 0, 6], fov: 50 }}
-            gl={{ antialias: false, alpha: true }}
-            onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-          >
-            <ambientLight intensity={0.6} />
-            <SunRays progressRef={resolvedProgressRef} />
-          </Canvas>
-        </WebglErrorBoundary>
-      </div>
+      {showSun && (
+        <div ref={containerRef} aria-hidden="true" className="absolute inset-0 -z-10">
+          <WebglErrorBoundary onFailure={() => setStatus("fallback")}>
+            <Canvas
+              dpr={[1, 1.5]}
+              camera={{ position: [0, 0, 6], fov: 50 }}
+              gl={{ antialias: false, alpha: true }}
+              onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+            >
+              <ambientLight intensity={0.6} />
+              <SunRays progressRef={resolvedProgressRef} />
+            </Canvas>
+          </WebglErrorBoundary>
+        </div>
+      )}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-30">
         <WebglErrorBoundary onFailure={() => setStatus("fallback")}>
           <Canvas
@@ -989,14 +709,7 @@ export function HeroScene({ progressRef }: HeroSceneProps) {
             onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
           >
             <ambientLight intensity={0.6} />
-            {PETAL_TEXTURE_URLS.map((url) => (
-              <FallingPetals
-                key={url}
-                progressRef={resolvedProgressRef}
-                textureUrl={url}
-                count={Math.round(PARTICLE_COUNT / PETAL_TEXTURE_URLS.length)}
-              />
-            ))}
+            <FallingMapleLeaves progressRef={resolvedProgressRef} />
           </Canvas>
         </WebglErrorBoundary>
       </div>

@@ -1,7 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useLayoutEffect, useRef, type CSSProperties, type RefObject } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { HeroPreloader } from "@/components/molecules/HeroPreloader";
+import { PAINT_COMPLETE_AT } from "@/components/three/watercolor/timing";
 import { Heading } from "@/components/atoms/Heading";
 import { Text } from "@/components/atoms/Text";
 
@@ -11,12 +13,19 @@ import { Text } from "@/components/atoms/Text";
 const HeroScene = dynamic(() => import("@/components/three/HeroScene").then((mod) => mod.HeroScene), {
   ssr: false,
 });
+const WatercolorHero = dynamic(
+  () => import("@/components/three/WatercolorHero").then((mod) => mod.WatercolorHero),
+  { ssr: false },
+);
+
+/** Quanto do download libera a rolagem (ver READY_FRACTION em WatercolorHero). A barra do preloader chega a 100% nesse ponto. */
+const PRELOAD_READY_FRACTION = 0.5;
 
 /**
- * Altura do "trilho" de rolagem do hero, em múltiplos da viewport. O vídeo
- * fica pinado (`position: sticky`) enquanto o usuário rola por essa
+ * Altura do "trilho" de rolagem do hero, em múltiplos da viewport. A pintura
+ * fica pinada (`position: sticky`) enquanto o usuário rola por essa
  * distância — 1 unidade a mais de altura vira 1 viewport a mais de rolagem
- * disponível pra "puxar" o `currentTime` do vídeo do início ao fim.
+ * pra câmera andar e a tinta cair.
  *
  * Efeito puramente decorativo — mesma exceção de `prefers-reduced-motion`
  * já documentada em components/three/HeroScene.tsx e
@@ -28,7 +37,7 @@ const SCROLL_TRACK_VH = 300;
 /**
  * Fração do progresso de rolagem (0 a 1) em que a caligrafia de entrada
  * termina de sumir — lê `--hero-progress` (setada em `document.documentElement`
- * por `useScrollScrubVideo`) e faz o próprio fade em CSS puro (`clamp()`),
+ * por `useHeroScrollProgress`) e faz o próprio fade em CSS puro (`clamp()`),
  * sem re-render do React a cada frame de scroll. Ao contrário do bloco de
  * conteúdo padrão (ver `--hero-reveal` abaixo), a caligrafia só tem essa
  * janela de saída — ela não volta a aparecer depois.
@@ -36,208 +45,109 @@ const SCROLL_TRACK_VH = 300;
 const CALLIGRAPHY_FADE_END = 0.12;
 
 /**
- * Segundo do vídeo (não fração de progresso — segundo de verdade) a partir
- * do qual a camada do vídeo (vídeo + scrim, a cena three.js fica de fora,
- * ver comentário mais abaixo) começa a dissolver, revelando o bloco de
- * conteúdo padrão do site (título, data, menu de âncoras) por trás — os
- * dois lados dessa dissolução terminam exatamente no último frame do
- * vídeo. Calculado contra `video.duration` em tempo real, então continua
- * correto se um dia o vídeo do hero for trocado por um de outra duração.
- *
- * Ajustado pra 6.8s (não os 8s originais) depois de conferir o material
- * bruto quadro a quadro: o casal já está praticamente na pose do beijo a
- * partir do 7º segundo e segura essa pose até o fim (10.04s) — é assim
- * mesmo a gravação, não é bug. Com o fade começando só no 8º segundo sobrava
- * pouco menos de 2s de dissolução pra cobrir os últimos 20% da rolagem
- * inteira, e a pose "parada" lia como o vídeo tendo travado. Começar a
- * dissolver um pouco antes (bem quando os dois se aproximam) faz o
- * "segurar a pose" virar parte do próprio efeito, em vez de um
- * congelamento antes dele.
+ * Fração da rolagem em que a camada do hero começa a dissolver pro bloco de
+ * conteúdo. Vem do hero antigo em vídeo (6.8s de 10.04s — o casal já está na
+ * pose do beijo e segura até o fim) e continua valendo: a pintura termina
+ * exatamente aqui (`PAINT_COMPLETE_AT`) e aí o conteúdo sobe por cima.
  */
-const VIDEO_FADE_START_SECONDS = 6.8;
+const HERO_FADE_START = PAINT_COMPLETE_AT;
 
 /**
- * Amarra o `currentTime` de um `<video>` à posição de rolagem de um
- * elemento "trilho" mais alto que ele (`trackRef`), sem nunca chamar
- * `.play()` — o vídeo só avança via seek manual, então no primeiro
- * carregamento (progress = 0) ele fica parado no primeiro frame até o
- * usuário começar a rolar.
+ * Amarra o progresso do hero à posição de rolagem do "trilho" (`trackRef`).
  *
- * Publica o estado de rolagem em CSS custom properties no
- * `document.documentElement` (não num elemento local do hero!) — assim tanto
- * o conteúdo interno do próprio `HeroSection` quanto o `AnchorNav`, que é
- * renderizado como *irmão* dele em `HomePageTemplate` (não descendente, então
- * não herdaria de uma custom property só do trilho), conseguem ler o mesmo
- * estado por herança de CSS, sem precisar de nenhum React context:
+ * Publica o estado em CSS custom properties no `document.documentElement`
+ * (não num elemento local!) — assim o `AnchorNav`, que é *irmão* do hero em
+ * `HomePageTemplate`, lê o mesmo estado por herança de CSS, sem context:
  *
  *  - `--hero-progress`: 0→1, progresso bruto de rolagem pelo trilho inteiro.
- *  - `--hero-video-opacity`: 1 durante toda a rolagem principal, dissolvendo
- *    pra 0 só na janela final (`VIDEO_FADE_START_SECONDS` → fim do vídeo).
- *  - `--hero-reveal`: o inverso do anterior (0→1) — o bloco de conteúdo
- *    padrão e o menu de âncoras usam essa variável, então ficam invisíveis
- *    durante toda a rolagem do vídeo e só aparecem, em sincronia, na mesma
- *    janela final em que o vídeo se dissolve.
- *  - `--hero-reveal-pointer-events`: "none" até o reveal estar quase
- *    completo, pra menu/links não ficarem clicáveis (nem focáveis por tab)
- *    enquanto ainda estão (quase) transparentes.
+ *  - `--hero-video-opacity`: opacidade da camada pintada (nome mantido do
+ *    hero antigo em vídeo pra não quebrar quem lê): 1 durante a pintura,
+ *    dissolvendo pra 0 de `HERO_FADE_START` até o fim do trilho.
+ *  - `--hero-reveal`: o inverso (0→1) — bloco de conteúdo e menu de âncoras.
+ *  - `--hero-reveal-pointer-events`: "none" até o reveal estar quase completo.
+ *
+ * Não existe mais `<video>` nem seek: o progresso vai pra `progressRef` e o
+ * canvas em aquarela (WatercolorHero) desenha o quadro certo sozinho.
  */
-function useScrollScrubVideo(
-  trackRef: RefObject<HTMLDivElement | null>,
-  videoRef: RefObject<HTMLVideoElement | null>,
-  progressRef: RefObject<number>,
-) {
+function useHeroScrollProgress(trackRef: RefObject<HTMLDivElement | null>, progressRef: RefObject<number>) {
   useLayoutEffect(() => {
-    const video = videoRef.current;
     const track = trackRef.current;
     const root = document.documentElement;
-    if (!video || !track) return;
-
-    let duration = 0;
+    if (!track) return;
     let rafId: number | null = null;
 
-    // Guarda contra seeks sobrepostos — a causa mais provável do "trava
-    // mas a rolagem continua" relatado no mobile (iPhone/Brave): sem essa
-    // guarda, cada frame de scroll dispara `video.currentTime = X` na
-    // hora, mesmo que o seek anterior ainda não tenha terminado de
-    // decodificar. Em decoders mais lentos (celular) isso enfileira vários
-    // pedidos de seek mais rápido do que o vídeo consegue processar — a
-    // imagem fica presa no frame do PRIMEIRO seek da fila enquanto
-    // `--hero-progress` (e o resto da UI) já avançou muito além, e quando
-    // o decoder enfim libera, ele pula direto pro último pedido, lendo
-    // como "travou e depois deu um salto". A correção é nunca sobrepor:
-    // só disparar um novo `currentTime` depois que o evento `seeked`
-    // confirmar que o anterior terminou; se a rolagem mudou nesse meio
-    // tempo, guarda só o alvo mais recente (`pendingSeekTime`) e aplica
-    // ele assim que der, sem empilhar seeks intermediários.
-    let isSeeking = false;
-    let pendingSeekTime: number | null = null;
-    let seekWatchdogId: ReturnType<typeof setTimeout> | null = null;
-
-    const seekTo = (time: number) => {
-      if (isSeeking) {
-        pendingSeekTime = time;
-        return;
-      }
-      // 0.12s (não mais 0.08s) — cada seek força o decoder a trabalhar; um
-      // limiar maior dispara ainda menos seeks por segundo de scroll,
-      // sobrando mais folga pro decoder de celular acompanhar.
-      if (Math.abs(video.currentTime - time) <= 0.12) return;
-
-      isSeeking = true;
-      video.currentTime = time;
-
-      // Watchdog: em tese todo `currentTime` dispara `seeked` mais cedo ou
-      // mais tarde, mas navegadores têm bug (principalmente mobile) onde o
-      // evento às vezes não dispara — sem isso, `isSeeking` ficaria preso
-      // em `true` pra sempre e o vídeo pararia de responder ao scroll até
-      // um recarregamento de página. Baixado de 400ms pra 180ms: era
-      // exatamente esse tempo de espera que lia como "trava" no relato do
-      // mobile — quando o `seeked` de fato não disparava, o vídeo ficava
-      // 400ms sem reagir a scroll nenhum antes do watchdog liberar de novo.
-      if (seekWatchdogId !== null) clearTimeout(seekWatchdogId);
-      seekWatchdogId = setTimeout(() => {
-        isSeeking = false;
-        if (pendingSeekTime !== null) {
-          const next = pendingSeekTime;
-          pendingSeekTime = null;
-          seekTo(next);
-        }
-      }, 180);
-    };
-
-    const handleSeeked = () => {
-      isSeeking = false;
-      if (seekWatchdogId !== null) {
-        clearTimeout(seekWatchdogId);
-        seekWatchdogId = null;
-      }
-      if (pendingSeekTime !== null) {
-        const next = pendingSeekTime;
-        pendingSeekTime = null;
-        seekTo(next);
-      }
-    };
-    video.addEventListener("seeked", handleSeeked);
-
-    const updateScrub = () => {
+    const update = () => {
       rafId = null;
       const rect = track.getBoundingClientRect();
-      const scrollableDistance = rect.height - window.innerHeight;
-      const progress = scrollableDistance > 0 ? Math.min(1, Math.max(0, -rect.top / scrollableDistance)) : 0;
-
-      root.style.setProperty("--hero-progress", progress.toString());
-      // Mesmo valor, mas como número puro numa ref — a cena three.js
-      // (HeroScene) lê isso a cada frame do próprio loop de render dela,
-      // sem precisar reler CSS nem re-renderizar o React.
+      const scrollable = rect.height - window.innerHeight;
+      const progress = scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0;
       progressRef.current = progress;
 
-      if (duration > 0) {
-        const targetTime = progress * duration;
-        seekTo(targetTime);
-
-        // Dissolve final: vídeo em opacidade 1 até `VIDEO_FADE_START_SECONDS`,
-        // depois cai pra 0 no último frame — só nesse trecho final é que a
-        // camada do vídeo começa a sumir, revelando o bloco de conteúdo
-        // padrão (título, data, menu) que sobe por trás em sincronia
-        // (`--hero-reveal` é sempre `1 - videoOpacity`).
-        const fadeWindow = Math.max(0.001, duration - VIDEO_FADE_START_SECONDS);
-        const videoOpacity =
-          targetTime <= VIDEO_FADE_START_SECONDS ? 1 : Math.max(0, 1 - (targetTime - VIDEO_FADE_START_SECONDS) / fadeWindow);
-        const reveal = 1 - videoOpacity;
-
-        root.style.setProperty("--hero-video-opacity", videoOpacity.toString());
-        root.style.setProperty("--hero-reveal", reveal.toString());
-        // Só fica clicável (e focável por tab) quando o reveal já está
-        // visualmente quase completo — antes disso os links do menu e do
-        // bloco de conteúdo ficariam "fantasmas" por cima do vídeo.
-        root.style.setProperty("--hero-reveal-pointer-events", reveal > 0.5 ? "auto" : "none");
-      }
+      const fade = progress <= HERO_FADE_START ? 1 : Math.max(0, 1 - (progress - HERO_FADE_START) / (1 - HERO_FADE_START));
+      const reveal = 1 - fade;
+      root.style.setProperty("--hero-progress", progress.toString());
+      root.style.setProperty("--hero-video-opacity", fade.toString());
+      root.style.setProperty("--hero-reveal", reveal.toString());
+      root.style.setProperty("--hero-reveal-pointer-events", reveal > 0.5 ? "auto" : "none");
     };
-
-    const handleLoadedMetadata = () => {
-      duration = video.duration || 0;
-      updateScrub();
-    };
-
-    video.addEventListener("loadedmetadata", handleLoadedMetadata);
-    // Vídeo já em cache do navegador pode nunca disparar o evento acima.
-    if (video.readyState >= 1) handleLoadedMetadata();
 
     const onScrollOrResize = () => {
       if (rafId !== null) return;
-      rafId = requestAnimationFrame(updateScrub);
+      rafId = requestAnimationFrame(update);
     };
 
-    updateScrub();
+    update();
     window.addEventListener("scroll", onScrollOrResize, { passive: true });
     window.addEventListener("resize", onScrollOrResize);
-
     return () => {
-      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      video.removeEventListener("seeked", handleSeeked);
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
       if (rafId !== null) cancelAnimationFrame(rafId);
-      if (seekWatchdogId !== null) clearTimeout(seekWatchdogId);
-      // Ao desmontar o hero (nunca acontece nesta página hoje, mas evita
-      // deixar `document.documentElement` com variáveis "presas" caso o
-      // componente algum dia passe a ser condicional), devolve o menu ao
-      // estado visível/clicável padrão.
       root.style.removeProperty("--hero-progress");
       root.style.removeProperty("--hero-video-opacity");
       root.style.removeProperty("--hero-reveal");
       root.style.removeProperty("--hero-reveal-pointer-events");
     };
-  }, [trackRef, videoRef, progressRef]);
+  }, [trackRef, progressRef]);
 }
 
-/** Organism `HeroSection` — vídeo do casal amarrado à rolagem + cena three.js decorativa por cima. */
+type HeroPhase = "loading" | "ready" | "fallback";
+
+/**
+ * Decide se a rolagem fica travada enquanto a pintura carrega: só se a
+ * pessoa chegou no topo. Quem abre um link direto pra `#evento`, por
+ * exemplo, nem vê o preloader. Retorna `false` só depois de hidratar
+ * (no HTML do servidor o preloader já nasce travando — ver HeroPreloader).
+ */
+function useShouldLockForHero(trackRef: RefObject<HTMLDivElement | null>) {
+  const [lock, setLock] = useState(true);
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    const nearTop = !location.hash && (!track || window.scrollY < track.offsetHeight * 0.5);
+    if (nearTop) {
+      // recarregar no meio do trilho voltaria a um hero "a meio caminho"
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+    } else {
+      setLock(false);
+    }
+  }, [trackRef]);
+  return lock;
+}
+
+/** Organism `HeroSection` — pintura em aquarela do casal amarrada à rolagem + pétalas decorativas por cima. */
 export function HeroSection() {
   const trackRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef(0);
+  const [phase, setPhase] = useState<HeroPhase>("loading");
+  const [loadFraction, setLoadFraction] = useState(0);
 
-  useScrollScrubVideo(trackRef, videoRef, progressRef);
+  useHeroScrollProgress(trackRef, progressRef);
+  const lockForHero = useShouldLockForHero(trackRef);
+
+  const handleLoadProgress = useCallback((f: number) => setLoadFraction(f), []);
+  const handleReady = useCallback(() => setPhase((p) => (p === "loading" ? "ready" : p)), []);
+  const handleFallback = useCallback(() => setPhase("fallback"), []);
 
   return (
     <div ref={trackRef} className="relative" style={{ height: `${SCROLL_TRACK_VH}vh` }}>
@@ -246,68 +156,37 @@ export function HeroSection() {
         className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-6 text-center"
       >
         {/*
-          Camada do vídeo — só vídeo + scrim, opacidade 1 durante toda a
-          rolagem principal, dissolvendo na janela final (ver
-          `VIDEO_FADE_START_SECONDS` → fim). `pointer-events: none` porque é
-          puramente decorativa, nunca deve capturar clique nem enquanto
-          visível.
+          Camada pintada — canvas em aquarela (ou, se WebGL/rede falharem, a
+          pintura final como imagem estática). Opacidade 1 durante toda a
+          pintura, dissolvendo na janela final (`HERO_FADE_START` → fim).
+          `pointer-events: none`: puramente decorativa.
 
-          A cena three.js (pétalas + raio de sol) FICA DE FORA desta div de
-          propósito: ela já reage ao progresso de rolagem com a própria
-          lógica dela (`FallingPetals`/`SunRays` em HeroScene.tsx reduzem
-          partículas e apagam o raio de sol conforme o scroll avança) — se
-          ela ficasse dentro desta camada, herdaria TAMBÉM a opacidade do
-          vídeo e sumiria de vez assim que o vídeo começasse a dissolver
-          (foi exatamente o bug reportado: "sumiram as pétalas e o raio de
-          sol"). Como componente próprio, continua viva e visível mesmo
-          depois do vídeo já ter sumido de vez.
+          As pétalas (HeroScene) ficam DE FORA desta div de propósito — se
+          ficassem dentro, herdariam a opacidade e sumiriam junto no fim.
         */}
         <div
-          className="absolute inset-0 -z-20"
+          className="absolute inset-0 -z-20 bg-page"
           style={{ opacity: "var(--hero-video-opacity, 1)", pointerEvents: "none" }}
           aria-hidden="true"
         >
-          <video
-            ref={videoRef}
-            className="absolute inset-0 h-full w-full object-cover"
-            muted
-            playsInline
-            preload="auto"
-            poster="/hero/banner-hero-poster.jpg"
-            aria-hidden="true"
-          >
-            {/*
-              Versão bem mais leve (854px de largura, em vez de 1920px —
-              baixado de uma tentativa anterior de 1280px que ainda não foi
-              suficiente pra sumir com o travamento relatado no iPhone) pra
-              telas estreitas — celular é o cenário mais sensível ao
-              travamento no scroll-scrub, porque cada seek força o decoder
-              a decodificar de novo, e um vídeo menor decodifica bem mais
-              rápido. O navegador testa os `<source>` na ordem e usa o
-              primeiro cujo `media` bate, então as versões mobile vêm
-              primeiro.
-            */}
-            <source src="/hero/banner-hero-mobile.webm" type="video/webm" media="(max-width: 768px)" />
-            <source src="/hero/banner-hero-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
-            <source src="/hero/banner-hero.webm" type="video/webm" />
-            <source src="/hero/banner-hero.mp4" type="video/mp4" />
-          </video>
-          {/*
-            Scrim gradiente (mais escuro no centro/base, onde fica o texto;
-            quase transparente nas bordas) — garante contraste em qualquer
-            frame do vídeo sem esconder o vídeo inteiro atrás de um véu chapado.
-          */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse 70% 60% at 50% 65%, rgba(34,27,25,0.55) 0%, rgba(34,27,25,0.25) 45%, rgba(34,27,25,0.05) 75%)",
-            }}
-            aria-hidden="true"
-          />
+          {phase === "fallback" ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src="/hero/aquarela/fallback.webp"
+              alt=""
+              className="absolute inset-0 h-full w-full object-contain sm:object-cover"
+            />
+          ) : (
+            <WatercolorHero
+              progressRef={progressRef}
+              onLoadProgress={handleLoadProgress}
+              onReady={handleReady}
+              onFallback={handleFallback}
+            />
+          )}
         </div>
 
-        <HeroScene progressRef={progressRef} />
+        {phase !== "loading" && <HeroScene progressRef={progressRef} showSun={false} />}
 
         {/*
           Caligrafia de entrada — só existe no primeiro momento (progress
@@ -339,10 +218,12 @@ export function HeroSection() {
         */}
         <p
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-1 px-6 text-center font-script leading-none text-white sm:flex-row sm:gap-10"
+          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-1 px-6 text-center font-script leading-none text-ink-700 sm:flex-row sm:gap-10"
           style={{
             fontSize: "clamp(3.5rem, 12vw, 8rem)",
-            textShadow: "0 2px 24px rgba(34,27,25,0.35)",
+            // tinta escura sobre papel/aquarela, com um halo de papel pra
+            // continuar legível quando cai em cima de uma mancha escura
+            textShadow: "0 0 18px rgba(255,250,243,0.9), 0 0 4px rgba(255,250,243,0.8)",
             opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)`,
           }}
         >
@@ -410,6 +291,12 @@ export function HeroSection() {
           </nav>
         </div>
       </section>
+      {lockForHero && (
+        <HeroPreloader
+          progress={phase === "loading" ? loadFraction / PRELOAD_READY_FRACTION : 1}
+          done={phase !== "loading"}
+        />
+      )}
     </div>
   );
 }
