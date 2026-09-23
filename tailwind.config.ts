@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import { designTokens } from "./lib/design-system/tokens";
+import { designTokens, palette } from "./lib/design-system/tokens";
 
 /**
  * Tema do Tailwind derivado dos tokens DTCG do design system
@@ -15,6 +15,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // paleta oficial (ex.: bg-terracota-500, text-salvia-800)
+        ...palette,
+        "brand-logo": designTokens.color.brandLogo,
         page: designTokens.color.page,
         surface: designTokens.color.surface,
         accent: designTokens.color.accent,

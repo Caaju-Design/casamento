@@ -134,7 +134,7 @@ const COMP_FRAG = /* glsl */ `
 
     float pg = texture2D(tNoise, q*2.4).r*0.55 + texture2D(tNoise, q*7.5).g*0.45;
     float pgh = texture2D(tNoise, q*7.5 + px*3.0).g;
-    vec3 paper = vec3(1.0, 0.98, 0.953);              // = color.background.page (#fffaf3)
+    vec3 paper = vec3(0.961, 0.949, 0.929);           // = color.background.page (linho.50 #f5f2ed)
 
     vec4 m = texture2D(tMask, uv + (texture2D(tNoise, q*1.7).rg - 0.5) * 0.004) * ${MASK_SCALE.toFixed(1)};
     float P = m.r, E = m.g;
@@ -252,7 +252,7 @@ export class WatercolorEngine {
 
     this.maskRT = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
 
-    this.blank = new THREE.DataTexture(new Uint8Array([255, 250, 243, 255]), 1, 1);
+    this.blank = new THREE.DataTexture(new Uint8Array([245, 242, 237, 255]), 1, 1);
     this.blank.needsUpdate = true;
 
     this.cu = {

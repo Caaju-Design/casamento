@@ -91,6 +91,24 @@ function token(path: string): string {
   return value;
 }
 
+/** Famílias da paleta oficial do casamento (7 cores × 7 tons: 50…900). */
+export const PALETTE_FAMILIES = ["amarelo", "pessego", "terracota", "caramelo", "salvia", "linho", "ardosia"] as const;
+export const PALETTE_STEPS = ["50", "100", "200", "500", "700", "800", "900"] as const;
+export type PaletteFamily = (typeof PALETTE_FAMILIES)[number];
+
+function paletteFamily(family: PaletteFamily): Record<(typeof PALETTE_STEPS)[number], string> {
+  return Object.fromEntries(PALETTE_STEPS.map((step) => [step, token(`color.${family}.${step}`)])) as Record<
+    (typeof PALETTE_STEPS)[number],
+    string
+  >;
+}
+
+/** Paleta oficial completa, ex.: `palette.terracota["500"]`. */
+export const palette = Object.fromEntries(PALETTE_FAMILIES.map((f) => [f, paletteFamily(f)])) as Record<
+  PaletteFamily,
+  Record<(typeof PALETTE_STEPS)[number], string>
+>;
+
 /** Tokens organizados para consumo direto em componentes React/three.js. */
 export const designTokens = {
   color: {
@@ -124,6 +142,7 @@ export const designTokens = {
     ink700: token("color.ink.700"),
     ink900: token("color.ink.900"),
     white: token("color.white"),
+    brandLogo: token("color.brand.logo"),
   },
   font: {
     heading: token("font.heading"),

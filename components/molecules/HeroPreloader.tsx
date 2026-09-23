@@ -56,9 +56,8 @@ export function HeroPreloader({ progress, done }: HeroPreloaderProps) {
       <noscript>
         <style>{`html,body{overflow:auto!important;touch-action:auto!important}[data-hero-preloader]{display:none!important}`}</style>
       </noscript>
-      <p className="font-script leading-none text-ink-700" style={{ fontSize: "clamp(2.75rem, 9vw, 4.5rem)" }}>
-        Gabriela <span style={{ fontSize: "0.55em" }}>&amp;</span> Emanuel
-      </p>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/logo-ge.svg" alt="Gabriela & Emanuel" width={470} height={401} className="h-auto w-36 sm:w-44" />
 
       {/* Pincelada que se enche de tinta conforme o download avança */}
       <svg viewBox="0 0 320 40" className="w-64 max-w-[70vw]" aria-hidden="true">
@@ -76,7 +75,7 @@ export function HeroPreloader({ progress, done }: HeroPreloaderProps) {
         <path
           d="M8 22 C 70 12, 140 30, 200 20 S 290 16, 312 21"
           fill="none"
-          stroke="#a85a52"
+          stroke="#984b2c"
           strokeOpacity="0.12"
           strokeWidth="14"
           strokeLinecap="round"
@@ -87,7 +86,7 @@ export function HeroPreloader({ progress, done }: HeroPreloaderProps) {
           <path
             d="M8 22 C 70 12, 140 30, 200 20 S 290 16, 312 21"
             fill="none"
-            stroke="#a85a52"
+            stroke="#984b2c"
             strokeOpacity="0.75"
             strokeWidth="14"
             strokeLinecap="round"

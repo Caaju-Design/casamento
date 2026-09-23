@@ -142,11 +142,11 @@ def render_leaf(seed, base, tip):
 
 
 LEAVES = [
-    # (miolo, pontas) — tons do BANNERHERO
-    ((0.93, 0.52, 0.16), (0.72, 0.09, 0.07)),  # laranja → carmim
-    ((0.88, 0.20, 0.08), (0.55, 0.05, 0.10)),  # vermelho → vinho
-    ((0.97, 0.72, 0.28), (0.90, 0.35, 0.10)),  # âmbar → laranja
-    ((0.85, 0.28, 0.10), (0.68, 0.10, 0.12)),  # vermelho-laranja → carmim
+    # (miolo, pontas) — tons quentes da paleta oficial do casamento
+    ((0.941, 0.702, 0.329), (0.925, 0.557, 0.302)),  # amarelo.500 → pessego.500
+    ((0.925, 0.557, 0.302), (0.596, 0.294, 0.173)),  # pessego.500 → terracota.500
+    ((0.953, 0.761, 0.443), (0.694, 0.416, 0.224)),  # amarelo.200 → pessego.700
+    ((0.761, 0.525, 0.380), (0.447, 0.224, 0.129)),  # caramelo.500 → terracota.700
 ]
 
 atlas = np.zeros((SIZE * 2, SIZE * 2, 4), dtype=np.uint8)

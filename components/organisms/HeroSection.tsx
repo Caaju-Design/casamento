@@ -189,50 +189,51 @@ export function HeroSection() {
         {phase !== "loading" && <HeroScene progressRef={progressRef} showSun={false} />}
 
         {/*
-          Caligrafia de entrada — só existe no primeiro momento (progress
-          perto de 0) e some assim que a rolagem começa. `opacity` via
-          `clamp()` lendo `--hero-progress` direto no CSS: acompanha o dedo
-          no scroll 1:1, sem esperar um re-render do React. `pointer-events:
-          none` porque é só assinatura decorativa — nunca deve capturar
-          clique, nem depois de sumir.
+          Abertura com a identidade do casamento: monograma G&E (logo
+          oficial, `public/brand/logo-ge.svg`) + os nomes em Cochin. Só existe
+          no primeiro momento (progress perto de 0) e some assim que a
+          rolagem começa — `opacity` via `clamp()` lendo `--hero-progress`
+          direto no CSS, acompanhando o dedo 1:1 sem re-render do React.
+          Decorativo (`aria-hidden`, `pointer-events: none`): o título real da
+          página é o <h1> do bloco de conteúdo abaixo.
 
-          Layout diferente por tamanho de tela, não um `flex-wrap` que
-          quebra sozinho: no mobile (padrão, sem prefixo) é
-          `flex-col items-center text-center` — "Gabriela" e "Emanuel"
-          empilhados e centralizados horizontalmente (era `items-start
-          text-left`, ficava tudo grudado na margem esquerda — pedido
-          explícito pra centralizar), com o "&" (menor) entre os dois,
-          também centralizado, tipo uma assinatura. A partir de `sm:` vira
-          `flex-row items-center justify-center` — os 3 numa linha só,
-          centralizados, "Gabriela & Emanuel" corrido (o texto original).
-
-          `sm:gap-10` (não mais `sm:gap-4`) no desktop: com a fonte
-          script gigante (`clamp(..., 8rem)`) 1rem de respiro entre os
-          `<span>` lia como colado — as curvas do "a" final de "Gabriela"
-          quase encostavam no "&", e o "&" quase encostava no "E" de
-          "Emanuel" (reportado como "falta espaço"). Faixa maior de gap dá
-          folga visível nesse tamanho de fonte. `mx-1` extra direto no "&"
-          (que já é 0.55em menor que o resto) reforça essa respiração dos
-          dois lados independente do `gap`, porque o próprio glifo "&" da
-          Fleur De Leah tem bastante peso visual grudado nas bordas.
+          A logo é sálvia clara; por cima da aquarela (a copa vermelha fica
+          bem atrás dela) ela sumiria. Por isso ganha um "respiro" de papel
+          por trás: uma aguada clara e esfumada, como se o pintor tivesse
+          deixado aquele pedaço do papel em branco pra assinar.
         */}
-        <p
+        <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-1 px-6 text-center font-script leading-none text-ink-700 sm:flex-row sm:gap-10"
-          style={{
-            fontSize: "clamp(3.5rem, 12vw, 8rem)",
-            // tinta escura sobre papel/aquarela, com um halo de papel pra
-            // continuar legível quando cai em cima de uma mancha escura
-            textShadow: "0 0 18px rgba(255,250,243,0.9), 0 0 4px rgba(255,250,243,0.8)",
-            opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)`,
-          }}
+          className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center"
+          style={{ opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)` }}
         >
-          <span>Gabriela</span>
-          <span className="mx-1 self-center sm:self-auto" style={{ fontSize: "0.55em" }}>
-            &amp;
-          </span>
-          <span>Emanuel</span>
-        </p>
+          <div className="relative flex flex-col items-center gap-4">
+            <div
+              className="absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                width: "175%",
+                height: "150%",
+                background: "radial-gradient(closest-side, rgba(245,242,237,0.92), rgba(245,242,237,0.7) 55%, rgba(245,242,237,0) 100%)",
+                filter: "blur(6px)",
+              }}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/logo-ge.svg"
+              alt=""
+              width={470}
+              height={401}
+              className="h-auto"
+              style={{ width: "clamp(8.5rem, 26vw, 15rem)" }}
+            />
+            <p
+              className="font-display uppercase text-text-primary"
+              style={{ fontSize: "clamp(0.95rem, 2.6vw, 1.35rem)", letterSpacing: "0.32em" }}
+            >
+              Gabriela &amp; Emanuel
+            </p>
+          </div>
+        </div>
 
         {/*
           Bloco de conteúdo padrão — fica invisível durante toda a rolagem

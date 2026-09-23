@@ -9,31 +9,25 @@ export const metadata: Metadata = {
 /**
  * Layout raiz — só um visual (claro, estilo Bridgerton/Regência), sem
  * alternância claro/escuro (ver docs/architecture/adr/0001-origem-design-system.md).
- * As fontes (Cormorant Garamond / Lora / Fleur De Leah) espelham
- * docs/design-system/tokens/primitivos.tokens.json (fontFamily.display/body/script).
+ * As fontes (Cochin LT Pro / Museo Sans, via Adobe Fonts) espelham
+ * docs/design-system/tokens/primitivos.tokens.json (fontFamily.display/body).
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/*
-          Carregamento de fonte externa via <link> no layout raiz do App
-          Router — a regra abaixo é voltada ao Pages Router
-          (pages/_document.js), onde esse padrão carregaria a fonte só numa
-          página; aqui o layout já é global.
-          Ver https://nextjs.org/docs/app/getting-started/fonts#google-fonts.
-
-          Fleur De Leah entrou pra dar a assinatura caligráfica dos nomes no
-          overlay do hero (ver components/organisms/HeroSection.tsx) —
-          mapeada em fontFamily.script (docs/design-system/tokens/primitivos.tokens.json).
+          Tipografia oficial do casamento via kit web do Adobe Fonts
+          (kit "Casamento Gabriela & Emanuel", id wjw8qvm, liberado pra
+          casamento.caaju.com.br, *.vercel.app e localhost — gerenciar em
+          fonts.adobe.com/my_fonts#web_projects-section):
+            - Cochin LT Pro  → "cochin-lt-pro" (títulos, fontFamily.display)
+            - Museo Sans     → "museo-sans"    (textos e subtítulos, fontFamily.body)
+          Os nomes CSS espelham docs/design-system/tokens/primitivos.tokens.json.
         */}
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Fleur+De+Leah&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://p.typekit.net" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://use.typekit.net/wjw8qvm.css" />
       </head>
       <body className="min-h-screen bg-page font-body text-text-primary">{children}</body>
     </html>

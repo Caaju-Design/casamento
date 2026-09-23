@@ -1,29 +1,92 @@
 {
   "color": {
+    "amarelo": {
+      "50": { "$value": "#f8e0b6", "$type": "color" },
+      "100": { "$value": "#f6d293", "$type": "color" },
+      "200": { "$value": "#f3c271", "$type": "color" },
+      "500": { "$value": "#f0b354", "$type": "color" },
+      "700": { "$value": "#b4863e", "$type": "color" },
+      "800": { "$value": "#785a29", "$type": "color" },
+      "900": { "$value": "#3c2d14", "$type": "color" }
+    },
+    "pessego": {
+      "50": { "$value": "#f6d1b5", "$type": "color" },
+      "100": { "$value": "#f3bb90", "$type": "color" },
+      "200": { "$value": "#efa46d", "$type": "color" },
+      "500": { "$value": "#ec8e4d", "$type": "color" },
+      "700": { "$value": "#b16a39", "$type": "color" },
+      "800": { "$value": "#764726", "$type": "color" },
+      "900": { "$value": "#3b2313", "$type": "color" }
+    },
+    "terracota": {
+      "50": { "$value": "#d5b6a9", "$type": "color" },
+      "100": { "$value": "#c0927e", "$type": "color" },
+      "200": { "$value": "#ac6f54", "$type": "color" },
+      "500": { "$value": "#984b2c", "$type": "color" },
+      "700": { "$value": "#723921", "$type": "color" },
+      "800": { "$value": "#4c2616", "$type": "color" },
+      "900": { "$value": "#26130b", "$type": "color" }
+    },
+    "caramelo": {
+      "50": { "$value": "#e6cebf", "$type": "color" },
+      "100": { "$value": "#d9b79f", "$type": "color" },
+      "200": { "$value": "#cd9e80", "$type": "color" },
+      "500": { "$value": "#c28661", "$type": "color" },
+      "700": { "$value": "#916449", "$type": "color" },
+      "800": { "$value": "#614431", "$type": "color" },
+      "900": { "$value": "#302218", "$type": "color" }
+    },
+    "salvia": {
+      "50": { "$value": "#e0ded0", "$type": "color" },
+      "100": { "$value": "#d0cdba", "$type": "color" },
+      "200": { "$value": "#c0bda3", "$type": "color" },
+      "500": { "$value": "#b1ac8c", "$type": "color" },
+      "700": { "$value": "#848169", "$type": "color" },
+      "800": { "$value": "#585646", "$type": "color" },
+      "900": { "$value": "#2d2b23", "$type": "color" }
+    },
+    "linho": {
+      "50": { "$value": "#f5f2ed", "$type": "color" },
+      "100": { "$value": "#f0ebe3", "$type": "color" },
+      "200": { "$value": "#ece5da", "$type": "color" },
+      "500": { "$value": "#e6ded1", "$type": "color" },
+      "700": { "$value": "#ada79c", "$type": "color" },
+      "800": { "$value": "#736f69", "$type": "color" },
+      "900": { "$value": "#3a3834", "$type": "color" }
+    },
+    "ardosia": {
+      "50": { "$value": "#c4d1da", "$type": "color" },
+      "100": { "$value": "#a8bac7", "$type": "color" },
+      "200": { "$value": "#8ba4b4", "$type": "color" },
+      "500": { "$value": "#6e8da2", "$type": "color" },
+      "700": { "$value": "#536a79", "$type": "color" },
+      "800": { "$value": "#374651", "$type": "color" },
+      "900": { "$value": "#1b2428", "$type": "color" }
+    },
     "blush": {
-      "50": { "$value": "#fdf3f2", "$type": "color" },
-      "100": { "$value": "#f8e1de", "$type": "color" },
-      "300": { "$value": "#eeb6ae", "$type": "color" },
-      "500": { "$value": "#d98a80", "$type": "color" },
-      "700": { "$value": "#a85a52", "$type": "color" }
+      "50": { "$value": "{color.linho.100}", "$type": "color" },
+      "100": { "$value": "{color.pessego.50}", "$type": "color" },
+      "300": { "$value": "{color.caramelo.100}", "$type": "color" },
+      "500": { "$value": "{color.terracota.500}", "$type": "color" },
+      "700": { "$value": "{color.terracota.700}", "$type": "color" }
     },
     "sage": {
-      "100": { "$value": "#eaf0e6", "$type": "color" },
-      "300": { "$value": "#c3d3ba", "$type": "color" },
-      "500": { "$value": "#8fa682", "$type": "color" }
+      "100": { "$value": "{color.salvia.50}", "$type": "color" },
+      "300": { "$value": "{color.salvia.200}", "$type": "color" },
+      "500": { "$value": "{color.salvia.800}", "$type": "color" }
     },
     "gold": {
-      "300": { "$value": "#e7cd8f", "$type": "color" },
-      "500": { "$value": "#c9a24d", "$type": "color" },
-      "700": { "$value": "#96772f", "$type": "color" }
+      "300": { "$value": "{color.amarelo.100}", "$type": "color" },
+      "500": { "$value": "{color.salvia.500}", "$type": "color" },
+      "700": { "$value": "{color.amarelo.800}", "$type": "color" }
     },
     "cream": {
-      "50": { "$value": "#fffaf3", "$type": "color" },
-      "100": { "$value": "#fbf1e2", "$type": "color" }
+      "50": { "$value": "{color.linho.50}", "$type": "color" },
+      "100": { "$value": "{color.linho.100}", "$type": "color" }
     },
     "ink": {
-      "700": { "$value": "#3a2f2c", "$type": "color" },
-      "900": { "$value": "#221b19", "$type": "color" }
+      "700": { "$value": "{color.caramelo.800}", "$type": "color" },
+      "900": { "$value": "{color.caramelo.900}", "$type": "color" }
     },
     "red": {
       "600": { "$value": "#b3392f", "$type": "color" }
@@ -31,9 +94,9 @@
     "white": { "$value": "#ffffff", "$type": "color" }
   },
   "fontFamily": {
-    "display": { "$value": "'Cormorant Garamond', serif", "$type": "fontFamily" },
-    "body": { "$value": "'Lora', serif", "$type": "fontFamily" },
-    "script": { "$value": "'Fleur De Leah', cursive", "$type": "fontFamily" }
+    "display": { "$value": "'cochin-lt-pro', Cochin, Georgia, 'Times New Roman', serif", "$type": "fontFamily" },
+    "body": { "$value": "'museo-sans', 'Helvetica Neue', Arial, sans-serif", "$type": "fontFamily" },
+    "script": { "$value": "'cochin-lt-pro', Cochin, Georgia, serif", "$type": "fontFamily" }
   },
   "fontSize": {
     "100": { "$value": "0.875rem", "$type": "dimension" },
