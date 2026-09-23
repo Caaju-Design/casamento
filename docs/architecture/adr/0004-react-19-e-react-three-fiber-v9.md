@@ -1,6 +1,6 @@
 # ADR-0004: React 19 e @react-three/fiber v9 (em vez de React 18 e v8)
 
-- Status: aceito
+- Status: substituído em 2026-09-23 (o `@react-three/fiber` saiu do projeto; o React 19 continua)
 - Data: 2026-08-19
 - Dono: Emanuel
 - Impacto no Data Mapping: não
@@ -23,3 +23,7 @@ Atualizar `react` e `react-dom` para `^19.0.0`, e `@react-three/fiber` para `^9.
 - Fica mais fácil manter a cena three.js no futuro, usando a versão da biblioteca de fato mantida para o React atual.
 - Fica mais difícil usar bibliotecas de terceiros que ainda não suportam React 19, caso alguma seja adicionada depois — risco baixo dado o escopo fechado do projeto.
 - Exigiu revalidar toda a suíte de testes (Testing Library já suporta React 19) e o typecheck após o upgrade — feito, tudo verde (lint, typecheck, build, 35 testes).
+
+## Atualização (2026-09-23)
+
+O hero passou a ser uma pintura em aquarela desenhada com three.js puro (`components/three/watercolor/`), sem React Three Fiber. As partículas decorativas, primeiro as pétalas e depois as folhas de bordo, eram o último uso do R3F e foram removidas a pedido do casal ("não ficou bom"). Com isso, `@react-three/fiber` saiu das dependências. O React 19 continua, por ser o requisito do Next 16.

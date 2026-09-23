@@ -15,7 +15,6 @@
     "invites:generate": "node scripts/generate-invite-links.mjs"
   },
   "dependencies": {
-    "@react-three/fiber": "^9.7.0",
     "googleapis": "^176.0.0",
     "next": "16.3.6",
     "qrcode": "^1.5.4",

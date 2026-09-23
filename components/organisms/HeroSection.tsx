@@ -7,12 +7,8 @@ import { PAINT_COMPLETE_AT } from "@/components/three/watercolor/timing";
 import { Heading } from "@/components/atoms/Heading";
 import { Text } from "@/components/atoms/Text";
 
-// A cena three.js (e o próprio @react-three/fiber) só existe no navegador —
-// carregada com `ssr: false` para nunca ser executada durante o
-// pré-renderização no servidor (puramente decorativa, sem papel funcional).
-const HeroScene = dynamic(() => import("@/components/three/HeroScene").then((mod) => mod.HeroScene), {
-  ssr: false,
-});
+// O canvas em aquarela (three.js) só existe no navegador — carregado com
+// `ssr: false` pra nunca rodar na pré-renderização do servidor.
 const WatercolorHero = dynamic(
   () => import("@/components/three/WatercolorHero").then((mod) => mod.WatercolorHero),
   { ssr: false },
@@ -27,9 +23,8 @@ const PRELOAD_READY_FRACTION = 0.5;
  * distância — 1 unidade a mais de altura vira 1 viewport a mais de rolagem
  * pra câmera andar e a tinta cair.
  *
- * Efeito puramente decorativo — mesma exceção de `prefers-reduced-motion`
- * já documentada em components/three/HeroScene.tsx e
- * docs/design-system/acessibilidade.md (decisão de produto do casal, não do
+ * Efeito puramente decorativo — exceção de `prefers-reduced-motion`
+ * documentada em docs/design-system/acessibilidade.md (decisão de produto do casal, não do
  * agente).
  */
 const SCROLL_TRACK_VH = 300;
@@ -135,7 +130,7 @@ function useShouldLockForHero(trackRef: RefObject<HTMLDivElement | null>) {
   return lock;
 }
 
-/** Organism `HeroSection` — pintura em aquarela do casal amarrada à rolagem + pétalas decorativas por cima. */
+/** Organism `HeroSection` — pintura em aquarela do casal amarrada à rolagem. */
 export function HeroSection() {
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
@@ -160,9 +155,6 @@ export function HeroSection() {
           pintura final como imagem estática). Opacidade 1 durante toda a
           pintura, dissolvendo na janela final (`HERO_FADE_START` → fim).
           `pointer-events: none`: puramente decorativa.
-
-          As pétalas (HeroScene) ficam DE FORA desta div de propósito — se
-          ficassem dentro, herdariam a opacidade e sumiriam junto no fim.
         */}
         <div
           className="absolute inset-0 -z-20 bg-page"
@@ -185,8 +177,6 @@ export function HeroSection() {
             />
           )}
         </div>
-
-        {phase !== "loading" && <HeroScene progressRef={progressRef} showSun={false} />}
 
         {/*
           Abertura com a identidade do casamento: monograma G&E (logo

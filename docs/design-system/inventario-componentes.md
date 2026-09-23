@@ -16,7 +16,7 @@ Referência de todo componente existente, sua camada (Atomic Design) e onde é u
 | `RsvpForm` | Organism | Página `/convite/[token]` |
 | `RsvpFlow` | Organism | Orquestra o estado vazio (formulário) e o de sucesso (depoimento + presentes) na página `/convite/[token]` — introduzido na implementação |
 | `InviteNotFound` | Organism | Estado de token inválido/não encontrado na página `/convite/[token]` — introduzido na implementação |
-| `HeroSection` (com cena three.js) | Organism | Topo da home |
+| `HeroSection` (pintura em aquarela em WebGL + `HeroPreloader`) | Organism | Topo da home |
 | `GiftListSection` | Organism | Página `/convite/[token]`, exibida após confirmação (não na home — decisão de implementação); recebe a lista da aba "Presentes" da planilha (`lib/gifts.ts`) — trata lista vazia e Pix ainda não configurado sem quebrar |
 | `TestimonialSection` | Organism | Coleta de depoimento no convite pessoal |
 | `RecommendationsSection` (hospedagem/restaurantes) | Organism | Home |
