@@ -179,37 +179,24 @@ export function HeroSection() {
         </div>
 
         {/*
-          Abertura com a identidade do casamento: monograma G&E (logo
-          oficial, `public/brand/logo-ge.svg`) + os nomes em Cochin. Só existe
-          no primeiro momento (progress perto de 0) e some assim que a
-          rolagem começa — `opacity` via `clamp()` lendo `--hero-progress`
-          direto no CSS, acompanhando o dedo 1:1 sem re-render do React.
-          Decorativo (`aria-hidden`, `pointer-events: none`): o título real da
-          página é o <h1> do bloco de conteúdo abaixo.
-
-          A logo é sálvia clara; por cima da aquarela (a copa vermelha fica
-          bem atrás dela) ela sumiria. Por isso ganha um "respiro" de papel
-          por trás: uma aguada clara e esfumada, como se o pintor tivesse
-          deixado aquele pedaço do papel em branco pra assinar.
+          Abertura com a identidade do casamento: monograma G&E + os nomes em
+          Cochin, os dois em branco chapado direto sobre a aquarela (pedido do
+          casal: sem halo/respiro de papel por trás). Só existe no primeiro
+          momento (progress perto de 0) e some assim que a rolagem começa —
+          `opacity` via `clamp()` lendo `--hero-progress` direto no CSS,
+          acompanhando o dedo 1:1 sem re-render do React. Decorativo
+          (`aria-hidden`, `pointer-events: none`): o título real da página é
+          o <h1> do bloco de conteúdo abaixo.
         */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center"
           style={{ opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)` }}
         >
-          <div className="relative flex flex-col items-center gap-4">
-            <div
-              className="absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{
-                width: "175%",
-                height: "150%",
-                background: "radial-gradient(closest-side, rgba(245,242,237,0.92), rgba(245,242,237,0.7) 55%, rgba(245,242,237,0) 100%)",
-                filter: "blur(6px)",
-              }}
-            />
+          <div className="flex flex-col items-center gap-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/logo-ge.svg"
+              src="/brand/logo-ge-branca.svg"
               alt=""
               width={470}
               height={401}
@@ -217,7 +204,7 @@ export function HeroSection() {
               style={{ width: "clamp(8.5rem, 26vw, 15rem)" }}
             />
             <p
-              className="font-display uppercase text-text-primary"
+              className="font-display uppercase text-white"
               style={{ fontSize: "clamp(0.95rem, 2.6vw, 1.35rem)", letterSpacing: "0.32em" }}
             >
               Gabriela &amp; Emanuel

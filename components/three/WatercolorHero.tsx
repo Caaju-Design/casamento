@@ -9,6 +9,8 @@ import { PAINT_COMPLETE_AT } from "@/components/three/watercolor/timing";
 /** Parte da pintura que acontece sozinha ao chegar (primeiras aguadas), antes do scroll. */
 const INTRO_SHARE = 0.16;
 const INTRO_MS = 2400;
+/** Coluna da imagem que fica no centro da tela (só importa no celular em pé). */
+const FOCUS_U = 0.56;
 
 /**
  * Quanto precisa estar baixado pra liberar a rolagem. A ordem de download
@@ -39,10 +41,6 @@ function isLiteDevice() {
   return small || coarse;
 }
 
-const smooth01 = (a: number, b: number, x: number) => {
-  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
-};
 
 /** Canvas do hero em aquarela. Decorativo (aria-hidden); a lógica de rolagem fica em HeroSection. */
 export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallback }: WatercolorHeroProps) {
@@ -126,7 +124,11 @@ export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallbac
       const a = store.nearestDecoded(ia);
       const b = store.nearestDecoded(ib);
       const exact = a && b && a.index === ia && b.index === ib;
-      const focusU = 0.5 + 0.1 * smooth01(0.35, 0.7, shown);
+      // Enquadramento FIXO. Antes a imagem andava pro lado acompanhando o
+      // casal (0.5 → 0.6) e, no celular em pé, isso aparecia como a pintura
+      // "escorregando pra esquerda" no fim da rolagem. 0.56 deixa a árvore
+      // (início) e o beijo (fim) dentro da faixa visível sem mexer nada.
+      const focusU = FOCUS_U;
       try {
         engine.render(paint, a, exact ? b : null, exact ? f - ia : 0, focusU);
       } catch (err) {
