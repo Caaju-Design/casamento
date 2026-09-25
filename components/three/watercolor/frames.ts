@@ -32,6 +32,13 @@ export const FRAME_SETS = {
   mobile: { base: "/hero/aquarela/m", count: 121 } satisfies FrameSet,
 };
 
+/** Voo de helicóptero sobre a Cidade do Cabo (Nossa história, momento 1). 8 quadros/s, recorte central 16:15. */
+export const CAPE_TOWN_FRAMES = {
+  desktop: { base: "/historia/cape-town/d", count: 111 } satisfies FrameSet,
+  mobile: { base: "/historia/cape-town/m", count: 111 } satisfies FrameSet,
+  aspect: 704 / 660,
+};
+
 export type FrameSource = ImageBitmap | HTMLImageElement;
 
 const FETCH_CONCURRENCY = 6;

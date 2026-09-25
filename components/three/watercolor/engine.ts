@@ -23,8 +23,8 @@ import type { FrameSource } from "./frames";
 // por MASK_SCALE pra caber na faixa 0–1 sem saturar cedo.
 const MASK_SCALE = 4.0;
 
-// Proporção dos quadros do BANNERHERO (16:9).
-const IMAGE_ASPECT = 16 / 9;
+// Proporção padrão dos quadros (BANNERHERO, 16:9). Outras cenas passam a sua.
+const DEFAULT_IMAGE_ASPECT = 16 / 9;
 
 // ------------------------------------------------------------------ manchas
 type Stain = {
@@ -32,7 +32,14 @@ type Stain = {
   stage: number; strength: number; soft: number; elong: number; rot: number;
 };
 
-function buildStains(count: "full" | "lite"): Stain[] {
+/**
+ * Onde as manchas se concentram. `focus` = centro de massa no fim da pintura
+ * (uv da imagem, y pra cima); `spreadX/Y` multiplicam o espalhamento.
+ */
+export type StainPreset = { focusX: number; focusY: number; spreadX: number; spreadY: number; radius?: number };
+export const HERO_STAINS: StainPreset = { focusX: 0.53, focusY: 0.56, spreadX: 1, spreadY: 1 };
+
+function buildStains(count: "full" | "lite", preset: StainPreset): Stain[] {
   let s = 20261 >>> 0;
   const rand = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
   const gauss = () => {
@@ -40,7 +47,7 @@ function buildStains(count: "full" | "lite"): Stain[] {
     return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
   };
   // Centro de massa da composição no fim (onde o casal se beija), em uv da imagem (y pra cima).
-  const FOCUS = { x: 0.53, y: 0.56 };
+  const FOCUS = { x: preset.focusX, y: preset.focusY };
   const k = count === "lite" ? 0.75 : 1; // celular: menos manchas, um pouco maiores
   const out: Stain[] = [];
   const add = (n: number, s0: number, s1: number, rMin: number, rMax: number, st0: number, st1: number,
@@ -53,9 +60,9 @@ function buildStains(count: "full" | "lite"): Stain[] {
         spawn: s0 + (s1 - s0) * (t * 0.85 + rand() * 0.15),
         // no celular em pé só ~56% da largura da imagem aparece: aperta o
         // espalhamento horizontal pra tinta não bater chapada nas laterais
-        cx: 0.5 + (FOCUS.x - 0.5) * t + gauss() * sx * (count === "lite" ? 0.6 : 1),
-        cy: 0.5 + (FOCUS.y - 0.5) * t + gauss() * sy,
-        r: (rMin + (rMax - rMin) * rand()) * grow,
+        cx: 0.5 + (FOCUS.x - 0.5) * t + gauss() * sx * preset.spreadX * (count === "lite" ? 0.6 : 1),
+        cy: 0.5 + (FOCUS.y - 0.5) * t + gauss() * sy * preset.spreadY,
+        r: (rMin + (rMax - rMin) * rand()) * grow * (preset.radius ?? 1),
         seed: rand() * 100,
         stage: st0 + (st1 - st0) * (t * 0.7 + rand() * 0.3),
         strength: str0 + (str1 - str0) * rand(),
@@ -76,12 +83,13 @@ function buildStains(count: "full" | "lite"): Stain[] {
 const STAIN_VERT = /* glsl */ `
   attribute vec4 iA; attribute vec4 iB; attribute vec4 iC;
   uniform vec4 uRect;      // retângulo da imagem na tela, em uv (x0, y0, w, h)
+  uniform float uImgAspect;
   varying vec2 vQ; varying vec4 vB; varying float vSpawn;
   void main(){
     vec2 corner = position.xy * 1.5;            // folga pra borda irregular
     float c = cos(iC.y), s = sin(iC.y);
     vec2 q = mat2(c, s, -s, c) * (corner * vec2(iC.x, 1.0)) * iA.z; // em "alturas da imagem"
-    vec2 img = iA.xy + vec2(q.x / ${IMAGE_ASPECT.toFixed(6)}, q.y);
+    vec2 img = iA.xy + vec2(q.x / uImgAspect, q.y);
     vec2 scr = uRect.xy + img * uRect.zw;
     gl_Position = vec4(scr * 2.0 - 1.0, 0.0, 1.0);
     vQ = corner; vB = iB; vSpawn = iA.w;
@@ -118,7 +126,7 @@ const STAIN_FRAG = /* glsl */ `
 const COMP_FRAG = /* glsl */ `
   uniform sampler2D tSrcA; uniform sampler2D tSrcB; uniform float uMix;
   uniform sampler2D tMask; uniform sampler2D tNoise;
-  uniform vec4 uRect; uniform vec2 uRes; uniform float uHasSrc;
+  uniform vec4 uRect; uniform vec2 uRes; uniform float uHasSrc; uniform float uImgAspect; uniform float uEdgeFade;
   varying vec2 vUv;
   float lum(vec3 c){ return dot(c, vec3(0.299,0.587,0.114)); }
   // quadros vêm sem flip (ImageBitmap): linha 0 é o topo
@@ -142,11 +150,22 @@ const COMP_FRAG = /* glsl */ `
     vec2 iuv = (uv - uRect.xy) / uRect.zw;            // uv dentro da imagem
     // fora da imagem (celular em pé): a tinta morre numa borda irregular
     vec2 outside = max(max(-iuv, iuv - 1.0), 0.0);
-    float od = length(outside * vec2(${IMAGE_ASPECT.toFixed(6)}, 1.0)); // em "alturas da imagem"
+    float od = length(outside * vec2(uImgAspect, 1.0)); // em "alturas da imagem"
     // borda que serpenteia (não um retângulo): ruído largo + recorte médio
     float edgeN = texture2D(tNoise, q*0.45 + 7.0).r * 0.7 + texture2D(tNoise, q*1.6 + 3.0).g * 0.3;
     float keep = 1.0 - smoothstep(0.0, 0.01 + edgeN*0.12, od);
     P *= keep; E *= keep;
+    // painéis ("cover"): a tinta morre antes da borda do canvas, numa borda
+    // irregular, deixando papel em volta — igual a uma aquarela no papel
+    if (uEdgeFade > 0.0) {
+      vec2 dd = min(uv, 1.0 - uv) * vec2(asp, 1.0);
+      float dEdge = min(dd.x, dd.y);
+      float en = texture2D(tNoise, q * 0.5 + 3.0).g * 0.7 + texture2D(tNoise, q * 1.7 + 9.0).r * 0.3;
+      float edgeT = uEdgeFade * (0.25 + 1.3 * en);
+      float ek = smoothstep(edgeT, edgeT + 0.012, dEdge);           // borda seca, recortada
+      E += (1.0 - smoothstep(edgeT + 0.012, edgeT + 0.03, dEdge)) * ek * 0.8 * min(P, 1.0); // pigmento acumula na borda (só onde tem tinta)
+      P *= ek; E *= ek;
+    }
 
     vec2 fl = (texture2D(tNoise, q*1.2).ba - 0.5) * 0.008;
     vec2 ci = clamp(iuv, 0.0, 1.0);
@@ -178,23 +197,39 @@ const COMP_FRAG = /* glsl */ `
     gl_FragColor = vec4(col, 1.0);
   }`;
 
-export type EngineOptions = { lite: boolean; noise: THREE.Texture };
+export type EngineOptions = {
+  lite: boolean;
+  noise: THREE.Texture;
+  /** Largura/altura dos quadros (padrão 16:9). */
+  imageAspect?: number;
+  /**
+   * "hero": cobre a tela em paisagem e vira uma "folha" central no celular em pé.
+   * "cover": sempre cobre o canvas inteiro (painéis das seções da história).
+   */
+  fit?: "hero" | "cover";
+  stains?: StainPreset;
+  /** Margem de papel (em alturas do canvas) onde a tinta termina antes da borda. 0 = sem margem. */
+  edgeFade?: number;
+};
 
 export class WatercolorEngine {
   readonly renderer: THREE.WebGLRenderer;
   private stainMat: THREE.ShaderMaterial;
   private compMat: THREE.ShaderMaterial;
-  private su: { uS: THREE.IUniform<number>; uRect: THREE.IUniform<THREE.Vector4>; tNoise: THREE.IUniform<THREE.Texture> };
+  private su: { uS: THREE.IUniform<number>; uRect: THREE.IUniform<THREE.Vector4>; tNoise: THREE.IUniform<THREE.Texture>; uImgAspect: THREE.IUniform<number> };
   private cu: {
     tSrcA: THREE.IUniform<THREE.Texture>; tSrcB: THREE.IUniform<THREE.Texture>; uMix: THREE.IUniform<number>;
     uHasSrc: THREE.IUniform<number>; tMask: THREE.IUniform<THREE.Texture>; tNoise: THREE.IUniform<THREE.Texture>;
-    uRect: THREE.IUniform<THREE.Vector4>; uRes: THREE.IUniform<THREE.Vector2>;
+    uRect: THREE.IUniform<THREE.Vector4>; uRes: THREE.IUniform<THREE.Vector2>; uImgAspect: THREE.IUniform<number>;
+    uEdgeFade: THREE.IUniform<number>;
   };
   private stainScene = new THREE.Scene();
   private compScene = new THREE.Scene();
   private cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private maskRT: THREE.WebGLRenderTarget;
   private lite: boolean;
+  private imageAspect: number;
+  private fit: "hero" | "cover";
   private blank: THREE.DataTexture;
   private texCache = new Map<number, THREE.Texture>();
   private width = 1;
@@ -202,6 +237,8 @@ export class WatercolorEngine {
 
   constructor(canvas: HTMLCanvasElement, opts: EngineOptions) {
     this.lite = opts.lite;
+    this.imageAspect = opts.imageAspect ?? DEFAULT_IMAGE_ASPECT;
+    this.fit = opts.fit ?? "hero";
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: false,
@@ -216,7 +253,7 @@ export class WatercolorEngine {
     noise.wrapS = noise.wrapT = THREE.RepeatWrapping;
     noise.colorSpace = THREE.NoColorSpace;
 
-    const stains = buildStains(opts.lite ? "lite" : "full");
+    const stains = buildStains(opts.lite ? "lite" : "full", opts.stains ?? HERO_STAINS);
     const base = new THREE.PlaneGeometry(2, 2);
     const geo = new THREE.InstancedBufferGeometry();
     geo.index = base.index;
@@ -233,7 +270,7 @@ export class WatercolorEngine {
     geo.setAttribute("iC", new THREE.InstancedBufferAttribute(iC, 4));
     geo.instanceCount = n;
 
-    this.su = { uS: { value: 0 }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, tNoise: { value: noise } };
+    this.su = { uS: { value: 0 }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, tNoise: { value: noise }, uImgAspect: { value: this.imageAspect } };
     this.stainMat = new THREE.ShaderMaterial({
       uniforms: this.su,
       vertexShader: STAIN_VERT,
@@ -264,6 +301,8 @@ export class WatercolorEngine {
       tNoise: { value: noise },
       uRect: { value: new THREE.Vector4(0, 0, 1, 1) },
       uRes: { value: new THREE.Vector2(1, 1) },
+      uImgAspect: { value: this.imageAspect },
+      uEdgeFade: { value: opts.edgeFade ?? 0 },
     };
     this.compMat = new THREE.ShaderMaterial({
       uniforms: this.cu,
@@ -296,17 +335,20 @@ export class WatercolorEngine {
    */
   private computeRect(focusU: number): THREE.Vector4 {
     const vw = this.width, vh = this.height;
+    const ai = this.imageAspect;
     let wPx: number, hPx: number;
-    if (vw / vh >= 0.9) {
-      if (vw / vh > IMAGE_ASPECT) { wPx = vw; hPx = vw / IMAGE_ASPECT; } else { hPx = vh; wPx = vh * IMAGE_ASPECT; }
+    const portraitSheet = this.fit === "hero" && vw / vh < 0.9;
+    if (!portraitSheet) {
+      if (vw / vh > ai) { wPx = vw; hPx = vw / ai; } else { hPx = vh; wPx = vh * ai; }
     } else {
       hPx = Math.min(vw * 1.1, vh * 0.66);
-      wPx = hPx * IMAGE_ASPECT;
+      wPx = hPx * ai;
     }
     const w = wPx / vw, h = hPx / vh;
     let x0 = 0.5 - focusU * w;
     if (w >= 1) x0 = Math.min(0, Math.max(1 - w, x0));
-    const y0 = 0.5 - h / 2 + (vw / vh < 0.9 ? 0.02 : 0);
+    let y0 = 0.5 - h / 2 + (portraitSheet ? 0.02 : 0);
+    if (h >= 1) y0 = 0.5 - h / 2;
     return new THREE.Vector4(x0, y0, w, h);
   }
 

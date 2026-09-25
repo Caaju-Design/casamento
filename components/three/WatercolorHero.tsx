@@ -93,7 +93,8 @@ export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallbac
 
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
-      if (!engine || readyAt < 0) return;
+      // fora da tela (já passou do hero) não desenha nada — poupa bateria
+      if (!engine || readyAt < 0 || !onScreen) return;
       const dt = Math.min(0.1, (now - lastT) / 1000);
       lastT = now;
 
@@ -186,6 +187,16 @@ export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallbac
 
     void start();
 
+    let onScreen = true;
+    const vis = new IntersectionObserver((entries) => {
+      onScreen = entries.some((e) => e.isIntersecting);
+      if (onScreen) {
+        lastT = performance.now();
+        dirty = true;
+      }
+    });
+    vis.observe(container);
+
     const ro = new ResizeObserver(() => resize());
     ro.observe(container);
 
@@ -193,6 +204,7 @@ export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallbac
       disposed = true;
       cancelAnimationFrame(raf);
       ro.disconnect();
+      vis.disconnect();
       canvas.removeEventListener("webglcontextlost", onLost);
       store.dispose();
       engine?.dispose();

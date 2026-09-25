@@ -1,17 +1,18 @@
 import { PaintReveal } from "@/components/molecules/PaintReveal";
+import { CapeTownMoment } from "@/components/organisms/CapeTownMoment";
 
 /**
  * Organism `StorySection` — "Nossa história", logo depois do hero.
  *
- * Mesma estética do hero: cada momento da história tem uma ilustração em
- * aquarela (estática, gerada por scripts/aquarela/historia.py com a paleta
- * oficial) que aparece "sendo pintada" quando entra na tela. As imagens têm
- * fundo branco e entram com `mix-blend-mode: multiply`: o branco vira o
- * papel da página e só a tinta aparece, sem retângulo em volta.
- *
- * No desktop os momentos alternam ilustração à esquerda/direita, ligados
- * por uma rota tracejada (a "volta ao mundo"). No celular fica tudo
- * empilhado: ilustração e depois o texto.
+ * Sete telas, uma por momento (sem a linha de timeline da versão anterior):
+ *  1. título, centralizado;
+ *  2. Cape Town — vídeo do voo sobre a cidade sendo pintado em aquarela
+ *     (mesma técnica do hero, amarrada à rolagem) à esquerda e texto à
+ *     direita (CapeTownMoment);
+ *  3–7. demais momentos com as ilustrações estáticas em aquarela
+ *     (scripts/aquarela/historia.py), que aparecem "sendo pintadas".
+ * As ilustrações têm fundo branco e usam `mix-blend-mode: multiply` no
+ * mesmo elemento da máscara, então só a tinta aparece sobre o papel.
  *
  * Texto escrito pelo casal — não alterar sem pedir pra eles.
  */
@@ -54,7 +55,7 @@ const CLOSING = {
   text: "Agora, queremos reunir quem a gente ama para celebrar essa história — e viver com vocês um pedacinho dela.",
 };
 
-function Illustration({ src, alt, priority = false }: { src: string; alt: string; priority?: boolean }) {
+function Illustration({ src, alt }: { src: string; alt: string }) {
   return (
     // o multiply vai no MESMO elemento da máscara: com a máscara, o grupo vira
     // uma camada isolada e o multiply na <img> de dentro não enxergaria o papel
@@ -65,7 +66,7 @@ function Illustration({ src, alt, priority = false }: { src: string; alt: string
         alt={alt}
         width={960}
         height={720}
-        loading={priority ? "eager" : "lazy"}
+        loading="lazy"
         decoding="async"
         className="h-auto w-full"
       />
@@ -73,56 +74,63 @@ function Illustration({ src, alt, priority = false }: { src: string; alt: string
   );
 }
 
-/** Organism `StorySection` — a história do casal em momentos ilustrados em aquarela. */
+const TEXT_STYLE = { fontSize: "clamp(1.4rem, 2.4vw, 2.25rem)" } as const;
+
+/** Organism `StorySection` — a história do casal, uma tela por momento. */
 export function StorySection() {
+  const [capeTown, ...rest] = CHAPTERS;
   return (
-    <section id="historia" aria-labelledby="historia-titulo" className="relative mx-auto max-w-5xl px-6 py-section-gap">
-      <PaintReveal variant="rise" className="mx-auto max-w-3xl text-center">
-        <p className="font-body text-100 uppercase tracking-[0.3em] text-text-secondary">Nossa história</p>
-        <h2
-          id="historia-titulo"
-          className="mt-4 font-display italic leading-tight text-text-primary"
-          style={{ fontSize: "clamp(2.1rem, 6vw, 3.75rem)" }}
-        >
-          {TITLE}
-        </h2>
-      </PaintReveal>
+    <section id="historia" aria-labelledby="historia-titulo" className="relative">
+      {/* 1 · título */}
+      <div className="flex min-h-[100svh] items-center justify-center px-6 py-section-gap">
+        <PaintReveal variant="rise" className="mx-auto max-w-3xl text-center">
+          <p className="font-body text-100 uppercase tracking-[0.3em] text-text-secondary">Nossa história</p>
+          <h2
+            id="historia-titulo"
+            className="mt-4 font-display italic leading-tight text-text-primary"
+            style={{ fontSize: "clamp(2.1rem, 6vw, 3.75rem)" }}
+          >
+            {TITLE}
+          </h2>
+        </PaintReveal>
+      </div>
 
-      <ol className="relative mt-16 flex flex-col gap-16 md:mt-24 md:gap-24">
-        {/* rota tracejada ligando os momentos (só no desktop) */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-10 left-1/2 top-10 hidden -translate-x-1/2 border-l-2 border-dashed border-salvia-500/60 md:block"
-        />
-        {CHAPTERS.map((chapter, i) => {
-          const imageFirst = i % 2 === 0;
-          return (
-            <li key={chapter.image} className="relative grid items-center gap-6 md:grid-cols-2 md:gap-16">
-              <span
-                aria-hidden="true"
-                className="absolute left-1/2 top-1/2 hidden h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-terracota-500 ring-4 ring-page md:block"
-              />
-              <div className={imageFirst ? "md:order-1" : "md:order-2"}>
-                <Illustration src={chapter.image} alt={chapter.alt} priority={i === 0} />
-              </div>
-              <PaintReveal
-                variant="rise"
-                delay={350}
-                className={["text-center md:text-left", imageFirst ? "md:order-2" : "md:order-1 md:text-right"].join(" ")}
-              >
-                <p className="font-body text-[1.0625rem] leading-relaxed text-text-primary md:text-[1.125rem]">{chapter.text}</p>
-              </PaintReveal>
-            </li>
-          );
-        })}
-      </ol>
+      {/* 2 · Cape Town (vídeo em aquarela + texto) */}
+      {capeTown && <CapeTownMoment text={capeTown.text} />}
 
-      <div className="mx-auto mt-20 flex max-w-2xl flex-col items-center gap-6 text-center md:mt-28">
+      {/* 3–6 · demais momentos, uma tela cada */}
+      {rest.map((chapter, i) => {
+        const imageFirst = i % 2 === 1;
+        return (
+          <div
+            key={chapter.image}
+            className="mx-auto grid min-h-[100svh] max-w-6xl content-center items-center gap-8 px-6 py-16 md:grid-cols-2 md:gap-16"
+          >
+            <div className={imageFirst ? "md:order-1" : "md:order-2"}>
+              <Illustration src={chapter.image} alt={chapter.alt} />
+            </div>
+            <PaintReveal
+              variant="rise"
+              delay={350}
+              className={["text-center", imageFirst ? "md:order-2 md:text-left" : "md:order-1 md:text-right"].join(" ")}
+            >
+              <p className="font-display italic leading-snug text-text-primary" style={TEXT_STYLE}>
+                {chapter.text}
+              </p>
+            </PaintReveal>
+          </div>
+        );
+      })}
+
+      {/* 7 · fechamento */}
+      <div className="mx-auto flex min-h-[100svh] max-w-3xl flex-col items-center justify-center gap-8 px-6 py-16 text-center">
         <div className="w-full max-w-md">
           <Illustration src={CLOSING.image} alt={CLOSING.alt} />
         </div>
         <PaintReveal variant="rise" delay={350}>
-          <p className="font-display text-[1.5rem] italic leading-snug text-text-primary md:text-[1.875rem]">{CLOSING.text}</p>
+          <p className="font-display italic leading-snug text-text-primary" style={{ fontSize: "clamp(1.6rem, 3vw, 2.5rem)" }}>
+            {CLOSING.text}
+          </p>
         </PaintReveal>
       </div>
     </section>

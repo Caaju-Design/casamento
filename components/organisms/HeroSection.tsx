@@ -1,11 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { HeroPreloader } from "@/components/molecules/HeroPreloader";
 import { PAINT_COMPLETE_AT } from "@/components/three/watercolor/timing";
-import { Heading } from "@/components/atoms/Heading";
-import { Text } from "@/components/atoms/Text";
 
 // O canvas em aquarela (three.js) só existe no navegador — carregado com
 // `ssr: false` pra nunca rodar na pré-renderização do servidor.
@@ -55,10 +53,8 @@ const HERO_FADE_START = PAINT_COMPLETE_AT;
  * `HomePageTemplate`, lê o mesmo estado por herança de CSS, sem context:
  *
  *  - `--hero-progress`: 0→1, progresso bruto de rolagem pelo trilho inteiro.
- *  - `--hero-video-opacity`: opacidade da camada pintada (nome mantido do
- *    hero antigo em vídeo pra não quebrar quem lê): 1 durante a pintura,
- *    dissolvendo pra 0 de `HERO_FADE_START` até o fim do trilho.
- *  - `--hero-reveal`: o inverso (0→1) — bloco de conteúdo e menu de âncoras.
+ *  - `--hero-reveal`: 0 durante a pintura, subindo pra 1 de `HERO_FADE_START`
+ *    até o fim do trilho — é quando o menu de âncoras (AnchorNav) aparece.
  *  - `--hero-reveal-pointer-events`: "none" até o reveal estar quase completo.
  *
  * Não existe mais `<video>` nem seek: o progresso vai pra `progressRef` e o
@@ -81,7 +77,6 @@ function useHeroScrollProgress(trackRef: RefObject<HTMLDivElement | null>, progr
       const fade = progress <= HERO_FADE_START ? 1 : Math.max(0, 1 - (progress - HERO_FADE_START) / (1 - HERO_FADE_START));
       const reveal = 1 - fade;
       root.style.setProperty("--hero-progress", progress.toString());
-      root.style.setProperty("--hero-video-opacity", fade.toString());
       root.style.setProperty("--hero-reveal", reveal.toString());
       root.style.setProperty("--hero-reveal-pointer-events", reveal > 0.5 ? "auto" : "none");
     };
@@ -99,7 +94,6 @@ function useHeroScrollProgress(trackRef: RefObject<HTMLDivElement | null>, progr
       window.removeEventListener("resize", onScrollOrResize);
       if (rafId !== null) cancelAnimationFrame(rafId);
       root.style.removeProperty("--hero-progress");
-      root.style.removeProperty("--hero-video-opacity");
       root.style.removeProperty("--hero-reveal");
       root.style.removeProperty("--hero-reveal-pointer-events");
     };
@@ -152,13 +146,13 @@ export function HeroSection() {
       >
         {/*
           Camada pintada — canvas em aquarela (ou, se WebGL/rede falharem, a
-          pintura final como imagem estática). Opacidade 1 durante toda a
-          pintura, dissolvendo na janela final (`HERO_FADE_START` → fim).
+          pintura final como imagem estática). Não dissolve mais no fim: a
+          pintura fica inteira e sobe junto com a página quando o trilho
+          acaba, emendando direto na "Nossa história".
           `pointer-events: none`: puramente decorativa.
         */}
         <div
-          className="absolute inset-0 -z-20 bg-page"
-          style={{ opacity: "var(--hero-video-opacity, 1)", pointerEvents: "none" }}
+          className="pointer-events-none absolute inset-0 -z-20 bg-page"
           aria-hidden="true"
         >
           {phase === "fallback" ? (
@@ -213,61 +207,13 @@ export function HeroSection() {
         </div>
 
         {/*
-          Bloco de conteúdo padrão — fica invisível durante toda a rolagem
-          principal do vídeo e só aparece (fade-in) na janela final
-          (`VIDEO_FADE_START_SECONDS` → fim), em sincronia exata com a
-          dissolução da camada do vídeo (`--hero-reveal` é sempre
-          `1 - videoOpacity`). `pointerEvents` some junto: só fica clicável
-          quando o reveal já está visualmente quase completo.
-
-          Cores normais do design system (não mais branco com sombra): a
-          essa altura da rolagem o vídeo já sumiu quase por completo, então
-          o fundo por trás é o `bg-page` (creme) normal do site — texto
-          branco ficava ilegível (branco sobre quase-branco). O fundo
-          (`bg-page/90` + blur) garante leitura mesmo no meio da transição,
-          quando ainda sobra um resto do vídeo por trás.
+          O cartão com "Vamos nos casar / nomes / data / botões" que aparecia
+          no fim da rolagem foi removido a pedido do casal ("aparecendo no meio
+          do caminho"). O <h1> da página continua existindo, só que visível
+          apenas pra leitores de tela; a abertura com a logo já faz esse
+          papel visualmente.
         */}
-        <div
-          className="relative z-10 flex max-w-2xl flex-col items-center gap-field-gap rounded-card bg-page/90 px-8 py-10 shadow-lg backdrop-blur-sm"
-          style={{
-            opacity: "var(--hero-reveal, 0)",
-            pointerEvents: "var(--hero-reveal-pointer-events, none)" as CSSProperties["pointerEvents"],
-          }}
-        >
-          <Text tone="secondary" className="uppercase tracking-[0.3em] text-100">
-            Vamos nos casar
-          </Text>
-          <Heading as="h1" size="xl">
-            Gabriela &amp; Emanuel
-          </Heading>
-          <Text tone="secondary" className="text-400">
-            17 de abril de 2027
-          </Text>
-          <Text className="max-w-lg">
-            Com o coração cheio de alegria, convidamos você para celebrar ao nosso lado o começo de uma nova
-            história. Sua presença é o presente que mais desejamos.
-          </Text>
-          <nav className="mt-4 flex flex-wrap justify-center gap-4 font-body text-100">
-            <a
-              href="#historia"
-              className="rounded-pill border border-border-subtle bg-surface px-5 py-2 text-text-primary transition-colors hover:bg-blush-50"
-            >
-              Nossa história
-            </a>
-            <a
-              href="#evento"
-              className="rounded-pill border border-border-subtle bg-surface px-5 py-2 text-text-primary transition-colors hover:bg-blush-50"
-            >
-              O evento
-            </a>
-            <a
-              href="#recomendacoes"
-              className="rounded-pill border border-border-subtle bg-surface px-5 py-2 text-text-primary transition-colors hover:bg-blush-50"
-            >
-              Hospedagem e restaurantes
-            </a>
-          </nav>
-        </div>
+        <h1 className="sr-only">Gabriela &amp; Emanuel — vamos nos casar em 17 de abril de 2027</h1>
       </section>
       {lockForHero && (
         <HeroPreloader
