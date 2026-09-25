@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useLayoutEffect, useRef } from "react";
+import { useRef } from "react";
+import { useTrackProgress } from "@/lib/hooks/useTrackProgress";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { CAPE_TOWN_FRAMES } from "@/components/three/watercolor/frames";
 import type { StainPreset } from "@/components/three/watercolor/engine";
@@ -28,30 +29,7 @@ const TRACK_VH = 220;
  */
 export function CapeTownMoment({ text }: { text: string }) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef(0);
-
-  useLayoutEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    let raf: number | null = null;
-    const update = () => {
-      raf = null;
-      const rect = track.getBoundingClientRect();
-      const scrollable = rect.height - window.innerHeight;
-      progressRef.current = scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0;
-    };
-    const onScroll = () => {
-      if (raf === null) raf = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (raf !== null) cancelAnimationFrame(raf);
-    };
-  }, []);
+  const progressRef = useTrackProgress(trackRef);
 
   return (
     <div ref={trackRef} className="relative" style={{ height: `${TRACK_VH}vh` }}>

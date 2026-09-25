@@ -244,3 +244,15 @@ function releaseSource(src: FrameSource) {
     URL.revokeObjectURL(src.src);
   }
 }
+
+/** Fotos da amiga cupido (Nossa história, momento 2): uma foto = sequência de 1 quadro. */
+export const AMIGA_GRUPO_FRAMES = {
+  desktop: { base: "/historia/amiga/grupo/d", count: 1 } satisfies FrameSet,
+  mobile: { base: "/historia/amiga/grupo/m", count: 1 } satisfies FrameSet,
+  aspect: 4 / 3,
+};
+export const AMIGA_GABI_FRAMES = {
+  desktop: { base: "/historia/amiga/gabi/d", count: 1 } satisfies FrameSet,
+  mobile: { base: "/historia/amiga/gabi/m", count: 1 } satisfies FrameSet,
+  aspect: 9 / 16,
+};

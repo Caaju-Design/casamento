@@ -126,7 +126,7 @@ const STAIN_FRAG = /* glsl */ `
 const COMP_FRAG = /* glsl */ `
   uniform sampler2D tSrcA; uniform sampler2D tSrcB; uniform float uMix;
   uniform sampler2D tMask; uniform sampler2D tNoise;
-  uniform vec4 uRect; uniform vec2 uRes; uniform float uHasSrc; uniform float uImgAspect; uniform float uEdgeFade;
+  uniform vec4 uRect; uniform vec2 uRes; uniform float uHasSrc; uniform float uImgAspect; uniform float uEdgeFade; uniform float uTransparent;
   varying vec2 vUv;
   float lum(vec3 c){ return dot(c, vec3(0.299,0.587,0.114)); }
   // quadros vêm sem flip (ImageBitmap): linha 0 é o topo
@@ -193,8 +193,15 @@ const COMP_FRAG = /* glsl */ `
     float edge = smoothstep(0.12, 0.3, length(vec2(l1-l2, l3-l4))) * uHasSrc;
     col *= 1.0 - edge * 0.18 * smoothstep(0.08, 0.6, P);
 
-    col *= 0.975 + 0.035 * pg + (pg - pgh) * 0.05;   // relevo do papel
-    gl_FragColor = vec4(col, 1.0);
+    float emboss = 0.975 + 0.035 * pg + (pg - pgh) * 0.05;   // relevo do papel
+    // nos painéis das seções o papel fora da tinta tem que ser idêntico ao
+    // fundo da página (senão aparece um retângulo de textura em volta)
+    col *= uEdgeFade > 0.0 ? mix(1.0, emboss, clamp(P * 3.0, 0.0, 1.0)) : emboss;
+    // camada transparente (uma pintura por cima de outra): onde não tem
+    // tinta o canvas fica vazio e deixa ver o que está embaixo; aguada fina
+    // é translúcida, como veladura de aquarela
+    float alpha = mix(1.0, smoothstep(0.02, 0.55, T), uTransparent);
+    gl_FragColor = vec4(col * alpha, alpha);
   }`;
 
 export type EngineOptions = {
@@ -210,6 +217,8 @@ export type EngineOptions = {
   stains?: StainPreset;
   /** Margem de papel (em alturas do canvas) onde a tinta termina antes da borda. 0 = sem margem. */
   edgeFade?: number;
+  /** Canvas transparente fora da tinta (pra empilhar uma pintura sobre outra). */
+  transparent?: boolean;
 };
 
 export class WatercolorEngine {
@@ -222,6 +231,7 @@ export class WatercolorEngine {
     uHasSrc: THREE.IUniform<number>; tMask: THREE.IUniform<THREE.Texture>; tNoise: THREE.IUniform<THREE.Texture>;
     uRect: THREE.IUniform<THREE.Vector4>; uRes: THREE.IUniform<THREE.Vector2>; uImgAspect: THREE.IUniform<number>;
     uEdgeFade: THREE.IUniform<number>;
+    uTransparent: THREE.IUniform<number>;
   };
   private stainScene = new THREE.Scene();
   private compScene = new THREE.Scene();
@@ -242,7 +252,8 @@ export class WatercolorEngine {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: false,
-      alpha: false,
+      alpha: opts.transparent ?? false,
+      premultipliedAlpha: true,
       depth: false,
       stencil: false,
       powerPreference: "high-performance",
@@ -253,7 +264,11 @@ export class WatercolorEngine {
     noise.wrapS = noise.wrapT = THREE.RepeatWrapping;
     noise.colorSpace = THREE.NoColorSpace;
 
-    const stains = buildStains(opts.lite ? "lite" : "full", opts.stains ?? HERO_STAINS);
+    // o aperto horizontal do modo "lite" (0.6×) só faz sentido na folha do hero
+    // no celular em pé; nos painéis ("cover") ele deixaria a pintura estreita
+    const preset = opts.stains ?? HERO_STAINS;
+    const tuned = opts.lite && this.fit === "cover" ? { ...preset, spreadX: preset.spreadX / 0.6 } : preset;
+    const stains = buildStains(opts.lite ? "lite" : "full", tuned);
     const base = new THREE.PlaneGeometry(2, 2);
     const geo = new THREE.InstancedBufferGeometry();
     geo.index = base.index;
@@ -303,6 +318,7 @@ export class WatercolorEngine {
       uRes: { value: new THREE.Vector2(1, 1) },
       uImgAspect: { value: this.imageAspect },
       uEdgeFade: { value: opts.edgeFade ?? 0 },
+      uTransparent: { value: opts.transparent ? 1 : 0 },
     };
     this.compMat = new THREE.ShaderMaterial({
       uniforms: this.cu,

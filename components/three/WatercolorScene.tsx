@@ -28,6 +28,14 @@ export interface WatercolorSceneProps {
   progressRef: RefObject<number>;
   /** Fração da rolagem em que a pintura fica completa. */
   paintCompleteAt?: number;
+  /** Fração da rolagem em que a tinta começa a cair (pra uma pintura vir depois da outra). */
+  paintStart?: number;
+  /** Primeiras aguadas caem sozinhas quando o painel aparece (padrão: sim). */
+  intro?: boolean;
+  /** Canvas transparente fora da tinta — pra pintar uma foto por cima de outra. */
+  transparent?: boolean;
+  /** Margem de papel onde a tinta termina antes da borda (em alturas do canvas). */
+  edgeFade?: number;
   stains: StainPreset;
   className?: string;
 }
@@ -41,7 +49,17 @@ function isLiteDevice() {
   return small || coarse;
 }
 
-export function WatercolorScene({ frames, progressRef, paintCompleteAt = 0.6, stains, className }: WatercolorSceneProps) {
+export function WatercolorScene({
+  frames,
+  progressRef,
+  paintCompleteAt = 0.6,
+  paintStart = 0,
+  intro = true,
+  transparent = false,
+  edgeFade = 0.07,
+  stains,
+  className,
+}: WatercolorSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
@@ -93,12 +111,15 @@ export function WatercolorScene({ frames, progressRef, paintCompleteAt = 0.6, st
         shown = next;
         dirty = true;
       }
-      const introT = Math.min(1, (now - introAt) / INTRO_MS);
+      const introT = intro ? Math.min(1, (now - introAt) / INTRO_MS) : 1;
       if (introT < 1) dirty = true;
       if (!dirty) return;
       dirty = false;
 
-      const paint = Math.min(1, INTRO_SHARE * (1 - Math.pow(1 - introT, 3)) + (1 - INTRO_SHARE) * Math.min(1, shown / paintCompleteAt));
+      const introShare = intro ? INTRO_SHARE : 0;
+      const span = Math.max(1e-3, paintCompleteAt - paintStart);
+      const scrollPaint = Math.min(1, Math.max(0, (shown - paintStart) / span));
+      const paint = Math.min(1, introShare * (1 - Math.pow(1 - introT, 3)) + (1 - introShare) * scrollPaint);
       const f = shown * (store.count - 1);
       const ia = Math.floor(f);
       const ib = Math.min(store.count - 1, ia + 1);
@@ -121,7 +142,7 @@ export function WatercolorScene({ frames, progressRef, paintCompleteAt = 0.6, st
       try {
         const noise = await new THREE.TextureLoader().loadAsync("/hero/aquarela/noise.png");
         if (disposed) return;
-        engine = new WatercolorEngine(canvas, { lite, noise, imageAspect: frames.aspect, fit: "cover", stains, edgeFade: 0.07 });
+        engine = new WatercolorEngine(canvas, { lite, noise, imageAspect: frames.aspect, fit: "cover", stains, edgeFade, transparent });
       } catch {
         fail();
         return;
@@ -181,7 +202,7 @@ export function WatercolorScene({ frames, progressRef, paintCompleteAt = 0.6, st
       store?.dispose();
       engine?.dispose();
     };
-  }, [frames, progressRef, paintCompleteAt, stains]);
+  }, [frames, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains]);
 
   return (
     <div ref={containerRef} className={["relative", className].filter(Boolean).join(" ")} aria-hidden="true">
