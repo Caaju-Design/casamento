@@ -3,6 +3,7 @@ import { Text } from "@/components/atoms/Text";
 import { AnchorNav } from "@/components/molecules/AnchorNav";
 import { HeroSection } from "@/components/organisms/HeroSection";
 import { RecommendationsSection } from "@/components/organisms/RecommendationsSection";
+import { StorySection } from "@/components/organisms/StorySection";
 
 const NAV_ITEMS = [
   { href: "#historia", label: "Nossa história" },
@@ -17,17 +18,7 @@ export function HomePageTemplate() {
       <AnchorNav items={NAV_ITEMS} startHiddenForHero />
       <HeroSection />
 
-      <section id="historia" className="mx-auto max-w-3xl px-6 py-section-gap text-center">
-        <Heading>Nossa história</Heading>
-        <Text tone="secondary" className="mx-auto mt-6 max-w-xl">
-          Foi num daqueles encontros que parecem obra do destino que tudo começou. Desde então, construímos,
-          dia após dia, uma história feita de cumplicidade, risadas e muito carinho — e agora queremos
-          celebrar esse próximo capítulo ao lado de quem a gente ama.
-        </Text>
-        <Text tone="secondary" className="mx-auto mt-4 max-w-xl">
-          (Conteúdo definitivo da nossa história em breve — o casal ainda está escrevendo esse capítulo.)
-        </Text>
-      </section>
+      <StorySection />
 
       <section id="evento" className="mx-auto max-w-3xl px-6 py-section-gap text-center">
         <Heading>O evento</Heading>

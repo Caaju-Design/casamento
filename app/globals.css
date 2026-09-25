@@ -24,3 +24,58 @@ body {
   background-color: theme("colors.page");
   overscroll-behavior-y: none;
 }
+
+/*
+ * Revelação das ilustrações da "Nossa história" (components/molecules/PaintReveal.tsx):
+ * a ilustração aparece como uma mancha de aquarela se espalhando. A máscara é
+ * um sprite de 10 quadros (public/historia/revelar.png, gerado por
+ * scripts/aquarela/historia.py) percorrido com steps() — custo zero de
+ * processamento, funciona igual no celular.
+ */
+.paint-reveal {
+  -webkit-mask-image: url("/historia/revelar.png");
+  mask-image: url("/historia/revelar.png");
+  -webkit-mask-size: 100% 1000%;
+  mask-size: 100% 1000%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+}
+.paint-reveal[data-shown] {
+  animation: paint-spread 1.3s steps(9, end) forwards;
+}
+@keyframes paint-spread {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+  to {
+    -webkit-mask-position: 0 100%;
+    mask-position: 0 100%;
+  }
+}
+.rise-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s ease;
+}
+.rise-reveal[data-shown] {
+  opacity: 1;
+  transform: none;
+}
+/* sem JavaScript ou com "reduzir movimento": tudo aparece direto */
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .paint-reveal {
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation: none;
+  }
+  .rise-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
