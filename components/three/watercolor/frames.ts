@@ -268,3 +268,15 @@ export const CAFE_SELFIE_FRAMES = {
   mobile: { base: "/historia/cafe/selfie/m", count: 1 } satisfies FrameSet,
   aspect: 9 / 16,
 };
+
+/** Fotos das viagens (Nossa história, momento 4): mural com cinco fotos. */
+const single = (base: string, aspect: number) => ({
+  desktop: { base: `${base}/d`, count: 1 } satisfies FrameSet,
+  mobile: { base: `${base}/m`, count: 1 } satisfies FrameSet,
+  aspect,
+});
+export const VIAGEM_HOPIHARI_FRAMES = single("/historia/viagens/hopihari", 4 / 3);
+export const VIAGEM_ANGRA_FRAMES = single("/historia/viagens/angra", 3 / 4);
+export const VIAGEM_GALERA_FRAMES = single("/historia/viagens/galera", 9 / 16);
+export const VIAGEM_CONCERTO_FRAMES = single("/historia/viagens/concerto", 3 / 4);
+export const VIAGEM_NINO_FRAMES = single("/historia/viagens/nino", 3 / 4);

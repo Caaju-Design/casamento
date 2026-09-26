@@ -439,5 +439,9 @@ export class WatercolorEngine {
     this.compMat.dispose();
     this.blank.dispose();
     this.renderer.dispose();
+    // devolve o contexto WebGL na hora: o navegador só aguenta ~16 vivos (menos
+    // no iPhone) e a história tem vários painéis — sem isso, o mais antigo (o
+    // hero) é quem perde o contexto
+    this.renderer.forceContextLoss();
   }
 }

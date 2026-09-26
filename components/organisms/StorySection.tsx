@@ -2,6 +2,7 @@ import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { CapeTownMoment } from "@/components/organisms/CapeTownMoment";
 import { FriendMoment } from "@/components/organisms/FriendMoment";
 import { CafeMoment } from "@/components/organisms/CafeMoment";
+import { TravelMoment } from "@/components/organisms/TravelMoment";
 
 /**
  * Organism `StorySection` — "Nossa história", logo depois do hero.
@@ -14,7 +15,9 @@ import { CafeMoment } from "@/components/organisms/CafeMoment";
  *  3. a amiga cupido — duas fotos pintadas em aquarela, uma sobre a outra,
  *     à direita e texto à esquerda (FriendMoment);
  *  4. café e forró — mesma ideia, espelhada: fotos à esquerda (CafeMoment);
- *  5–7. demais momentos com as ilustrações estáticas em aquarela
+ *  5. as viagens — mural com cinco fotos pintadas uma sobre a outra, fotos
+ *     à direita (TravelMoment);
+ *  6–7. demais momentos com as ilustrações estáticas em aquarela
  *     (scripts/aquarela/historia.py), que aparecem "sendo pintadas".
  * As ilustrações têm fundo branco e usam `mix-blend-mode: multiply` no
  * mesmo elemento da máscara, então só a tinta aparece sobre o papel.
@@ -83,7 +86,7 @@ const TEXT_STYLE = { fontSize: "clamp(1.4rem, 2.4vw, 2.25rem)" } as const;
 
 /** Organism `StorySection` — a história do casal, uma tela por momento. */
 export function StorySection() {
-  const [capeTown, friend, cafe, ...rest] = CHAPTERS;
+  const [capeTown, friend, cafe, viagens, ...rest] = CHAPTERS;
   return (
     <section id="historia" aria-labelledby="historia-titulo" className="relative">
       {/* 1 · título */}
@@ -109,9 +112,12 @@ export function StorySection() {
       {/* 4 · café e forró (duas fotos pintadas, uma sobre a outra, espelhado) */}
       {cafe && <CafeMoment text={cafe.text} />}
 
-      {/* 5–6 · demais momentos, uma tela cada */}
+      {/* 5 · as viagens (mural de cinco fotos pintadas) */}
+      {viagens && <TravelMoment text={viagens.text} />}
+
+      {/* 6 · demais momentos, uma tela cada */}
       {rest.map((chapter, i) => {
-        const imageFirst = i % 2 === 1;
+        const imageFirst = i % 2 === 0;
         return (
           <div
             key={chapter.image}

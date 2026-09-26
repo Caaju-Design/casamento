@@ -63,6 +63,10 @@ export function WatercolorScene({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
+  // trocar a geração remonta o <canvas>: é como o painel devolve o contexto
+  // WebGL quando fica longe da tela e pega um novo quando volta
+  const [generation, setGeneration] = useState(0);
+  const introDoneRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -103,6 +107,7 @@ export function WatercolorScene({
       const dt = Math.min(0.1, (now - lastT) / 1000);
       lastT = now;
       if (introAt < 0) introAt = now;
+      if (introDoneRef.current) introAt = -Infinity;
 
       const target = progressRef.current ?? 0;
       const k = 1 - Math.exp(-dt * 10);
@@ -113,6 +118,7 @@ export function WatercolorScene({
       }
       const introT = intro ? Math.min(1, (now - introAt) / INTRO_MS) : 1;
       if (introT < 1) dirty = true;
+      else introDoneRef.current = true;
       if (!dirty) return;
       dirty = false;
 
@@ -170,10 +176,13 @@ export function WatercolorScene({
       });
     };
 
-    // começa a baixar com antecedência; desenha só quando está na tela
+    // começa a baixar com antecedência; desenha só quando está na tela; e
+    // quando fica bem longe, devolve o contexto WebGL (remonta o canvas)
     const near = new IntersectionObserver(
       (entries) => {
-        if (!started && entries.some((e) => e.isIntersecting)) void start();
+        const isNear = entries.some((e) => e.isIntersecting);
+        if (!started && isNear) void start();
+        else if (started && !isNear) setGeneration((g) => g + 1);
       },
       { rootMargin: "150% 0px 150% 0px" },
     );
@@ -202,7 +211,7 @@ export function WatercolorScene({
       store?.dispose();
       engine?.dispose();
     };
-  }, [frames, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains]);
+  }, [frames, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains, generation]);
 
   return (
     <div ref={containerRef} className={["relative", className].filter(Boolean).join(" ")} aria-hidden="true">
@@ -214,7 +223,7 @@ export function WatercolorScene({
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
+        <canvas key={generation} ref={canvasRef} className="absolute inset-0 block h-full w-full" />
       )}
     </div>
   );
