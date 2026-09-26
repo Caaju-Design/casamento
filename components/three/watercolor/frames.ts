@@ -25,6 +25,13 @@ export type FrameSet = {
   /** Pasta pública dos quadros, ex.: "/hero/aquarela/m". */
   base: string;
   count: number;
+  /**
+   * Versão dos arquivos. Os quadros são baixados com `cache: "force-cache"`,
+   * que reaproveita a cópia antiga do navegador mesmo se o arquivo mudou no
+   * servidor. Sempre que TROCAR a imagem mantendo o mesmo caminho, suba este
+   * número: ele vai na URL (`?v=`) e força o download da nova.
+   */
+  version?: number;
 };
 
 export const FRAME_SETS = {
@@ -52,8 +59,9 @@ const DECODE_RADIUS = 6;
  */
 const PIN_EVERY = 10;
 
-function frameUrl(set: FrameSet, i: number) {
-  return `${set.base}/${String(i).padStart(3, "0")}.webp`;
+export function frameUrl(set: FrameSet, i: number) {
+  const url = `${set.base}/${String(i).padStart(3, "0")}.webp`;
+  return set.version ? `${url}?v=${set.version}` : url;
 }
 
 /**
@@ -247,8 +255,9 @@ function releaseSource(src: FrameSource) {
 
 /** Fotos da amiga cupido (Nossa história, momento 2): uma foto = sequência de 1 quadro. */
 export const AMIGA_GRUPO_FRAMES = {
-  desktop: { base: "/historia/amiga/grupo/d", count: 1 } satisfies FrameSet,
-  mobile: { base: "/historia/amiga/grupo/m", count: 1 } satisfies FrameSet,
+  // v2: foto espelhada (a v1, sem espelhar, ficava presa no cache do navegador)
+  desktop: { base: "/historia/amiga/grupo/d", count: 1, version: 2 } satisfies FrameSet,
+  mobile: { base: "/historia/amiga/grupo/m", count: 1, version: 2 } satisfies FrameSet,
   // foto inteira, espelhada na horizontal (a cupido fica à esquerda)
   aspect: 4 / 3,
 };
@@ -265,8 +274,9 @@ export const CAFE_BALOES_FRAMES = {
   aspect: 4 / 3,
 };
 export const CAFE_SELFIE_FRAMES = {
-  desktop: { base: "/historia/cafe/selfie/d", count: 1 } satisfies FrameSet,
-  mobile: { base: "/historia/cafe/selfie/m", count: 1 } satisfies FrameSet,
+  // v2: de volta à foto original (a v1 esticada podia ficar presa no cache)
+  desktop: { base: "/historia/cafe/selfie/d", count: 1, version: 2 } satisfies FrameSet,
+  mobile: { base: "/historia/cafe/selfie/m", count: 1, version: 2 } satisfies FrameSet,
   aspect: 9 / 16,
 };
 

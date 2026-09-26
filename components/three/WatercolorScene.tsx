@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
-import { FrameStore, type FrameSet } from "@/components/three/watercolor/frames";
+import { FrameStore, frameUrl, type FrameSet } from "@/components/three/watercolor/frames";
 import { WatercolorEngine, type StainPreset } from "@/components/three/watercolor/engine";
 
 /**
@@ -221,7 +221,7 @@ export function WatercolorScene({
       {failed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={`${frames.desktop.base}/${String(frames.desktop.count - 1).padStart(3, "0")}.webp`}
+          src={frameUrl(frames.desktop, frames.desktop.count - 1)}
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />
