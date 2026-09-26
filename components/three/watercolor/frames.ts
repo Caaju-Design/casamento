@@ -249,9 +249,8 @@ function releaseSource(src: FrameSource) {
 export const AMIGA_GRUPO_FRAMES = {
   desktop: { base: "/historia/amiga/grupo/d", count: 1 } satisfies FrameSet,
   mobile: { base: "/historia/amiga/grupo/m", count: 1 } satisfies FrameSet,
-  // recorte 5:4 puxado pra direita (tira a lateral esquerda)
-  // pra amiga de rosa — a cupido — entrar inteira
-  aspect: 5 / 4,
+  // foto inteira, espelhada na horizontal (a cupido fica à esquerda)
+  aspect: 4 / 3,
 };
 export const AMIGA_GABI_FRAMES = {
   desktop: { base: "/historia/amiga/gabi/d", count: 1 } satisfies FrameSet,

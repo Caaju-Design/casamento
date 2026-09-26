@@ -5,26 +5,27 @@ import { AMIGA_GABI_FRAMES, AMIGA_GRUPO_FRAMES } from "@/components/three/waterc
 
 /**
  * Momento 2 da "Nossa história" — a amiga em comum (a cupido). Texto à
- * esquerda; à direita a foto do grupo (Emanuel com as amigas) pintada primeiro
- * e a da Gabi com a amiga pintada por cima.
+ * esquerda; à direita a foto do grupo pintada primeiro e a da Gabi com a
+ * amiga, GRANDE, pintada por cima.
+ *
+ * A foto do grupo é ESPELHADA (pedido do Emanuel): a amiga de rosa — a
+ * cupido — fica à esquerda, perto do texto, o Emanuel no meio, e as duas
+ * outras meninas à direita. A foto da Gabi com a amiga cai justamente por
+ * cima dessas duas, deixando a cupido e o Emanuel à mostra.
  */
 export function FriendMoment({ text }: { text: string }) {
   return (
     <PhotoPairMoment
       text={text}
       photosSide="right"
-      // foto 1 (paisagem 5:4): a amiga de rosa (a cupido) é a estrela — as
-      // manchas puxam pra direita, onde ela está, e se abrem até a borda; se o
-      // painel for mais estreito que a foto, o corte sai só da esquerda (focusU 1)
-      first={{ frames: AMIGA_GRUPO_FRAMES, focusU: 1, stains: { focusX: 0.66, focusY: 0.6, spreadX: 1.1, spreadY: 1.25, radius: 1.1 } }}
-      // foto 2 (retrato): manchas puxadas pro alto, onde estão os rostos
-      second={{ frames: AMIGA_GABI_FRAMES, stains: { focusX: 0.5, focusY: 0.62, spreadX: 1.4, spreadY: 0.8, radius: 0.72 } }}
-      // no celular: foto 1 quase na proporção
-      // da foto (5:4), pra não cortar a cabeça da amiga de rosa
-      firstPlace="left-[2%] top-[2%] h-[74%] w-[76%] md:left-0 md:top-[5%] md:h-[60%] md:w-[88%]"
-      // foto 2 mais baixa e menor que o padrão, pra não cobrir o rosto e o
-      // tronco da amiga de rosa, que fica no canto direito da foto 1
-      secondPlace="bottom-0 right-[2%] h-[58%] w-[32%] md:bottom-[2%] md:right-[4%] md:h-[48%] md:w-[36%]"
+      // foto 1 (4:3, espelhada): manchas na cupido (esquerda) e no Emanuel
+      // (centro); corte lateral, se houver, sai só da direita (focusU 0)
+      first={{ frames: AMIGA_GRUPO_FRAMES, focusU: 0, stains: { focusX: 0.4, focusY: 0.56, spreadX: 1.15, spreadY: 1.2, radius: 1.1 } }}
+      // foto 2 (retrato 9:16): as duas de corpo inteiro, rostos no terço de cima
+      second={{ frames: AMIGA_GABI_FRAMES, stains: { focusX: 0.5, focusY: 0.58, spreadX: 1.5, spreadY: 1.2, radius: 0.95 } }}
+      firstPlace="left-[1%] top-[2%] h-[72%] w-[80%] md:left-0 md:top-[6%] md:h-[58%] md:w-[92%]"
+      // grande, por cima do terço direito da foto 1 (as duas outras meninas)
+      secondPlace="right-0 top-0 h-[94%] w-[46%] md:right-0 md:top-[3%] md:h-[76%] md:w-[46%]"
     />
   );
 }
