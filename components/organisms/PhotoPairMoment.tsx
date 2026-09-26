@@ -17,6 +17,8 @@ export type PaintedPhoto = {
   stains: StainPreset;
   /** Quando o painel corta as laterais da foto, qual coluna fica no centro (padrão 0,5). */
   focusU?: number;
+  /** Quando o painel corta em cima/embaixo, qual linha fica no centro (0 = topo; padrão 0,5). */
+  focusV?: number;
 };
 
 export interface PhotoPairMomentProps {
@@ -69,6 +71,7 @@ export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, s
             progressRef={progressRef}
             stains={first.stains}
             focusU={first.focusU}
+            focusV={first.focusV}
             paintStart={0}
             paintCompleteAt={0.42}
             className={
@@ -85,6 +88,7 @@ export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, s
             progressRef={progressRef}
             stains={second.stains}
             focusU={second.focusU}
+            focusV={second.focusV}
             paintStart={0.46}
             paintCompleteAt={0.88}
             intro={false}

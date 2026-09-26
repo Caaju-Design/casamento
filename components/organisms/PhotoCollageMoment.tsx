@@ -29,6 +29,7 @@ export type PlacedVideo = {
   video: VideoSources;
   stains: StainPreset;
   focusU?: number;
+  focusV?: number;
   place: string;
   edgeFade?: number;
 };
@@ -87,6 +88,7 @@ export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380 }: 
               progressRef,
               stains: photo.stains,
               focusU: photo.focusU,
+              focusV: photo.focusV,
               paintStart: start,
               paintCompleteAt: end,
               intro: i === 0,

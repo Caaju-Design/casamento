@@ -350,7 +350,7 @@ export class WatercolorEngine {
    * papel em vez de cortar o casal pela metade. `focusU` = qual coluna da
    * imagem fica no centro (acompanha o casal quando ele vai pra direita).
    */
-  private computeRect(focusU: number): THREE.Vector4 {
+  private computeRect(focusU: number, focusV = 0.5): THREE.Vector4 {
     const vw = this.width, vh = this.height;
     const ai = this.imageAspect;
     let wPx: number, hPx: number;
@@ -365,7 +365,9 @@ export class WatercolorEngine {
     let x0 = 0.5 - focusU * w;
     if (w >= 1) x0 = Math.min(0, Math.max(1 - w, x0));
     let y0 = 0.5 - h / 2 + (portraitSheet ? 0.02 : 0);
-    if (h >= 1) y0 = 0.5 - h / 2;
+    // focusV = linha da imagem (0 = topo, 1 = base) que fica no meio quando o
+    // painel corta em cima/embaixo; a imagem nunca descola da borda
+    if (h >= 1) y0 = Math.min(0, Math.max(1 - h, 0.5 - (1 - focusV) * h));
     return new THREE.Vector4(x0, y0, w, h);
   }
 
@@ -401,8 +403,8 @@ export class WatercolorEngine {
    *    (a transição entre quadros fica suave mesmo com 12 quadros/segundo).
    */
   render(paint: number, a: { index: number; source: FrameSource } | null,
-    b: { index: number; source: FrameSource } | null, mix: number, focusU: number) {
-    const rect = this.computeRect(focusU);
+    b: { index: number; source: FrameSource } | null, mix: number, focusU: number, focusV = 0.5) {
+    const rect = this.computeRect(focusU, focusV);
     this.su.uS.value = paint;
     this.su.uRect.value.copy(rect);
     this.cu.uRect.value.copy(rect);
@@ -427,7 +429,7 @@ export class WatercolorEngine {
    * `<video>` quadro a quadro. O `VideoTexture` do three já reenvia o quadro
    * novo pra GPU sempre que o vídeo avança.
    */
-  renderVideo(paint: number, video: HTMLVideoElement, focusU = 0.5) {
+  renderVideo(paint: number, video: HTMLVideoElement, focusU = 0.5, focusV = 0.5) {
     if (!this.videoTex || this.videoTex.image !== video) {
       this.videoTex?.dispose();
       const tex = new THREE.VideoTexture(video);
@@ -438,7 +440,7 @@ export class WatercolorEngine {
       tex.magFilter = THREE.LinearFilter;
       this.videoTex = tex;
     }
-    const rect = this.computeRect(focusU);
+    const rect = this.computeRect(focusU, focusV);
     this.su.uS.value = paint;
     this.su.uRect.value.copy(rect);
     this.cu.uRect.value.copy(rect);
