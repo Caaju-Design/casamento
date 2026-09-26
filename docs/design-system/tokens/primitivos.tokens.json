@@ -94,9 +94,9 @@
     "white": { "$value": "#ffffff", "$type": "color" }
   },
   "fontFamily": {
-    "display": { "$value": "'cochin-lt-pro', Cochin, Georgia, 'Times New Roman', serif", "$type": "fontFamily" },
-    "body": { "$value": "'museo-sans', 'Helvetica Neue', Arial, sans-serif", "$type": "fontFamily" },
-    "script": { "$value": "'cochin-lt-pro', Cochin, Georgia, serif", "$type": "fontFamily" }
+    "display": { "$value": "var(--font-questrial), 'Helvetica Neue', Arial, sans-serif", "$type": "fontFamily" },
+    "body": { "$value": "var(--font-cinzel), Georgia, 'Times New Roman', serif", "$type": "fontFamily" },
+    "script": { "$value": "var(--font-questrial), 'Helvetica Neue', Arial, sans-serif", "$type": "fontFamily" }
   },
   "fontSize": {
     "100": { "$value": "0.875rem", "$type": "dimension" },

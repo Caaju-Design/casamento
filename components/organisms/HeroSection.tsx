@@ -174,7 +174,7 @@ export function HeroSection() {
 
         {/*
           Abertura com a identidade do casamento: monograma G&E + os nomes em
-          Cochin, os dois em branco chapado direto sobre a aquarela (pedido do
+          Questrial, os dois em branco chapado direto sobre a aquarela (pedido do
           casal: sem halo/respiro de papel por trás). Só existe no primeiro
           momento (progress perto de 0) e some assim que a rolagem começa —
           `opacity` via `clamp()` lendo `--hero-progress` direto no CSS,
