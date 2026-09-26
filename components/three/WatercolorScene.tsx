@@ -37,6 +37,8 @@ export interface WatercolorSceneProps {
   /** Margem de papel onde a tinta termina antes da borda (em alturas do canvas). */
   edgeFade?: number;
   stains: StainPreset;
+  /** Coluna da imagem que fica no centro quando o painel corta as laterais (0 = esquerda, 1 = direita). */
+  focusU?: number;
   className?: string;
 }
 
@@ -58,6 +60,7 @@ export function WatercolorScene({
   transparent = false,
   edgeFade = 0.07,
   stains,
+  focusU = 0.5,
   className,
 }: WatercolorSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -137,7 +140,7 @@ export function WatercolorScene({
       const b = store.nearestDecoded(ib);
       const exact = a && b && a.index === ia && b.index === ib;
       try {
-        engine.render(paint, a, exact ? b : null, exact ? f - ia : 0, 0.5);
+        engine.render(paint, a, exact ? b : null, exact ? f - ia : 0, focusU);
       } catch {
         fail();
       }
@@ -211,7 +214,7 @@ export function WatercolorScene({
       store?.dispose();
       engine?.dispose();
     };
-  }, [frames, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains, generation]);
+  }, [frames, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains, focusU, generation]);
 
   return (
     <div ref={containerRef} className={["relative", className].filter(Boolean).join(" ")} aria-hidden="true">

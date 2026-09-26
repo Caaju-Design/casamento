@@ -249,7 +249,9 @@ function releaseSource(src: FrameSource) {
 export const AMIGA_GRUPO_FRAMES = {
   desktop: { base: "/historia/amiga/grupo/d", count: 1 } satisfies FrameSet,
   mobile: { base: "/historia/amiga/grupo/m", count: 1 } satisfies FrameSet,
-  aspect: 4 / 3,
+  // recorte 5:4 puxado pra direita (tira a lateral esquerda)
+  // pra amiga de rosa — a cupido — entrar inteira
+  aspect: 5 / 4,
 };
 export const AMIGA_GABI_FRAMES = {
   desktop: { base: "/historia/amiga/gabi/d", count: 1 } satisfies FrameSet,

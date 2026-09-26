@@ -12,7 +12,12 @@ const WatercolorScene = dynamic(
   { ssr: false },
 );
 
-export type PaintedPhoto = { frames: SceneFrames; stains: StainPreset };
+export type PaintedPhoto = {
+  frames: SceneFrames;
+  stains: StainPreset;
+  /** Quando o painel corta as laterais da foto, qual coluna fica no centro (padrão 0,5). */
+  focusU?: number;
+};
 
 export interface PhotoPairMomentProps {
   text: string;
@@ -22,6 +27,10 @@ export interface PhotoPairMomentProps {
   second: PaintedPhoto;
   /** Lado das fotos no desktop. O texto fica do outro lado. */
   photosSide: "left" | "right";
+  /** Troca a posição padrão da primeira foto (classes absolutas, mobile + md:). */
+  firstPlace?: string;
+  /** Troca a posição padrão da segunda foto (classes absolutas, mobile + md:). */
+  secondPlace?: string;
 }
 
 const TRACK_VH = 240;
@@ -35,7 +44,7 @@ const TEXT_STYLE = { fontSize: "clamp(1.4rem, 2.4vw, 2.25rem)" } as const;
  * em volta). Texto do outro lado. No celular: fotos em cima e texto embaixo,
  * numa tela só.
  */
-export function PhotoPairMoment({ text, first, second, photosSide }: PhotoPairMomentProps) {
+export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, secondPlace }: PhotoPairMomentProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useTrackProgress(trackRef);
   const right = photosSide === "right";
@@ -59,26 +68,36 @@ export function PhotoPairMoment({ text, first, second, photosSide }: PhotoPairMo
             frames={first.frames}
             progressRef={progressRef}
             stains={first.stains}
+            focusU={first.focusU}
             paintStart={0}
             paintCompleteAt={0.42}
-            className={[
-              "!absolute top-[12%] h-[64%] w-[94%] md:top-[8%] md:h-[60%] md:w-[88%]",
-              right ? "left-[2%] md:left-0" : "right-[2%] md:right-0",
-            ].join(" ")}
+            className={
+              firstPlace
+                ? `!absolute ${firstPlace}`
+                : [
+                    "!absolute top-[12%] h-[64%] w-[94%] md:top-[8%] md:h-[60%] md:w-[88%]",
+                    right ? "left-[2%] md:left-0" : "right-[2%] md:right-0",
+                  ].join(" ")
+            }
           />
           <WatercolorScene
             frames={second.frames}
             progressRef={progressRef}
             stains={second.stains}
+            focusU={second.focusU}
             paintStart={0.46}
             paintCompleteAt={0.88}
             intro={false}
             transparent
             edgeFade={0.09}
-            className={[
-              "!absolute bottom-0 h-[66%] w-[50%] md:bottom-[4%] md:h-[74%] md:w-[42%]",
-              right ? "right-[3%] md:right-[6%]" : "left-[3%] md:left-[6%]",
-            ].join(" ")}
+            className={
+              secondPlace
+                ? `!absolute ${secondPlace}`
+                : [
+                    "!absolute bottom-0 h-[66%] w-[50%] md:bottom-[4%] md:h-[74%] md:w-[42%]",
+                    right ? "right-[3%] md:right-[6%]" : "left-[3%] md:left-[6%]",
+                  ].join(" ")
+            }
           />
         </div>
       </div>
