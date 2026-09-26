@@ -1,5 +1,6 @@
 "use client";
 
+import { Cloud } from "@/components/atoms/Cloud";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
 import { useTrackProgress } from "@/lib/hooks/useTrackProgress";
@@ -34,6 +35,8 @@ export function CapeTownMoment({ text }: { text: string }) {
   return (
     <div ref={trackRef} className="relative" style={{ height: `${TRACK_VH}vh` }}>
       <div className="sticky top-0 flex h-[100svh] pt-[72px] flex-col md:flex-row">
+        <Cloud id={7} className="right-[3%] top-[16%] w-[52vw] md:w-[30vw]" opacity={0.8} />
+        <Cloud id={1} className="bottom-[4%] right-0 w-[28vw] md:w-[15vw]" />
         <WatercolorScene
           frames={CAPE_TOWN_FRAMES}
           progressRef={progressRef}

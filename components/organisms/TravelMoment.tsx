@@ -1,5 +1,6 @@
 "use client";
 
+import { Cloud } from "@/components/atoms/Cloud";
 import { PhotoCollageMoment, type PlacedPhoto } from "@/components/organisms/PhotoCollageMoment";
 import {
   VIAGEM_ANGRA_FRAMES,
@@ -49,5 +50,16 @@ const PHOTOS: PlacedPhoto[] = [
 ];
 
 export function TravelMoment({ text }: { text: string }) {
-  return <PhotoCollageMoment text={text} photos={PHOTOS} photosSide="right" trackVh={380} />;
+  return <PhotoCollageMoment
+      text={text}
+      photos={PHOTOS}
+      photosSide="right"
+      trackVh={380}
+      decor={
+        <>
+          <Cloud id={2} className="left-0 top-[72px] w-[42vw] md:w-[26vw]" />
+          <Cloud id={9} className="bottom-[4%] left-0 w-[30vw] md:w-[15vw]" />
+        </>
+      }
+    />;
 }

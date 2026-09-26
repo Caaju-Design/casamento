@@ -1,5 +1,6 @@
 "use client";
 
+import { Cloud } from "@/components/atoms/Cloud";
 import { PhotoCollageMoment, type CollageItem } from "@/components/organisms/PhotoCollageMoment";
 import {
   CAFE_BALOES_FRAMES,
@@ -75,5 +76,16 @@ const ITEMS: CollageItem[] = [
 ];
 
 export function CafeMoment({ text }: { text: string }) {
-  return <PhotoCollageMoment text={text} photos={ITEMS} photosSide="left" trackVh={460} />;
+  return <PhotoCollageMoment
+      text={text}
+      photos={ITEMS}
+      photosSide="left"
+      trackVh={460}
+      decor={
+        <>
+          <Cloud id={6} className="right-0 top-[14%] w-[42vw] md:w-[24vw]" />
+          <Cloud id={8} className="bottom-[2%] right-[2%] w-[58vw] md:w-[30vw]" opacity={0.8} />
+        </>
+      }
+    />;
 }

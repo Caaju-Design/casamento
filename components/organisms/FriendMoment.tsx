@@ -1,5 +1,6 @@
 "use client";
 
+import { Cloud } from "@/components/atoms/Cloud";
 import { PhotoPairMoment } from "@/components/organisms/PhotoPairMoment";
 import { AMIGA_GABI_FRAMES, AMIGA_GRUPO_FRAMES } from "@/components/three/watercolor/frames";
 
@@ -18,6 +19,12 @@ export function FriendMoment({ text }: { text: string }) {
     <PhotoPairMoment
       text={text}
       photosSide="right"
+      decor={
+        <>
+          <Cloud id={5} className="left-[4%] top-[18%] w-[40vw] md:w-[22vw]" opacity={0.8} />
+          <Cloud id={4} className="bottom-0 left-0 w-[62vw] md:w-[30vw]" />
+        </>
+      }
       // foto 1 (4:3, espelhada): manchas na cupido (esquerda) e no Emanuel
       // (centro); corte lateral, se houver, sai só da direita (focusU 0)
       first={{ frames: AMIGA_GRUPO_FRAMES, focusU: 0, stains: { focusX: 0.4, focusY: 0.56, spreadX: 1.15, spreadY: 1.2, radius: 1.1 } }}

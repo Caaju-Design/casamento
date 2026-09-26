@@ -1,3 +1,4 @@
+import { Cloud } from "@/components/atoms/Cloud";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { CapeTownMoment } from "@/components/organisms/CapeTownMoment";
 import { FriendMoment } from "@/components/organisms/FriendMoment";
@@ -56,7 +57,10 @@ export function StorySection() {
   return (
     <section id="historia" aria-labelledby="historia-titulo" className="relative">
       {/* 1 · título */}
-      <div className="flex min-h-[100svh] items-center justify-center px-6 py-section-gap">
+      <div className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden px-6 py-section-gap">
+        <Cloud id={3} className="right-0 top-0 w-[46vw] md:w-[24vw]" />
+        <Cloud id={5} className="left-[6%] top-[20%] w-[46vw] md:w-[26vw]" opacity={0.8} />
+        <Cloud id={9} className="bottom-[6%] left-0 w-[36vw] md:w-[18vw]" />
         <PaintReveal variant="rise" className="mx-auto max-w-3xl text-center">
           <p className="font-body text-100 uppercase tracking-[0.3em] text-text-secondary">Nossa história</p>
           <h2
@@ -85,7 +89,10 @@ export function StorySection() {
       {endereco && <HomeMoment text={endereco.text} />}
 
       {/* 7 · fechamento — só o texto, uma tela, mesma tipografia do título */}
-      <div className="flex min-h-[100svh] items-center justify-center px-6 py-section-gap">
+      <div className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden px-6 py-section-gap">
+        <Cloud id={8} className="left-[3%] top-[14%] w-[62vw] md:w-[32vw]" opacity={0.8} />
+        <Cloud id={5} className="right-[8%] top-[8%] w-[40vw] md:w-[20vw]" opacity={0.8} />
+        <Cloud id={1} className="bottom-[8%] right-0 w-[30vw] md:w-[16vw]" />
         <PaintReveal variant="rise" className="mx-auto max-w-3xl text-center">
           <p
             className="font-display italic leading-tight text-text-primary"

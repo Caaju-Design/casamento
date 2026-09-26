@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import type { PaintedPhoto } from "@/components/organisms/PhotoPairMoment";
 import type { VideoSources } from "@/components/three/WatercolorVideo";
@@ -44,6 +44,8 @@ export interface PhotoCollageMomentProps {
   photosSide: "left" | "right";
   /** Altura do trilho de rolagem (mais fotos → trilho mais longo). */
   trackVh?: number;
+  /** Ornamentos (nuvens) presos na tela, atrás do conteúdo. */
+  decor?: ReactNode;
 }
 
 const TEXT_STYLE = { fontSize: "clamp(1.4rem, 2.4vw, 2.25rem)" } as const;
@@ -60,7 +62,7 @@ const OVERLAP = 0.35;
  * de baixo continuam aparecendo em volta. No celular: fotos em cima e texto
  * embaixo, numa tela só.
  */
-export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380 }: PhotoCollageMomentProps) {
+export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380, decor }: PhotoCollageMomentProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useTrackProgress(trackRef);
   const right = photosSide === "right";
@@ -69,6 +71,7 @@ export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380 }: 
   return (
     <div ref={trackRef} className="relative" style={{ height: `${trackVh}vh` }}>
       <div className={["sticky top-0 flex h-[100svh] pt-[72px] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
+        {decor}
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
             <p
