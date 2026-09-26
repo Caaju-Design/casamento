@@ -20,6 +20,8 @@ const WatercolorVideo = dynamic(
 export type PlacedPhoto = PaintedPhoto & {
   /** Posição/tamanho dentro do painel das fotos (classes absolutas, mobile + md:). */
   place: string;
+  /** Margem de papel na borda (padrão 0,07 na primeira e 0,09 nas outras). Menor = a tinta vai mais perto da borda. */
+  edgeFade?: number;
 };
 
 /** Um vídeo curto no mural: toca sozinho (mudo, em loop) e a rolagem só pinta. */
@@ -28,6 +30,7 @@ export type PlacedVideo = {
   stains: StainPreset;
   focusU?: number;
   place: string;
+  edgeFade?: number;
 };
 
 export type CollageItem = PlacedPhoto | PlacedVideo;
@@ -88,7 +91,7 @@ export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380 }: 
               paintCompleteAt: end,
               intro: i === 0,
               transparent: i > 0,
-              edgeFade: i === 0 ? 0.07 : 0.09,
+              edgeFade: photo.edgeFade ?? (i === 0 ? 0.07 : 0.09),
               className: `!absolute ${photo.place}`,
             };
             return "video" in photo ? (
