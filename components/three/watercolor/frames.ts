@@ -281,7 +281,7 @@ const single = (base: string, aspect: number) => ({
 });
 export const VIAGEM_HOPIHARI_FRAMES = single("/historia/viagens/hopihari", 4 / 3);
 export const VIAGEM_ANGRA_FRAMES = single("/historia/viagens/angra", 3 / 4);
-export const VIAGEM_GALERA_FRAMES = single("/historia/viagens/galera", 9 / 16);
+export const VIAGEM_PARQUE_FRAMES = single("/historia/viagens/parque", 3 / 4);
 export const VIAGEM_CONCERTO_FRAMES = single("/historia/viagens/concerto", 3 / 4);
 export const VIAGEM_NINO_FRAMES = single("/historia/viagens/nino", 3 / 4);
 export const CAFE_MAR_FRAMES = single("/historia/cafe/mar", 4 / 3);

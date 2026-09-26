@@ -4,15 +4,16 @@ import { PhotoCollageMoment, type PlacedPhoto } from "@/components/organisms/Pho
 import {
   VIAGEM_ANGRA_FRAMES,
   VIAGEM_CONCERTO_FRAMES,
-  VIAGEM_GALERA_FRAMES,
-  VIAGEM_HOPIHARI_FRAMES,
+    VIAGEM_HOPIHARI_FRAMES,
   VIAGEM_NINO_FRAMES,
+  VIAGEM_PARQUE_FRAMES,
 } from "@/components/three/watercolor/frames";
 
 /**
  * Momento 4 da "Nossa história" — as viagens pra se ver. Texto à esquerda; à
  * direita um mural de cinco fotos pintadas uma sobre a outra conforme a
- * rolagem: Hopi Hari, Angra, a galera à noite, o concerto de velas e o NINO.
+ * rolagem: Hopi Hari, Angra, o concerto de velas, os dois no parque e o NINO.
+ * Só fotos do casal.
  * Manchas (`stains`): focusY maior = mais pro alto da foto (onde estão os rostos).
  */
 const PHOTOS: PlacedPhoto[] = [
@@ -27,14 +28,16 @@ const PHOTOS: PlacedPhoto[] = [
     place: "right-[1%] top-[1%] h-[46%] w-[40%] md:right-[2%] md:top-[6%] md:h-[50%] md:w-[40%]",
   },
   {
-    frames: VIAGEM_GALERA_FRAMES,
-    stains: { focusX: 0.5, focusY: 0.55, spreadX: 1.6, spreadY: 1.1, radius: 0.9 },
-    place: "bottom-0 left-[1%] h-[52%] w-[36%] md:bottom-[4%] md:left-[2%] md:h-[56%] md:w-[34%]",
-  },
-  {
     frames: VIAGEM_CONCERTO_FRAMES,
     stains: { focusX: 0.5, focusY: 0.58, spreadX: 1.6, spreadY: 1.0, radius: 0.9 },
     place: "left-[31%] top-[42%] h-[46%] w-[40%] md:left-[30%] md:top-[40%] md:h-[50%] md:w-[40%]",
+  },
+  {
+    // os dois no parque (entrou no lugar da foto da galera: aqui é só o casal).
+    // Pintada DEPOIS do concerto, por cima dele, pra ninguém cobrir o rosto do Emanuel
+    frames: VIAGEM_PARQUE_FRAMES,
+    stains: { focusX: 0.55, focusY: 0.6, spreadX: 1.5, spreadY: 1.15, radius: 0.95 },
+    place: "bottom-0 left-[1%] h-[58%] w-[36%] md:bottom-[3%] md:left-[2%] md:h-[50%] md:w-[40%]",
   },
   {
     frames: VIAGEM_NINO_FRAMES,
