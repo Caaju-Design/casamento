@@ -161,8 +161,11 @@ const COMP_FRAG = /* glsl */ `
       vec2 dd = min(uv, 1.0 - uv) * vec2(asp, 1.0);
       float dEdge = min(dd.x, dd.y);
       float en = texture2D(tNoise, q * 0.5 + 3.0).g * 0.7 + texture2D(tNoise, q * 1.7 + 9.0).r * 0.3;
-      float edgeT = uEdgeFade * (0.25 + 1.3 * en);
-      float ek = smoothstep(edgeT, edgeT + 0.012, dEdge);           // borda seca, recortada
+      // "mordidas" finas na borda, independentes do tamanho da margem: mesmo
+      // com margem pequena a borda fica mastigada, nunca um corte reto
+      float chew = texture2D(tNoise, q * 5.0 + 1.3).b * 0.6 + texture2D(tNoise, q * 13.0 + 4.1).a * 0.4;
+      float edgeT = uEdgeFade * (0.25 + 1.3 * en) + 0.016 * chew;
+      float ek = smoothstep(edgeT, edgeT + 0.008, dEdge);           // borda seca, recortada
       E += (1.0 - smoothstep(edgeT + 0.012, edgeT + 0.03, dEdge)) * ek * 0.8 * min(P, 1.0); // pigmento acumula na borda (só onde tem tinta)
       P *= ek; E *= ek;
     }
