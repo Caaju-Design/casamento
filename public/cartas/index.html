@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F4EBDD">
+<title>Cartas G&E</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preload" as="image" href="/cartas/verso.webp">
+<style>
+:root{
+  --champ:#F4EBDD; --paper:#FFFDF8; --terr:#A8553B; --orange:#D47A3C;
+  --sage:#879B75; --moss:#536548; --ink:#3D342E; --gold:#B9935A;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Georgia,"Times New Roman",serif;color:var(--ink)}
+body{
+  min-height:100svh; display:flex; justify-content:center; align-items:center; overflow-x:hidden;
+  background:
+   radial-gradient(circle at 15% 15%,rgba(212,122,60,.12),transparent 28%),
+   radial-gradient(circle at 85% 82%,rgba(135,155,117,.15),transparent 30%),
+   var(--champ);
+}
+.app{width:min(100%,480px);min-height:100svh;padding:28px 22px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.eyebrow{font:600 11px/1.2 Arial,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:var(--terr);margin-bottom:14px}
+.stage{width:min(82vw,340px);aspect-ratio:2/3;perspective:1300px;position:relative}
+.card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .72s cubic-bezier(.2,.8,.2,1);cursor:pointer}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:28px;box-shadow:0 20px 50px rgba(70,45,32,.18);overflow:hidden}
+.back{
+  background:linear-gradient(rgba(54,47,35,.10),rgba(54,47,35,.10)),url('/cartas/verso.webp') center/cover no-repeat;
+  border:1px solid rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;
+}
+.back:before,.front:before{content:"";position:absolute;inset:13px;border:1px solid rgba(255,255,255,.55);border-radius:20px;pointer-events:none}
+.botanical{position:absolute;font-size:58px;opacity:.22;filter:saturate(.7)}
+.b1{top:22px;left:22px;transform:rotate(-22deg)} .b2{right:18px;bottom:24px;transform:rotate(155deg)}
+.monogram{display:block;width:76%;height:auto;filter:drop-shadow(0 2px 7px rgba(32,38,27,.50))}
+.tap{position:absolute;bottom:28px;left:0;right:0;text-align:center;color:#fff;font:600 10px Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;opacity:.9}
+.front{transform:rotateY(180deg);background:var(--paper);padding:38px 31px 34px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.front:before{border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+.category{font:700 10px Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-top:7px}
+.icon{font-size:28px;margin:18px 0 10px}
+h1{font-size:29px;line-height:1.02;margin:0 0 18px;font-weight:500}
+.mission{font-size:18px;line-height:1.45;margin:auto 0}
+.spark{font-size:17px;color:var(--accent);margin:14px}
+.done{border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:999px;padding:11px 22px;font:700 11px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.controls{height:72px;display:flex;align-items:center;justify-content:center;gap:12px}
+.next{border:1px solid var(--terr);background:var(--terr);color:#fff;border-radius:999px;font:700 14px Arial,sans-serif;letter-spacing:.04em;cursor:pointer;padding:14px 24px;box-shadow:0 5px 14px rgba(168,85,59,.22)}
+.next:hover{background:#91452F;border-color:#91452F}
+.next:disabled{cursor:wait;opacity:.7}
+.hint{font:400 11px/1.4 Arial,sans-serif;text-align:center;opacity:.62;max-width:330px}
+.toast{position:fixed;top:24px;background:#fff;border-radius:999px;padding:11px 17px;box-shadow:0 10px 30px #0002;font:600 12px Arial,sans-serif;transform:translateY(-80px);transition:.35s}
+.toast.show{transform:translateY(0)}
+@media(max-height:690px){.app{padding:14px}.stage{width:min(66vw,290px)}.controls{height:54px}.hint{display:none}.front{padding:30px 27px}.mission{font-size:16px}h1{font-size:25px}}
+
+/* Readable controls and room for enlarged text. */
+.eyebrow{font-size:12px;letter-spacing:.12em;text-align:center;line-height:1.5}
+.tap{font-size:14px;letter-spacing:.1em}
+.category{font-size:14px;letter-spacing:.12em}.done,.next{font-size:14px;min-height:44px}
+.hint{font-size:14px;line-height:1.55;opacity:1;color:#665c51}.toast{font-size:14px;z-index:10}
+.stage{width:min(86vw,360px);height:540px;aspect-ratio:auto}
+.front{overflow:auto}.mission{font-size:18px;line-height:1.5}.front h1{line-height:1.15}
+.back{width:100%;font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #536548;outline-offset:5px}
+@media(max-height:690px){.app{justify-content:flex-start}.stage{height:480px;width:min(86vw,340px)}.hint{display:block}}
+@media(prefers-reduced-motion:reduce){.card,.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast" role="status">Missão cumprida ✨</div>
+<main class="app">
+  <div class="eyebrow">Gabriela & Emanuel</div>
+  <div class="stage">
+    <div class="card" id="card" aria-label="Carta interativa">
+      <button class="face back" id="reveal" aria-label="Virar carta">
+        
+        <img class="monogram" src="/cartas/monograma.webp" alt="Monograma G e E">
+      </button>
+      <section class="face front" id="front" inert>
+        <div class="category" id="category"></div><div class="icon" id="icon"></div>
+        <h1 id="title"></h1><div class="mission" id="mission"></div>
+        <div class="spark">✦</div><button class="done" id="done">Cumpri ✓</button>
+      </section>
+    </div>
+  </div>
+  <div class="controls"><button class="next" id="next">Tire uma carta</button></div>
+  <div class="hint">Sem obrigação, sem pontuação. Só pequenos convites para viver a festa de um jeito diferente.</div>
+</main>
+<script>
+const cards=[
+ {c:"Conectar",i:"💬",a:"#718667",t:"Coincidências",m:"Encontre alguém que você ainda não conhece. Conversem até descobrirem <b>uma coisa que vocês têm em comum.</b>"},
+ {c:"Conectar",i:"🌿",a:"#718667",t:"Como você chegou aqui?",m:"Encontre alguém novo e descubra como essa pessoa conhece Gabi ou Emanuel."},
+ {c:"Conectar",i:"🧭",a:"#718667",t:"De onde você veio?",m:"Descubra alguém que veio de longe para estar aqui hoje. Pergunte de onde veio e como foi chegar até aqui."},
+ {c:"Conectar",i:"🕰️",a:"#718667",t:"Antes de nós",m:"Encontre alguém que conhecia Gabi ou Emanuel antes de eles se conhecerem e peça uma história daquela época."},
+ {c:"Brincar",i:"🎲",a:"#D47A3C",t:"Investigação",m:"Descubra quem nesta festa conhece um dos noivos há mais tempo."},
+ {c:"Brincar",i:"🕺",a:"#D47A3C",t:"Passinho",m:"Encontre alguém que saiba dançar forró e aprenda pelo menos um passo."},
+ {c:"Brincar",i:"🔎",a:"#D47A3C",t:"Pequeno detalhe",m:"Encontre o acessório mais interessante da festa e avise ao dono que ele ganhou esta competição imaginária."},
+ {c:"Brincar",i:"🧩",a:"#D47A3C",t:"Mesa contra mesa",m:"Descubram uma coisa que todas as pessoas da sua mesa têm em comum."},
+ {c:"Aproximar",i:"🤎",a:"#A8553B",t:"Não deixe para depois",m:"Escolha alguém que está aqui e diga <b>uma coisa que você admira nessa pessoa.</b>"},
+ {c:"Aproximar",i:"💭",a:"#A8553B",t:"Memória desbloqueada",m:"Conte para alguém uma lembrança feliz que você tem com ela."},
+ {c:"Aproximar",i:"✨",a:"#A8553B",t:"Pequenas felicidades",m:"Pergunte a alguém: <b>o que tem deixado seus dias melhores ultimamente?</b>"},
+ {c:"Registrar",i:"📸",a:"#B9935A",t:"Novo encontro",m:"Tire uma foto com alguém que você conheceu hoje."},
+ {c:"Registrar",i:"👥",a:"#B9935A",t:"Gerações",m:"Junte pessoas de pelo menos três gerações diferentes para uma foto."},
+ {c:"Registrar",i:"🌼",a:"#B9935A",t:"Detalhes",m:"Fotografe uma coisa pequena da festa que você achou bonita."},
+ {c:"Carta rara",i:"💌",a:"#9B783F",t:"Cápsula do tempo",m:"Pense em uma mensagem que você gostaria que Gabi & Emanuel lessem no primeiro aniversário de casamento."},
+ {c:"Carta rara",i:"🫶",a:"#9B783F",t:"Cupido social",m:"Apresente duas pessoas desta festa que ainda não se conhecem e que você acha que deveriam conversar."},
+ {c:"Carta rara",i:"🎁",a:"#9B783F",t:"Passe adiante",m:"Escolha alguém da festa e entregue seu celular para essa pessoa. <b>A próxima carta é dela.</b>"}
+];
+let last=-1, busy=false, hasDrawn=false, toastTimer;
+const card=document.querySelector('#card'), front=document.querySelector('#front');
+const reveal=document.querySelector('#reveal'), next=document.querySelector('#next'), done=document.querySelector('#done');
+function pick(){
+ const pool=cards.map((x,n)=>({x,n})).filter(v=>v.n!==last);
+ const weights=pool.map(v=>v.x.c==='Carta rara'?0.35:1);
+ let roll=Math.random()*weights.reduce((a,b)=>a+b,0), selected=pool[pool.length-1];
+ for(let j=0;j<pool.length;j++){roll-=weights[j];if(roll<=0){selected=pool[j];break;}}
+ last=selected.n;const x=selected.x;front.style.setProperty('--accent',x.c==='Conectar'?'#536548':x.c==='Brincar'?'#995022':x.c==='Registrar'?'#80612D':x.a);
+ document.querySelector('#category').textContent=x.c;
+ document.querySelector('#icon').textContent=x.i;
+ document.querySelector('#title').textContent=x.t;
+ document.querySelector('#mission').innerHTML=x.m;
+ done.disabled=false;done.textContent='Cumpri ✓';
+}
+function flip(open){card.classList.toggle('flipped',open);front.inert=!open;reveal.inert=open;}
+pick();
+reveal.addEventListener('click',()=>{if(busy)return;flip(true);hasDrawn=true;next.textContent='Tirar outra carta';done.focus({preventScroll:true});});
+next.addEventListener('click',()=>{
+ if(!hasDrawn){flip(true);hasDrawn=true;next.textContent='Tirar outra carta';done.focus({preventScroll:true});return;}
+ if(busy)return;busy=true;next.disabled=true;flip(false);
+ setTimeout(()=>{pick();busy=false;next.disabled=false;reveal.focus({preventScroll:true});},750);
+});
+done.addEventListener('click',()=>{
+ done.disabled=true;done.textContent='Feito ✓';const t=document.querySelector('#toast');t.classList.add('show');
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);next.focus({preventScroll:true});
+});
+</script>
+</body>
+</html>
