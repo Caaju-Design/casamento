@@ -242,6 +242,7 @@ export class WatercolorEngine {
   private fit: "hero" | "cover";
   private blank: THREE.DataTexture;
   private texCache = new Map<number, THREE.Texture>();
+  private videoTex: THREE.VideoTexture | null = null;
   private width = 1;
   private height = 1;
 
@@ -418,6 +419,39 @@ export class WatercolorEngine {
       u.uHasSrc.value = 0;
     }
 
+    this.draw();
+  }
+
+  /**
+   * Desenha um vídeo TOCANDO (não amarrado à rolagem): a tinta revela o
+   * `<video>` quadro a quadro. O `VideoTexture` do three já reenvia o quadro
+   * novo pra GPU sempre que o vídeo avança.
+   */
+  renderVideo(paint: number, video: HTMLVideoElement, focusU = 0.5) {
+    if (!this.videoTex || this.videoTex.image !== video) {
+      this.videoTex?.dispose();
+      const tex = new THREE.VideoTexture(video);
+      tex.flipY = false;
+      tex.colorSpace = THREE.NoColorSpace;
+      tex.generateMipmaps = false;
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      this.videoTex = tex;
+    }
+    const rect = this.computeRect(focusU);
+    this.su.uS.value = paint;
+    this.su.uRect.value.copy(rect);
+    this.cu.uRect.value.copy(rect);
+    const u = this.cu;
+    const ready = video.readyState >= 2;
+    u.tSrcA.value = ready ? this.videoTex : this.blank;
+    u.tSrcB.value = u.tSrcA.value;
+    u.uMix.value = 0;
+    u.uHasSrc.value = ready ? 1 : 0;
+    this.draw();
+  }
+
+  private draw() {
     this.renderer.setRenderTarget(this.maskRT);
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.clear();
@@ -432,6 +466,8 @@ export class WatercolorEngine {
   }
 
   dispose() {
+    this.videoTex?.dispose();
+    this.videoTex = null;
     for (const t of this.texCache.values()) t.dispose();
     this.texCache.clear();
     this.maskRT.dispose();

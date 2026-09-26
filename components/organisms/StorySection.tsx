@@ -3,6 +3,7 @@ import { CapeTownMoment } from "@/components/organisms/CapeTownMoment";
 import { FriendMoment } from "@/components/organisms/FriendMoment";
 import { CafeMoment } from "@/components/organisms/CafeMoment";
 import { TravelMoment } from "@/components/organisms/TravelMoment";
+import { HomeMoment } from "@/components/organisms/HomeMoment";
 
 /**
  * Organism `StorySection` — "Nossa história", logo depois do hero.
@@ -17,8 +18,10 @@ import { TravelMoment } from "@/components/organisms/TravelMoment";
  *  4. café e forró — mesma ideia, espelhada: fotos à esquerda (CafeMoment);
  *  5. as viagens — mural com cinco fotos pintadas uma sobre a outra, fotos
  *     à direita (TravelMoment);
- *  6–7. demais momentos com as ilustrações estáticas em aquarela
- *     (scripts/aquarela/historia.py), que aparecem "sendo pintadas".
+ *  6. o mesmo endereço — dois vídeos de 15 s tocando juntos, pintados em
+ *     aquarela, à esquerda (HomeMoment);
+ *  7. fechamento, com a ilustração estática em aquarela
+ *     (scripts/aquarela/historia.py), que aparece "sendo pintada".
  * As ilustrações têm fundo branco e usam `mix-blend-mode: multiply` no
  * mesmo elemento da máscara, então só a tinta aparece sobre o papel.
  *
@@ -82,11 +85,10 @@ function Illustration({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-const TEXT_STYLE = { fontSize: "clamp(1.4rem, 2.4vw, 2.25rem)" } as const;
 
 /** Organism `StorySection` — a história do casal, uma tela por momento. */
 export function StorySection() {
-  const [capeTown, friend, cafe, viagens, ...rest] = CHAPTERS;
+  const [capeTown, friend, cafe, viagens, endereco] = CHAPTERS;
   return (
     <section id="historia" aria-labelledby="historia-titulo" className="relative">
       {/* 1 · título */}
@@ -115,29 +117,8 @@ export function StorySection() {
       {/* 5 · as viagens (mural de cinco fotos pintadas) */}
       {viagens && <TravelMoment text={viagens.text} />}
 
-      {/* 6 · demais momentos, uma tela cada */}
-      {rest.map((chapter, i) => {
-        const imageFirst = i % 2 === 0;
-        return (
-          <div
-            key={chapter.image}
-            className="mx-auto grid min-h-[100svh] max-w-6xl content-center items-center gap-8 px-6 py-16 md:grid-cols-2 md:gap-16"
-          >
-            <div className={imageFirst ? "md:order-1" : "md:order-2"}>
-              <Illustration src={chapter.image} alt={chapter.alt} />
-            </div>
-            <PaintReveal
-              variant="rise"
-              delay={350}
-              className={["text-center", imageFirst ? "md:order-2 md:text-left" : "md:order-1 md:text-right"].join(" ")}
-            >
-              <p className="font-display italic leading-snug text-text-primary" style={TEXT_STYLE}>
-                {chapter.text}
-              </p>
-            </PaintReveal>
-          </div>
-        );
-      })}
+      {/* 6 · o mesmo endereço (dois vídeos tocando juntos, em aquarela) */}
+      {endereco && <HomeMoment text={endereco.text} />}
 
       {/* 7 · fechamento */}
       <div className="mx-auto flex min-h-[100svh] max-w-3xl flex-col items-center justify-center gap-8 px-6 py-16 text-center">
