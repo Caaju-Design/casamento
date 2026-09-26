@@ -256,3 +256,15 @@ export const AMIGA_GABI_FRAMES = {
   mobile: { base: "/historia/amiga/gabi/m", count: 1 } satisfies FrameSet,
   aspect: 9 / 16,
 };
+
+/** Fotos do café e forró (Nossa história, momento 3). */
+export const CAFE_BALOES_FRAMES = {
+  desktop: { base: "/historia/cafe/baloes/d", count: 1 } satisfies FrameSet,
+  mobile: { base: "/historia/cafe/baloes/m", count: 1 } satisfies FrameSet,
+  aspect: 4 / 3,
+};
+export const CAFE_SELFIE_FRAMES = {
+  desktop: { base: "/historia/cafe/selfie/d", count: 1 } satisfies FrameSet,
+  mobile: { base: "/historia/cafe/selfie/m", count: 1 } satisfies FrameSet,
+  aspect: 9 / 16,
+};
