@@ -33,7 +33,7 @@ export function CapeTownMoment({ text }: { text: string }) {
 
   return (
     <div ref={trackRef} className="relative" style={{ height: `${TRACK_VH}vh` }}>
-      <div className="sticky top-0 flex h-[100svh] flex-col md:flex-row">
+      <div className="sticky top-0 flex h-[100svh] pt-[72px] flex-col md:flex-row">
         <WatercolorScene
           frames={CAPE_TOWN_FRAMES}
           progressRef={progressRef}

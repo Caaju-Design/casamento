@@ -51,7 +51,7 @@ export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, s
 
   return (
     <div ref={trackRef} className="relative" style={{ height: `${TRACK_VH}vh` }}>
-      <div className={["sticky top-0 flex h-[100svh] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
+      <div className={["sticky top-0 flex h-[100svh] pt-[72px] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-6 md:w-1/2 md:items-center md:px-16 md:py-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
             <p
@@ -63,7 +63,7 @@ export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, s
           </PaintReveal>
         </div>
 
-        <div className="relative h-[60%] w-full shrink-0 md:h-full md:w-1/2">
+        <div className="relative h-[54%] w-full shrink-0 md:h-full md:w-1/2">
           <WatercolorScene
             frames={first.frames}
             progressRef={progressRef}
@@ -75,7 +75,7 @@ export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, s
               firstPlace
                 ? `!absolute ${firstPlace}`
                 : [
-                    "!absolute top-[12%] h-[64%] w-[94%] md:top-[8%] md:h-[60%] md:w-[88%]",
+                    "!absolute top-[3%] h-[64%] w-[94%] md:top-[5%] md:h-[60%] md:w-[88%]",
                     right ? "left-[2%] md:left-0" : "right-[2%] md:right-0",
                   ].join(" ")
             }

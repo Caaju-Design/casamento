@@ -67,7 +67,7 @@ export function HomeMoment({ text }: { text: string }) {
 
   return (
     <div ref={trackRef} className="relative" style={{ height: `${TRACK_VH}vh` }}>
-      <div className="sticky top-0 flex h-[100svh] flex-col-reverse md:flex-row-reverse">
+      <div className="sticky top-0 flex h-[100svh] pt-[72px] flex-col-reverse md:flex-row-reverse">
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
             <p className="text-center font-display italic leading-snug text-text-primary md:text-left" style={TEXT_STYLE}>
@@ -76,7 +76,7 @@ export function HomeMoment({ text }: { text: string }) {
           </PaintReveal>
         </div>
 
-        <div className="relative h-[62%] w-full shrink-0 md:h-full md:w-1/2">
+        <div className="relative h-[54%] w-full shrink-0 md:h-full md:w-1/2">
           <WatercolorVideo
             video={CARRO}
             progressRef={progressRef}
@@ -84,7 +84,7 @@ export function HomeMoment({ text }: { text: string }) {
             paintStart={0}
             paintCompleteAt={0.4}
             onVideo={setLeader}
-            className="!absolute left-[1%] top-[12%] h-[42%] w-[94%] md:left-[2%] md:top-[9%] md:h-[46%] md:w-[88%]"
+            className="!absolute left-[1%] top-[2%] h-[50%] w-[82%] md:left-[2%] md:top-[5%] md:h-[46%] md:w-[88%]"
           />
           <WatercolorVideo
             video={SOFA}
@@ -96,7 +96,7 @@ export function HomeMoment({ text }: { text: string }) {
             transparent
             edgeFade={0.09}
             onVideo={setFollower}
-            className="!absolute bottom-0 right-[1%] h-[44%] w-[94%] md:bottom-[5%] md:right-[2%] md:h-[46%] md:w-[88%]"
+            className="!absolute bottom-0 right-[1%] h-[50%] w-[82%] md:bottom-[5%] md:right-[2%] md:h-[46%] md:w-[88%]"
           />
         </div>
       </div>

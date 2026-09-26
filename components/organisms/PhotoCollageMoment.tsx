@@ -4,10 +4,16 @@ import dynamic from "next/dynamic";
 import { useRef } from "react";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import type { PaintedPhoto } from "@/components/organisms/PhotoPairMoment";
+import type { VideoSources } from "@/components/three/WatercolorVideo";
+import type { StainPreset } from "@/components/three/watercolor/engine";
 import { useTrackProgress } from "@/lib/hooks/useTrackProgress";
 
 const WatercolorScene = dynamic(
   () => import("@/components/three/WatercolorScene").then((m) => m.WatercolorScene),
+  { ssr: false },
+);
+const WatercolorVideo = dynamic(
+  () => import("@/components/three/WatercolorVideo").then((m) => m.WatercolorVideo),
   { ssr: false },
 );
 
@@ -16,10 +22,20 @@ export type PlacedPhoto = PaintedPhoto & {
   place: string;
 };
 
+/** Um vídeo curto no mural: toca sozinho (mudo, em loop) e a rolagem só pinta. */
+export type PlacedVideo = {
+  video: VideoSources;
+  stains: StainPreset;
+  focusU?: number;
+  place: string;
+};
+
+export type CollageItem = PlacedPhoto | PlacedVideo;
+
 export interface PhotoCollageMomentProps {
   text: string;
   /** Na ordem em que são pintadas; cada uma cai por cima das anteriores. */
-  photos: PlacedPhoto[];
+  photos: CollageItem[];
   /** Lado das fotos no desktop. O texto fica do outro lado. */
   photosSide: "left" | "right";
   /** Altura do trilho de rolagem (mais fotos → trilho mais longo). */
@@ -33,7 +49,7 @@ const PAINT_SPAN = 0.9;
 const OVERLAP = 0.35;
 
 /**
- * Tela da "Nossa história" com várias fotos pintadas em aquarela, uma caindo
+ * Tela da "Nossa história" com várias fotos (e vídeos curtos) pintados em aquarela, uma caindo
  * sobre a outra como um mural de viagem, amarradas à rolagem (mesma técnica
  * das telas de duas fotos). Cada foto tem a sua janela do trilho; a primeira
  * é opaca (papel) e as demais têm canvas transparente fora da tinta, então as
@@ -48,7 +64,7 @@ export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380 }: 
 
   return (
     <div ref={trackRef} className="relative" style={{ height: `${trackVh}vh` }}>
-      <div className={["sticky top-0 flex h-[100svh] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
+      <div className={["sticky top-0 flex h-[100svh] pt-[72px] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
             <p
@@ -60,23 +76,25 @@ export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380 }: 
           </PaintReveal>
         </div>
 
-        <div className="relative h-[62%] w-full shrink-0 md:h-full md:w-1/2">
+        <div className="relative h-[54%] w-full shrink-0 md:h-full md:w-1/2">
           {photos.map((photo, i) => {
             const start = i === 0 ? 0 : i * slot - slot * OVERLAP;
             const end = Math.min(PAINT_SPAN, (i + 1) * slot);
-            return (
-              <WatercolorScene
-                key={photo.frames.desktop.base}
-                frames={photo.frames}
-                progressRef={progressRef}
-                stains={photo.stains}
-                paintStart={start}
-                paintCompleteAt={end}
-                intro={i === 0}
-                transparent={i > 0}
-                edgeFade={i === 0 ? 0.07 : 0.09}
-                className={`!absolute ${photo.place}`}
-              />
+            const common = {
+              progressRef,
+              stains: photo.stains,
+              focusU: photo.focusU,
+              paintStart: start,
+              paintCompleteAt: end,
+              intro: i === 0,
+              transparent: i > 0,
+              edgeFade: i === 0 ? 0.07 : 0.09,
+              className: `!absolute ${photo.place}`,
+            };
+            return "video" in photo ? (
+              <WatercolorVideo key={photo.video.desktop} video={photo.video} {...common} />
+            ) : (
+              <WatercolorScene key={photo.frames.desktop.base} frames={photo.frames} {...common} />
             );
           })}
         </div>

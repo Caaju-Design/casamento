@@ -19,12 +19,12 @@ const PHOTOS: PlacedPhoto[] = [
   {
     frames: VIAGEM_HOPIHARI_FRAMES,
     stains: { focusX: 0.45, focusY: 0.55, spreadX: 0.8, spreadY: 1.15, radius: 1.05 },
-    place: "left-[1%] top-[14%] h-[38%] w-[68%] md:left-0 md:top-[9%] md:h-[42%] md:w-[70%]",
+    place: "left-[1%] top-[3%] h-[40%] w-[68%] md:left-0 md:top-[5%] md:h-[42%] md:w-[70%]",
   },
   {
     frames: VIAGEM_ANGRA_FRAMES,
     stains: { focusX: 0.5, focusY: 0.42, spreadX: 1.6, spreadY: 1.0, radius: 0.9 },
-    place: "right-[1%] top-[12%] h-[44%] w-[40%] md:right-[2%] md:top-[6%] md:h-[50%] md:w-[40%]",
+    place: "right-[1%] top-[1%] h-[46%] w-[40%] md:right-[2%] md:top-[6%] md:h-[50%] md:w-[40%]",
   },
   {
     frames: VIAGEM_GALERA_FRAMES,

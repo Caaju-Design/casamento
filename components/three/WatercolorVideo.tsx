@@ -36,6 +36,8 @@ export interface WatercolorVideoProps {
   stains: StainPreset;
   /** Recebe o `<video>` (ou null ao desmontar), pra tocar em sincronia com outros. */
   onVideo?: (el: HTMLVideoElement | null) => void;
+  /** Coluna do vídeo que fica no centro quando o painel corta as laterais (0 a 1). */
+  focusU?: number;
   className?: string;
 }
 
@@ -58,6 +60,7 @@ export function WatercolorVideo({
   edgeFade = 0.07,
   stains,
   onVideo,
+  focusU = 0.5,
   className,
 }: WatercolorVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -122,7 +125,7 @@ export function WatercolorVideo({
       const paint = Math.min(1, introShare * (1 - Math.pow(1 - introT, 3)) + (1 - introShare) * scrollPaint);
       // vídeo tocando = quadro novo a cada rAF, então desenha sempre
       try {
-        engine.renderVideo(paint, vid);
+        engine.renderVideo(paint, vid, focusU);
       } catch {
         fail();
       }
@@ -181,7 +184,7 @@ export function WatercolorVideo({
       canvas?.removeEventListener("webglcontextlost", fail);
       engine?.dispose();
     };
-  }, [video, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains, generation]);
+  }, [video, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains, focusU, generation]);
 
   return (
     <div ref={containerRef} className={["relative", className].filter(Boolean).join(" ")} aria-hidden="true">

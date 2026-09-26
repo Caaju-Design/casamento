@@ -268,7 +268,9 @@ export const CAFE_BALOES_FRAMES = {
 export const CAFE_SELFIE_FRAMES = {
   desktop: { base: "/historia/cafe/selfie/d", count: 1 } satisfies FrameSet,
   mobile: { base: "/historia/cafe/selfie/m", count: 1 } satisfies FrameSet,
-  aspect: 9 / 16,
+  // a foto original (9:16) tem o rosto do Emanuel colado na borda direita; foi
+  // estendida 200px à direita (espelho borrado) pra ele sair da margem de papel
+  aspect: 1100 / 1600,
 };
 
 /** Fotos das viagens (Nossa história, momento 4): mural com cinco fotos. */
@@ -282,3 +284,5 @@ export const VIAGEM_ANGRA_FRAMES = single("/historia/viagens/angra", 3 / 4);
 export const VIAGEM_GALERA_FRAMES = single("/historia/viagens/galera", 9 / 16);
 export const VIAGEM_CONCERTO_FRAMES = single("/historia/viagens/concerto", 3 / 4);
 export const VIAGEM_NINO_FRAMES = single("/historia/viagens/nino", 3 / 4);
+export const CAFE_MAR_FRAMES = single("/historia/cafe/mar", 4 / 3);
+export const CAFE_TRILHA_FRAMES = single("/historia/cafe/trilha", 3 / 4);
