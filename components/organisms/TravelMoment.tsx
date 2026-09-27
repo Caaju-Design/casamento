@@ -50,7 +50,7 @@ const PHOTOS: PlacedPhoto[] = [
 ];
 
 export function TravelMoment({ text }: { text: string }) {
-  return <PhotoCollageMoment
+  return <PhotoCollageMoment quoteTone="oliva"
       text={text}
       photos={PHOTOS}
       photosSide="right"

@@ -16,7 +16,7 @@ import { AMIGA_GABI_FRAMES, AMIGA_GRUPO_FRAMES } from "@/components/three/waterc
  */
 export function FriendMoment({ text }: { text: string }) {
   return (
-    <PhotoPairMoment
+    <PhotoPairMoment quoteTone="oliva"
       text={text}
       photosSide="right"
       decor={

@@ -76,7 +76,7 @@ const ITEMS: CollageItem[] = [
 ];
 
 export function CafeMoment({ text }: { text: string }) {
-  return <PhotoCollageMoment
+  return <PhotoCollageMoment quoteTone="azul"
       text={text}
       photos={ITEMS}
       photosSide="left"

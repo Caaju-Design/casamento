@@ -1,6 +1,6 @@
 "use client";
 
-import { StoryQuote } from "@/components/molecules/StoryQuote";
+import { StoryQuote, type StoryQuoteTone } from "@/components/molecules/StoryQuote";
 import dynamic from "next/dynamic";
 import { useRef, type ReactNode } from "react";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
@@ -23,6 +23,8 @@ export type PaintedPhoto = {
 };
 
 export interface PhotoPairMomentProps {
+  /** Cor das nuvens e das aspas atrás do texto (padrão: azul). */
+  quoteTone?: StoryQuoteTone;
   text: string;
   /** Pintada primeiro (paisagem, 4:3): ocupa o alto do painel. */
   first: PaintedPhoto;
@@ -49,7 +51,7 @@ const TEXT_STYLE = { fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" } as const;
  * em volta). Texto do outro lado. No celular: fotos em cima e texto embaixo,
  * numa tela só.
  */
-export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, secondPlace, decor }: PhotoPairMomentProps) {
+export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, secondPlace, decor, quoteTone = "azul" }: PhotoPairMomentProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useTrackProgress(trackRef);
   const right = photosSide === "right";
@@ -59,16 +61,18 @@ export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, s
       <div className={["sticky top-0 flex h-[100svh] pt-[72px] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
         {decor}
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-6 md:w-1/2 md:items-center md:px-16 md:py-0">
-          <PaintReveal variant="rise" delay={500} className="max-w-xl">
-            <StoryQuote>
-              <p
-                className="text-center font-body leading-relaxed text-text-primary md:text-start"
-                style={TEXT_STYLE}
-              >
-                {text}
-              </p>
+          <div className="max-w-xl">
+            <StoryQuote tone={quoteTone}>
+              <PaintReveal variant="rise" delay={500}>
+                <p
+                  className="text-center font-body leading-relaxed text-text-primary md:text-start"
+                  style={TEXT_STYLE}
+                >
+                  {text}
+                </p>
+              </PaintReveal>
             </StoryQuote>
-          </PaintReveal>
+          </div>
         </div>
 
         <div className="relative h-[54%] w-full shrink-0 md:h-full md:w-1/2">

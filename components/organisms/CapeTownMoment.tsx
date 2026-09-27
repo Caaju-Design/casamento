@@ -46,16 +46,18 @@ export function CapeTownMoment({ text }: { text: string }) {
           className="h-[56%] w-full shrink-0 md:h-full md:w-1/2"
         />
         <div className="flex flex-1 items-center justify-center px-8 pb-10 md:w-1/2 md:px-16 md:pb-0">
-          <PaintReveal variant="rise" delay={500} className="max-w-xl">
-            <StoryQuote>
-              <p
-                className="text-center font-body leading-relaxed text-text-primary md:text-start"
-                style={{ fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" }}
-              >
-                {text}
-              </p>
+          <div className="max-w-xl">
+            <StoryQuote tone="azul">
+              <PaintReveal variant="rise" delay={500}>
+                <p
+                  className="text-center font-body leading-relaxed text-text-primary md:text-start"
+                  style={{ fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" }}
+                >
+                  {text}
+                </p>
+              </PaintReveal>
             </StoryQuote>
-          </PaintReveal>
+          </div>
         </div>
       </div>
     </div>
