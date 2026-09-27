@@ -1,5 +1,6 @@
 "use client";
 
+import { StoryQuote } from "@/components/molecules/StoryQuote";
 import { Cloud } from "@/components/atoms/Cloud";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef } from "react";
@@ -73,9 +74,11 @@ export function HomeMoment({ text }: { text: string }) {
         <Cloud id={7} className="bottom-[5%] right-[3%] w-[62vw] md:w-[32vw]" opacity={0.8} />
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
-            <p className="text-center font-body leading-relaxed text-text-primary md:text-start" style={TEXT_STYLE}>
-              {text}
-            </p>
+            <StoryQuote>
+              <p className="text-center font-body leading-relaxed text-text-primary md:text-start" style={TEXT_STYLE}>
+                {text}
+              </p>
+            </StoryQuote>
           </PaintReveal>
         </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { StoryQuote } from "@/components/molecules/StoryQuote";
 import { Cloud } from "@/components/atoms/Cloud";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
@@ -46,12 +47,14 @@ export function CapeTownMoment({ text }: { text: string }) {
         />
         <div className="flex flex-1 items-center justify-center px-8 pb-10 md:w-1/2 md:px-16 md:pb-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
-            <p
-              className="text-center font-body leading-relaxed text-text-primary md:text-start"
-              style={{ fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" }}
-            >
-              {text}
-            </p>
+            <StoryQuote>
+              <p
+                className="text-center font-body leading-relaxed text-text-primary md:text-start"
+                style={{ fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" }}
+              >
+                {text}
+              </p>
+            </StoryQuote>
           </PaintReveal>
         </div>
       </div>

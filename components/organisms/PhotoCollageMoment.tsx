@@ -1,5 +1,6 @@
 "use client";
 
+import { StoryQuote } from "@/components/molecules/StoryQuote";
 import dynamic from "next/dynamic";
 import { useRef, type ReactNode } from "react";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
@@ -74,12 +75,14 @@ export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380, de
         {decor}
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
-            <p
-              className="text-center font-body leading-relaxed text-text-primary md:text-start"
-              style={TEXT_STYLE}
-            >
-              {text}
-            </p>
+            <StoryQuote>
+              <p
+                className="text-center font-body leading-relaxed text-text-primary md:text-start"
+                style={TEXT_STYLE}
+              >
+                {text}
+              </p>
+            </StoryQuote>
           </PaintReveal>
         </div>
 
