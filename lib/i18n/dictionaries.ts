@@ -48,9 +48,8 @@ export type Dictionary = {
     maps: string;
     waze: string;
     calendar: string;
-    /** card "Reserve a data": título, data por extenso e nota */
+    /** card "Reserve a data": título e nota */
     saveTitle: string;
-    dateWords: string;
     saveNote: string;
     calendarTitle: string;
     calendarDetails: string;
@@ -175,7 +174,6 @@ const pt: Dictionary = {
     waze: "Waze",
     calendar: "Salvar na agenda",
     saveTitle: "Reserve a data",
-    dateWords: "Dezessete de abril de dois mil e vinte e sete",
     saveNote: "A partir das 16h, em São Paulo. Salve na sua agenda e venha celebrar com a gente!",
     calendarTitle: "Casamento Gabriela & Emanuel",
     calendarDetails: "16h chegada · 16h30 cerimônia · 17h recepção · 22h encerramento",
@@ -390,7 +388,6 @@ const en: Dictionary = {
     waze: "Waze",
     calendar: "Add to calendar",
     saveTitle: "Save the date",
-    dateWords: "The seventeenth of April, two thousand and twenty-seven",
     saveNote: "From 4 pm, in São Paulo. Add it to your calendar and come celebrate with us!",
     calendarTitle: "Gabriela & Emanuel's wedding",
     calendarDetails: "4 pm arrival · 4:30 pm ceremony · 5 pm reception · 10 pm farewell",
@@ -604,7 +601,6 @@ const ar: Dictionary = {
     waze: "Waze",
     calendar: "أضِف إلى التقويم",
     saveTitle: "احفظوا الموعد",
-    dateWords: "السابع عشر من أبريل، عام ألفين وسبعة وعشرين",
     saveNote: "ابتداءً من الساعة 4:00 م، في ساو باولو. أضيفوه إلى تقويمكم وتعالوا نحتفل معًا!",
     calendarTitle: "زفاف غابرييلا وإيمانويل",
     calendarDetails: "4:00 م الوصول · 4:30 م المراسم · 5:00 م الاستقبال · 10:00 م الختام",

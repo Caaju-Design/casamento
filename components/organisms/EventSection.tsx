@@ -62,10 +62,9 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
             <h3 className="font-body text-400 uppercase tracking-[0.2em] text-text-primary sm:tracking-[0.28em]">{t.saveTitle}</h3>
             <span aria-hidden="true" className="mt-4 block h-px w-10 bg-salvia-700" />
             <p className="mt-5 font-body leading-snug text-text-primary" style={{ fontSize: "clamp(1.35rem, 2.2vw, 1.75rem)" }}>{t.lead}</p>
-            <p className="mt-2 font-body text-200 italic leading-relaxed text-terracota-700">{t.dateWords}</p>
             <p className="mt-3 max-w-md font-body text-200 leading-relaxed text-text-secondary">{t.saveNote}</p>
             <a className={["mt-7", primaryClass].join(" ")} href={googleCalendar(t)} target="_blank" rel="noopener noreferrer">
-              {t.calendar} <span aria-hidden="true" className="rtl:-scale-x-100">›</span>
+              {t.calendar}
             </a>
           </div>
 
