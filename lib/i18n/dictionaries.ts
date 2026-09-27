@@ -158,7 +158,7 @@ const pt: Dictionary = {
       "Vieram as viagens para se ver, a saudade e as conversas sinceras que foram abrindo espaço para o amor. Até que estar juntos deixou de ser o plano para o próximo fim de semana e virou o plano para a vida.",
       "O endereço passou a ser o mesmo, os sonhos ganharam um “nós” e, em poucos meses, o casamento já tinha data. Para um começo tão despretensioso, até que aquele grupo rendeu.",
     ],
-    closing: "Agora, queremos reunir quem a gente ama para celebrar essa história — e viver com vocês um pedacinho dela.",
+    closing: "Agora, queremos reunir quem a gente ama para celebrar essa história e viver com vocês um pedacinho dela.",
   },
   event: {
     eyebrow: "O grande dia",
@@ -370,7 +370,7 @@ const en: Dictionary = {
       "Then came the trips to see each other, the missing each other, and the honest conversations that made room for love. Until being together stopped being the plan for next weekend and became the plan for life.",
       "We moved in together, our dreams became “ours” and, within a few months, the wedding had a date. For such an unassuming beginning, that group chat really paid off.",
     ],
-    closing: "Now we want to gather the people we love to celebrate this story — and share a little piece of it with you.",
+    closing: "Now we want to gather the people we love to celebrate this story and share a little piece of it with you.",
   },
   event: {
     eyebrow: "The big day",
@@ -581,7 +581,7 @@ const ar: Dictionary = {
       "ثم جاءت الرحلات لنرى بعضنا، والشوق، والأحاديث الصادقة التي أفسحت مكانًا للحبّ. حتى لم يعد أن نكون معًا خطةً لعطلة نهاية الأسبوع القادمة، بل صار خطة العمر.",
       "صار عنواننا واحدًا، وأصبحت أحلامنا «أحلامنا نحن»، وخلال أشهرٍ قليلة صار للزفاف موعد. لبدايةٍ بهذه البساطة، يبدو أن تلك المجموعة أثمرت حقًّا.",
     ],
-    closing: "والآن نريد أن نجمع من نحبّهم لنحتفل بهذه القصة — ونعيش معكم جزءًا صغيرًا منها.",
+    closing: "والآن نريد أن نجمع من نحبّهم لنحتفل بهذه القصة ونعيش معكم جزءًا صغيرًا منها.",
   },
   event: {
     eyebrow: "اليوم الكبير",
