@@ -84,7 +84,7 @@ export function AnchorNav({ items, startHiddenForHero = false }: AnchorNavProps)
         </a>
         <button
           type="button"
-          className="text-text-primary md:hidden"
+          className="text-text-primary lg:hidden"
           onClick={() => setIsOpen((open) => !open)}
           aria-expanded={isOpen}
           aria-label="Abrir menu"
@@ -93,7 +93,7 @@ export function AnchorNav({ items, startHiddenForHero = false }: AnchorNavProps)
         </button>
         <ul
           className={[
-            "font-body text-100 gap-6 md:flex md:items-center",
+            "font-body text-100 gap-6 lg:flex lg:items-center",
             isOpen ? "absolute left-0 right-0 top-full flex flex-col bg-surface p-4" : "hidden",
           ].join(" ")}
         >

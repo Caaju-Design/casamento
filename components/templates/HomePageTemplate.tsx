@@ -1,15 +1,18 @@
-import { Cloud } from "@/components/atoms/Cloud";
-import { Heading } from "@/components/atoms/Heading";
-import { Text } from "@/components/atoms/Text";
+import { Painting } from "@/components/atoms/Painting";
 import { AnchorNav } from "@/components/molecules/AnchorNav";
+import { DressCodeSection } from "@/components/organisms/DressCodeSection";
+import { EventSection } from "@/components/organisms/EventSection";
 import { HeroSection } from "@/components/organisms/HeroSection";
-import { RecommendationsSection } from "@/components/organisms/RecommendationsSection";
+import { StaySection } from "@/components/organisms/StaySection";
 import { StorySection } from "@/components/organisms/StorySection";
+import { TipsSection } from "@/components/organisms/TipsSection";
 
 const NAV_ITEMS = [
   { href: "#historia", label: "Nossa história" },
-  { href: "#evento", label: "O evento" },
-  { href: "#recomendacoes", label: "Hospedagem e restaurantes" },
+  { href: "#evento", label: "O grande dia" },
+  { href: "#dresscode", label: "Dress code" },
+  { href: "#hospedagem", label: "Hospedagem" },
+  { href: "#dicas", label: "Dicas da região" },
 ];
 
 /** Template `HomePageTemplate` — esqueleto da home one-page. */
@@ -20,64 +23,19 @@ export function HomePageTemplate() {
       <HeroSection />
 
       <StorySection />
+      <EventSection />
+      <DressCodeSection />
+      <StaySection />
+      <TipsSection />
 
-      <div className="relative isolate overflow-hidden">
-        <Cloud id={4} className="left-0 top-[6%] w-[60vw] md:w-[30vw]" />
-        <Cloud id={6} className="bottom-[4%] right-0 w-[44vw] md:w-[22vw]" />
-        <section
-          id="evento"
-          className="mx-auto max-w-3xl px-6 py-section-gap text-center"
-        >
-          <Heading>O evento</Heading>
-          <dl className="mx-auto mt-6 grid max-w-md gap-6 text-left sm:grid-cols-2">
-            <div>
-              <dt className="font-body text-100 uppercase tracking-wide text-text-secondary">
-                Data
-              </dt>
-              <dd className="font-display text-400 text-text-primary">
-                17 de abril de 2027
-              </dd>
-            </div>
-            <div>
-              <dt className="font-body text-100 uppercase tracking-wide text-text-secondary">
-                Horário
-              </dt>
-              <dd className="font-display text-400 text-text-primary">16h00</dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="font-body text-100 uppercase tracking-wide text-text-secondary">
-                Local
-              </dt>
-              <dd className="font-display text-400 text-text-primary">
-                Ed. Square 2 — Salão de festa
-                <br />
-                Rua Luís Correia de Melo, 86, Chácara Santo Antônio
-                <br />
-                São Paulo — CEP 04726-220
-              </dd>
-            </div>
-          </dl>
-          <Text tone="secondary" className="mx-auto mt-6 max-w-xl">
-            Contamos com você para celebrar esse dia com a gente.
-          </Text>
-        </section>
-      </div>
-
-      <div className="relative isolate overflow-hidden">
-        <Cloud id={2} className="left-0 top-0 w-[44vw] md:w-[24vw]" />
-        <Cloud id={1} className="bottom-[10%] right-0 w-[28vw] md:w-[14vw]" />
-        <RecommendationsSection />
-      </div>
-
-      <footer className="relative isolate overflow-hidden px-6 py-section-gap text-center">
-        <Cloud
-          id={7}
-          className="left-1/2 top-2 w-[80vw] -translate-x-1/2 md:w-[40vw]"
-          opacity={0.8}
-        />
-        <Text tone="secondary" className="text-100">
-          Com amor, Gabriela &amp; Emanuel.
-        </Text>
+      <footer className="relative isolate overflow-hidden px-6 pb-[clamp(9rem,24vw,16rem)] pt-section-gap text-center">
+        <Painting name="baia-veleiro" className="absolute bottom-0 left-1/2 w-[min(80vw,340px)] -translate-x-1/2" />
+        <p className="font-display leading-snug text-text-primary" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)" }}>
+          Esperamos vocês para celebrar com a gente!
+        </p>
+        <p className="mt-3 font-body text-100 uppercase tracking-[0.24em] text-text-secondary">
+          Com amor, Gabriela &amp; Emanuel
+        </p>
       </footer>
     </div>
   );
