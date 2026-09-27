@@ -2,6 +2,7 @@ import { Painting } from "@/components/atoms/Painting";
 import { AnchorNav } from "@/components/molecules/AnchorNav";
 import { DressCodeSection } from "@/components/organisms/DressCodeSection";
 import { EventSection } from "@/components/organisms/EventSection";
+import { GiftSection } from "@/components/organisms/GiftSection";
 import { HeroSection } from "@/components/organisms/HeroSection";
 import { StaySection } from "@/components/organisms/StaySection";
 import { StorySection } from "@/components/organisms/StorySection";
@@ -11,6 +12,7 @@ const NAV_ITEMS = [
   { href: "#historia", label: "Nossa história" },
   { href: "#evento", label: "O grande dia" },
   { href: "#dresscode", label: "Dress code" },
+  { href: "#presentes", label: "Presentes" },
   { href: "#hospedagem", label: "Hospedagem" },
   { href: "#dicas", label: "Dicas da região" },
 ];
@@ -25,6 +27,7 @@ export function HomePageTemplate() {
       <StorySection />
       <EventSection />
       <DressCodeSection />
+      <GiftSection />
       <StaySection />
       <TipsSection />
 

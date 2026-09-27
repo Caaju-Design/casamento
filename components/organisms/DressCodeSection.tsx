@@ -1,35 +1,19 @@
 import { Cloud } from "@/components/atoms/Cloud";
 import { Painting } from "@/components/atoms/Painting";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
+import { DressPalette } from "@/components/molecules/DressPalette";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
 
 /**
  * Organism `DressCodeSection` (#dresscode) — traje dos CONVIDADOS (o dos
  * padrinhos e madrinhas fica só no manual deles). Proposta montada a
  * partir do "esporte fino" dos manuais e da paleta do casamento:
- *  - tons sugeridos conversam com a aquarela (sálvia, oliva, ardósia, céu,
- *    manteiga, areia, lavanda, rosé);
- *  - pedido com carinho: branco/off-white ficam pra noiva e o trio
- *    marrom-alaranjado → terracota → laranja é das madrinhas.
- * As amostras são "manchas" de aquarela: a forma vem de uma mancha dos
- * manuais usada como máscara, e a cor vem do CSS.
+ *  - a paleta do dress code é a da identidade visual (7 famílias × 7 tons),
+ *    em `DressPalette`: tocar numa cor abre os sobretons, do claro ao escuro;
+ *  - pedido com carinho: branco/off-white ficam pra noiva.
  */
 
-const SUGGESTED = [
-  { name: "Sálvia", color: "#a7b39a" },
-  { name: "Verde-oliva", color: "#6f7a4f" },
-  { name: "Azul-ardósia", color: "#6e8da2" },
-  { name: "Azul-céu", color: "#a9c4d6" },
-  { name: "Amarelo-manteiga", color: "#efd99a" },
-  { name: "Areia", color: "#d8c3a5" },
-  { name: "Lavanda", color: "#b7a9c9" },
-  { name: "Rosé", color: "#dcaea6" },
-];
-
-const AVOID = [
-  { name: "Branco e off-white", color: "#fbf8f2", why: "ficam para a noiva" },
-  { name: "Terracota e laranja", color: "#c2643a", why: "são as cores das madrinhas" },
-];
+const AVOID = [{ name: "Branco e off-white", color: "#fbf8f2", why: "ficam para a noiva" }];
 
 const MASK = {
   WebkitMaskImage: "url(/decor/capetown/mancha.webp)",
@@ -93,14 +77,13 @@ export function DressCodeSection() {
         </div>
 
         <PaintReveal variant="rise" delay={150} className="mt-14 text-center">
-          <h3 className="font-body text-100 uppercase tracking-[0.24em] text-salvia-800">Tons que combinam com a gente</h3>
+          <h3 className="font-body text-100 uppercase tracking-[0.24em] text-salvia-800">A paleta do nosso dia</h3>
           <p className="mx-auto mt-2 max-w-xl font-body text-200 leading-relaxed text-text-secondary">
-            Cores suaves e naturais, como numa aquarela. É só inspiração: venha do jeito que você se sente bem.
+            Tons suaves e terrosos, como numa aquarela. Escolha uma cor e brinque com os tons dela: do mais claro ao mais
+            escuro, todos combinam com a gente.
           </p>
-          <div className="mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-x-3 gap-y-5">
-            {SUGGESTED.map((s) => (
-              <Swatch key={s.name} {...s} />
-            ))}
+          <div className="mt-6">
+            <DressPalette />
           </div>
         </PaintReveal>
 

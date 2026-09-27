@@ -91,3 +91,24 @@ body {
   font-size-adjust: 0.45;
   font-synthesis: none;
 }
+
+/* sobretons da paleta do dress code (DressPalette) entrando */
+@keyframes paleta-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="animate-[paleta-in"] { animation: none !important; }
+}
+
+/* /presentes: a lista (outro site) sobe o tamanho do cabeçalho dela, que fica escondido */
+.gift-frame iframe {
+  top: calc(-1 * var(--crop-m, 64px));
+  height: calc(100% + var(--crop-m, 64px));
+}
+@media (min-width: 768px) {
+  .gift-frame iframe {
+    top: calc(-1 * var(--crop-d, 64px));
+    height: calc(100% + var(--crop-d, 64px));
+  }
+}
