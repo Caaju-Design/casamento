@@ -79,3 +79,15 @@ body {
     transition: none;
   }
 }
+
+/*
+ * Italianno (font-display) é uma caligrafia com x-height de só 27% do corpo:
+ * no mesmo font-size ela sai bem menor que as outras. `font-size-adjust`
+ * reescala pra x-height de 45% sem mexer em cada componente. E como ela não
+ * tem itálico (já é cursiva), `font-synthesis: none` impede o navegador de
+ * inclinar a caligrafia nos textos marcados com `italic`.
+ */
+.font-display {
+  font-size-adjust: 0.45;
+  font-synthesis: none;
+}

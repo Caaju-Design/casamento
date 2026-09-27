@@ -174,7 +174,7 @@ export function HeroSection() {
 
         {/*
           Abertura com a identidade do casamento: monograma G&E + os nomes em
-          Questrial, os dois em branco chapado direto sobre a aquarela (pedido do
+          Italianno (caligrafia, sem caixa alta), os dois em branco chapado direto sobre a aquarela (pedido do
           casal: sem halo/respiro de papel por trás). Só existe no primeiro
           momento (progress perto de 0) e some assim que a rolagem começa —
           `opacity` via `clamp()` lendo `--hero-progress` direto no CSS,
@@ -198,8 +198,8 @@ export function HeroSection() {
               style={{ width: "clamp(8.5rem, 26vw, 15rem)" }}
             />
             <p
-              className="font-display uppercase text-white"
-              style={{ fontSize: "clamp(0.95rem, 2.6vw, 1.35rem)", letterSpacing: "0.32em" }}
+              className="font-display text-white"
+              style={{ fontSize: "clamp(1.6rem, 4.2vw, 2.4rem)" }}
             >
               Gabriela &amp; Emanuel
             </p>

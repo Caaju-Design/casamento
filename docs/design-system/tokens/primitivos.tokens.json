@@ -94,9 +94,9 @@
     "white": { "$value": "#ffffff", "$type": "color" }
   },
   "fontFamily": {
-    "display": { "$value": "var(--font-questrial), 'Helvetica Neue', Arial, sans-serif", "$type": "fontFamily" },
-    "body": { "$value": "var(--font-cinzel), Georgia, 'Times New Roman', serif", "$type": "fontFamily" },
-    "script": { "$value": "var(--font-questrial), 'Helvetica Neue', Arial, sans-serif", "$type": "fontFamily" }
+    "display": { "$value": "var(--font-italianno), 'Snell Roundhand', cursive", "$type": "fontFamily" },
+    "body": { "$value": "var(--font-cardo), Georgia, 'Times New Roman', serif", "$type": "fontFamily" },
+    "script": { "$value": "var(--font-italianno), 'Snell Roundhand', cursive", "$type": "fontFamily" }
   },
   "fontSize": {
     "100": { "$value": "0.875rem", "$type": "dimension" },
