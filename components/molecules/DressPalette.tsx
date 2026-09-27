@@ -13,15 +13,17 @@ import { PALETTE_STEPS, palette, type PaletteFamily } from "@/lib/design-system/
  * máscara CSS; a cor vem dos tokens (`palette`).
  */
 
-const FAMILIES: { id: PaletteFamily; name: string }[] = [
-  { id: "amarelo", name: "Amarelo" },
-  { id: "pessego", name: "Pêssego" },
-  { id: "terracota", name: "Terracota" },
-  { id: "caramelo", name: "Caramelo" },
-  { id: "salvia", name: "Sálvia" },
-  { id: "linho", name: "Linho" },
-  { id: "ardosia", name: "Ardósia" },
-];
+const FAMILY_IDS: PaletteFamily[] = ["amarelo", "pessego", "terracota", "caramelo", "salvia", "linho", "ardosia"];
+
+export interface DressPaletteLabels {
+  families: Record<PaletteFamily, string>;
+  group: string;
+  hint: string;
+  range: string;
+  base: string;
+  lighter: string;
+  darker: string;
+}
 
 const BASE = "500";
 
@@ -40,13 +42,14 @@ function Blot({ color, className }: { color: string; className: string }) {
   return <span aria-hidden="true" className={["block", className].join(" ")} style={{ ...MASK, backgroundColor: color }} />;
 }
 
-export function DressPalette() {
+export function DressPalette({ labels }: { labels: DressPaletteLabels }) {
   const [open, setOpen] = useState<PaletteFamily | null>(null);
+  const FAMILIES = FAMILY_IDS.map((id) => ({ id, name: labels.families[id] }));
   const current = FAMILIES.find((f) => f.id === open);
 
   return (
     <div>
-      <div role="group" aria-label="Cores da paleta" className="mx-auto flex max-w-3xl flex-wrap justify-center gap-x-2 gap-y-4">
+      <div role="group" aria-label={labels.group} className="mx-auto flex max-w-3xl flex-wrap justify-center gap-x-2 gap-y-4">
         {FAMILIES.map((f) => {
           const active = open === f.id;
           return (
@@ -79,7 +82,7 @@ export function DressPalette() {
         {current ? (
           <div key={current.id} className="animate-[paleta-in_320ms_ease-out] rounded-card border border-caramelo-100 bg-page/85 px-4 py-5 backdrop-blur-[2px]">
             <p className="font-body text-100 uppercase tracking-[0.24em] text-text-secondary">
-              {current.name} · do mais claro ao mais escuro
+              {current.name} · {labels.range}
             </p>
             <ul className="mt-4 flex items-end justify-center gap-1.5 sm:gap-3">
               {PALETTE_STEPS.map((step) => {
@@ -91,20 +94,20 @@ export function DressPalette() {
                       className={base ? "h-14 w-14 sm:h-16 sm:w-16" : "h-10 w-10 sm:h-12 sm:w-12"}
                     />
                     <span className={["font-body text-[0.7rem] leading-none sm:text-100", base ? "text-text-primary" : "text-text-secondary"].join(" ")}>
-                      {base ? "base" : step}
+                      {base ? labels.base : step}
                     </span>
                   </li>
                 );
               })}
             </ul>
             <p className="mt-3 flex justify-between px-1 font-body text-[0.7rem] uppercase tracking-[0.18em] text-text-secondary sm:text-100">
-              <span>← mais claro</span>
-              <span>mais escuro →</span>
+              <span>{labels.lighter}</span>
+              <span>{labels.darker}</span>
             </p>
           </div>
         ) : (
           <p className="text-center font-body text-100 italic text-text-secondary">
-            Toque numa cor para ver os tons, do mais claro ao mais escuro.
+            {labels.hint}
           </p>
         )}
       </div>

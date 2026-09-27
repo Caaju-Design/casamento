@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getDictionary, localeInfo, type Locale } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = {
   title: "Lista de presentes — Gabriela & Emanuel",
@@ -21,33 +22,36 @@ const LIST_URL = "https://www.gabrielaemanuel.com.br/lista-de-presentes";
 const DEFAULT_CROP_MOBILE = 64;
 const DEFAULT_CROP_DESKTOP = 64;
 
-type Props = { searchParams: Promise<{ corte?: string }> };
+type Props = { searchParams: Promise<{ corte?: string; lang?: string }> };
 
 export default async function GiftListPage({ searchParams }: Props) {
-  const { corte } = await searchParams;
+  const { corte, lang } = await searchParams;
+  const locale: Locale = lang === "en" || lang === "ar" ? lang : "pt";
+  const t = getDictionary(locale).gift;
+  const info = localeInfo(locale);
   const custom = Number.parseInt(corte ?? "", 10);
   const override = Number.isFinite(custom) ? Math.min(300, Math.max(0, custom)) : null;
   const cropMobile = override ?? DEFAULT_CROP_MOBILE;
   const cropDesktop = override ?? DEFAULT_CROP_DESKTOP;
 
   return (
-    <main className="flex h-[100svh] flex-col bg-page">
+    <main lang={info.lang} dir={info.dir} className="flex h-[100svh] flex-col bg-page">
       <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-caramelo-100 bg-page px-4 md:px-6">
         <Link
-          href="/#presentes"
+          href={`${info.href}#presentes`}
           className="inline-flex min-h-[44px] items-center gap-2 font-body text-100 uppercase tracking-[0.18em] text-text-primary hover:text-terracota-700"
         >
-          <span aria-hidden="true">←</span> Voltar
+          <span aria-hidden="true" className="rtl:-scale-x-100">←</span> {t.back}
         </Link>
-        <h1 className="truncate font-display text-400 leading-none text-text-primary sm:text-600">Lista de presentes</h1>
+        <h1 className="truncate font-display text-400 leading-none text-text-primary sm:text-600">{t.pageTitle}</h1>
         <a
           href={LIST_URL}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Abrir a lista em outra aba"
+          aria-label={t.newTabLabel}
           className="inline-flex min-h-[44px] min-w-[44px] items-center justify-end gap-1 whitespace-nowrap font-body text-100 uppercase tracking-[0.12em] text-text-secondary hover:text-terracota-700"
         >
-          <span className="hidden sm:inline">Abrir em outra aba</span>
+          <span className="hidden sm:inline">{t.newTab}</span>
           <span aria-hidden="true" className="text-200">↗</span>
         </a>
       </header>
@@ -58,13 +62,13 @@ export default async function GiftListPage({ searchParams }: Props) {
       >
         <iframe
           src={LIST_URL}
-          title="Lista de presentes de Gabriela & Emanuel"
+          title={t.iframeTitle}
           allow="payment; clipboard-write"
           referrerPolicy="strict-origin-when-cross-origin"
           className="absolute inset-x-0 w-full border-0"
         />
         <p className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 p-6 text-center font-body text-100 text-text-secondary">
-          Se a lista não aparecer, use “Abrir em outra aba” lá em cima.
+          {t.fallback}
         </p>
       </div>
     </main>

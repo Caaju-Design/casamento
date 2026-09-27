@@ -33,12 +33,37 @@ const cardo = localFont({
 });
 
 /**
+ * Versão em árabe (/ar): Aref Ruqaa (caligrafia) no lugar da Italianno e
+ * Amiri no lugar da Cardo — só o subconjunto árabe; letras latinas (nomes,
+ * números) caem na Italianno/Cardo. Sem preload: só baixam na página em
+ * árabe. As trocas ficam em app/globals.css (`[lang="ar"]`).
+ */
+const arefRuqaa = localFont({
+  src: [
+    { path: "./fonts/aref-ruqaa-arabic-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/aref-ruqaa-arabic-700.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-aref",
+  display: "swap",
+  preload: false,
+});
+const amiri = localFont({
+  src: [
+    { path: "./fonts/amiri-arabic-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/amiri-arabic-700.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-amiri",
+  display: "swap",
+  preload: false,
+});
+
+/**
  * Layout raiz — só um visual (claro, estilo Bridgerton/Regência), sem
  * alternância claro/escuro (ver docs/architecture/adr/0001-origem-design-system.md).
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${italianno.variable} ${cardo.variable}`}>
+    <html lang="pt-BR" className={`${italianno.variable} ${cardo.variable} ${arefRuqaa.variable} ${amiri.variable}`}>
       <body className="min-h-screen bg-page font-body text-text-primary">{children}</body>
     </html>
   );

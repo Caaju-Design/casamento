@@ -3,6 +3,7 @@ import { Painting } from "@/components/atoms/Painting";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { DressPalette } from "@/components/molecules/DressPalette";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /**
  * Organism `DressCodeSection` (#dresscode) — traje dos CONVIDADOS (o dos
@@ -13,7 +14,6 @@ import { SectionHeading } from "@/components/molecules/SectionHeading";
  *  - pedido com carinho: branco/off-white ficam pra noiva.
  */
 
-const AVOID = [{ name: "Branco e off-white", color: "#fbf8f2", why: "ficam para a noiva" }];
 
 const MASK = {
   WebkitMaskImage: "url(/decor/capetown/mancha.webp)",
@@ -48,7 +48,7 @@ function Card({ title, children, delay }: { title: string; children: React.React
   );
 }
 
-export function DressCodeSection() {
+export function DressCodeSection({ t }: { t: Dictionary["dress"] }) {
   return (
     <section id="dresscode" aria-labelledby="dresscode-titulo" className="relative isolate overflow-hidden py-section-gap">
       <Painting name="ramo-pendente" flip className="absolute left-0 top-0 w-[38vw] max-w-[230px]" />
@@ -60,45 +60,52 @@ export function DressCodeSection() {
       <div className="mx-auto max-w-5xl px-6">
         <SectionHeading
           id="dresscode-titulo"
-          eyebrow="Dress code"
-          title="Esporte fino"
-          lead="Queremos todo mundo lindo, confortável e com vontade de dançar. Pense em tecidos leves e elegantes, que combinem com um fim de tarde de outono em São Paulo."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          lead={t.lead}
         />
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <Card title="Para elas" delay={100}>
-            <p>Vestidos midi ou longos, macacões e conjuntos de alfaiataria. Tecidos fluidos, como seda, crepe, linho e viscose, caem muito bem.</p>
-            <p>No pé, vale o que deixar você dançar a noite toda: salto bloco, sandália ou sapatilha.</p>
+          <Card title={t.herTitle} delay={100}>
+            <p>{t.her[0]}</p>
+            <p>{t.her[1]}</p>
           </Card>
-          <Card title="Para eles" delay={250}>
-            <p>Calça de alfaiataria ou de sarja com camisa social ou de linho. O blazer é bem-vindo e a gravata é opcional.</p>
-            <p>Sapato social, loafer ou mocassim. A bermuda e o tênis ficam para outro dia.</p>
+          <Card title={t.himTitle} delay={250}>
+            <p>{t.him[0]}</p>
+            <p>{t.him[1]}</p>
           </Card>
         </div>
 
         <PaintReveal variant="rise" delay={150} className="mt-14 text-center">
-          <h3 className="font-body text-100 uppercase tracking-[0.24em] text-salvia-800">A paleta do nosso dia</h3>
+          <h3 className="font-body text-100 uppercase tracking-[0.24em] text-salvia-800">{t.paletteTitle}</h3>
           <p className="mx-auto mt-2 max-w-xl font-body text-200 leading-relaxed text-text-secondary">
-            Tons suaves e terrosos, como numa aquarela. Escolha uma cor e brinque com os tons dela: do mais claro ao mais
-            escuro, todos combinam com a gente.
+            {t.paletteLead}
           </p>
           <div className="mt-6">
-            <DressPalette />
+            <DressPalette
+              labels={{
+                families: t.families,
+                group: t.paletteGroup,
+                hint: t.paletteHint,
+                range: t.paletteRange,
+                base: t.base,
+                lighter: t.lighter,
+                darker: t.darker,
+              }}
+            />
           </div>
         </PaintReveal>
 
         <PaintReveal variant="rise" delay={250} className="mx-auto mt-12 max-w-2xl rounded-card border border-caramelo-100 bg-page/80 p-7 text-center backdrop-blur-[2px]">
-          <h3 className="font-body text-100 uppercase tracking-[0.24em] text-terracota-700">Pedimos com carinho</h3>
+          <h3 className="font-body text-100 uppercase tracking-[0.24em] text-terracota-700">{t.askTitle}</h3>
           <div className="mt-5 flex flex-wrap items-start justify-center gap-8">
-            {AVOID.map((a) => (
-              <div key={a.name} className="flex max-w-[12rem] flex-col items-center gap-2">
-                <Swatch color={a.color} name={a.name} outline={a.color === "#fbf8f2"} />
-                <span className="font-body text-100 italic text-text-secondary">{a.why}</span>
-              </div>
-            ))}
+            <div className="flex max-w-[12rem] flex-col items-center gap-2">
+              <Swatch color="#fbf8f2" name={t.avoidName} outline />
+              <span className="font-body text-100 italic text-text-secondary">{t.avoidWhy}</span>
+            </div>
           </div>
           <p className="mt-6 font-body text-200 leading-relaxed text-text-secondary">
-            Em abril, as noites em São Paulo costumam ser mais fresquinhas: leve um casaquinho ou uma pashmina.
+            {t.climate}
           </p>
         </PaintReveal>
       </div>

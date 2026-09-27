@@ -3,6 +3,7 @@ import { Painting } from "@/components/atoms/Painting";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
 import { mapsSearch } from "@/lib/content/maps";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /**
  * Organism `StaySection` (#hospedagem) — onde se hospedar e como chegar.
@@ -11,12 +12,13 @@ import { mapsSearch } from "@/lib/content/maps";
 
 const NEIGHBORHOODS = ["Granja Julieta", "Chácara Santo Antônio", "Várzea de Baixo", "Jardim Caravelas", "Vila Cruzeiro"];
 
-const LANDMARKS = [
-  { name: "MorumbiShopping", q: "MorumbiShopping, São Paulo" },
-  { name: "Shopping Parque da Cidade", q: "Shopping Parque da Cidade, São Paulo" },
-  { name: "Carrefour da Avenida das Nações Unidas", q: "Carrefour Avenida das Nações Unidas, São Paulo" },
-  { name: "Estação Granja Julieta — Linha 9–Esmeralda", q: "Estação Granja Julieta, São Paulo" },
-  { name: "Estação Alto da Boa Vista — Linha 5–Lilás", q: "Estação Alto da Boa Vista, São Paulo" },
+/** Buscas no Maps das referências — na mesma ordem de `t.landmarks`. */
+const LANDMARK_QUERIES = [
+  "MorumbiShopping, São Paulo",
+  "Shopping Parque da Cidade, São Paulo",
+  "Carrefour Avenida das Nações Unidas, São Paulo",
+  "Estação Granja Julieta, São Paulo",
+  "Estação Alto da Boa Vista, São Paulo",
 ];
 
 const HOTELS = [
@@ -26,20 +28,13 @@ const HOTELS = [
   { name: "ibis budget São Paulo Morumbi", q: "ibis budget São Paulo Morumbi" },
 ];
 
-const BUS_STEPS = [
-  "Na rodoviária, siga as placas para a estação Portuguesa–Tietê.",
-  "Pegue a Linha 1–Azul, sentido Jabaquara, e desça na estação Santa Cruz.",
-  "Faça a transferência para a Linha 5–Lilás, sentido Capão Redondo.",
-  "Desça na estação Alto da Boa Vista.",
-  "De lá, pegue um Uber ou 99 até sua hospedagem.",
-];
 
 const label = "font-body text-100 uppercase tracking-[0.24em] text-salvia-800";
 const body = "font-body text-200 leading-relaxed text-text-secondary";
 const place =
   "underline decoration-caramelo-200 decoration-1 underline-offset-4 transition-colors hover:text-terracota-700 hover:decoration-terracota-500";
 
-export function StaySection() {
+export function StaySection({ t }: { t: Dictionary["stay"] }) {
   return (
     <section id="hospedagem" aria-labelledby="hospedagem-titulo" className="relative isolate overflow-hidden pb-[min(34vw,17rem)] pt-section-gap">
       <Painting name="ramo-borda-dir" className="absolute right-0 top-[6%] hidden w-[10rem] md:block" />
@@ -51,9 +46,9 @@ export function StaySection() {
       <div className="mx-auto max-w-5xl px-6">
         <SectionHeading
           id="hospedagem-titulo"
-          eyebrow="Hospedagem"
-          title="Onde se hospedar"
-          lead="Nosso casamento será na Zona Sul de São Paulo, na Rua Luís Correia de Melo. Para ficar por perto, procure hospedagens nestes bairros:"
+          eyebrow={t.eyebrow}
+          title={t.title}
+          lead={t.lead}
         />
 
         <PaintReveal variant="rise" delay={100} className="mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-2">
@@ -66,16 +61,16 @@ export function StaySection() {
 
         <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-14">
           <PaintReveal variant="rise" delay={150}>
-            <h3 className={label}>Airbnb</h3>
+            <h3 className={label}>{t.airbnbTitle}</h3>
             <p className={`${body} mt-2`}>
-              Na busca pelo Airbnb, use o mapa e confira o trajeto até o endereço do casamento antes de reservar.
+              {t.airbnb}
             </p>
-            <h3 className={`${label} mt-7`}>Referências da região</h3>
+            <h3 className={`${label} mt-7`}>{t.landmarksTitle}</h3>
             <ul className={`${body} mt-2 space-y-1.5`}>
-              {LANDMARKS.map((l) => (
-                <li key={l.name}>
-                  <a className={place} href={mapsSearch(l.q)} target="_blank" rel="noopener noreferrer">
-                    {l.name}
+              {t.landmarks.map((name, i) => (
+                <li key={name}>
+                  <a className={place} href={mapsSearch(LANDMARK_QUERIES[i] ?? name)} target="_blank" rel="noopener noreferrer">
+                    {name}
                   </a>
                 </li>
               ))}
@@ -83,8 +78,8 @@ export function StaySection() {
           </PaintReveal>
 
           <PaintReveal variant="rise" delay={300}>
-            <h3 className="font-display text-600 leading-tight text-text-primary">Prefere ficar em hotel?</h3>
-            <p className={`${body} mt-1`}>Algumas opções na região para consultar:</p>
+            <h3 className="font-display text-600 leading-tight text-text-primary">{t.hotelsTitle}</h3>
+            <p className={`${body} mt-1`}>{t.hotelsLead}</p>
             <ul className={`${body} mt-3 space-y-1.5`}>
               {HOTELS.map((h) => (
                 <li key={h.name}>
@@ -99,23 +94,23 @@ export function StaySection() {
 
         {/* como chegar */}
         <div className="mt-20">
-          <SectionHeading id="como-chegar-titulo" eyebrow="Como chegar" title="Chegando em São Paulo" />
+          <SectionHeading id="como-chegar-titulo" eyebrow={t.arriveEyebrow} title={t.arriveTitle} />
           <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-14">
             <PaintReveal variant="rise" delay={100} className="rounded-card border border-caramelo-100 bg-page/80 p-7 backdrop-blur-[2px]">
-              <h3 className="font-display text-600 leading-tight text-text-primary">De avião</h3>
+              <h3 className="font-display text-600 leading-tight text-text-primary">{t.planeTitle}</h3>
               <p className={`${body} mt-3`}>
-                Se puder escolher, dê preferência ao{" "}
+                {t.plane[0]}
                 <a className={place} href={mapsSearch("Aeroporto de Congonhas, São Paulo")} target="_blank" rel="noopener noreferrer">
-                  Aeroporto de Congonhas
+                  {t.plane[1]}
                 </a>
-                , mais próximo da região do casamento. De lá, você pode pegar um Uber ou 99 até sua hospedagem.
+                {t.plane[2]}
               </p>
             </PaintReveal>
             <PaintReveal variant="rise" delay={250} className="rounded-card border border-caramelo-100 bg-page/80 p-7 backdrop-blur-[2px]">
-              <h3 className="font-display text-600 leading-tight text-text-primary">De ônibus</h3>
-              <p className={`${body} mt-1`}>Chegando pela Rodoviária do Tietê:</p>
+              <h3 className="font-display text-600 leading-tight text-text-primary">{t.busTitle}</h3>
+              <p className={`${body} mt-1`}>{t.busLead}</p>
               <ol className={`${body} mt-3 space-y-2`}>
-                {BUS_STEPS.map((s, i) => (
+                {t.busSteps.map((s, i) => (
                   <li key={s} className="flex gap-3">
                     <span aria-hidden="true" className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-salvia-500/25 font-body text-100 font-bold text-salvia-800">
                       {i + 1}

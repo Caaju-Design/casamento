@@ -7,6 +7,8 @@ export interface HeroPreloaderProps {
   progress: number;
   /** Quando vira `true`, o preloader dissolve e desmonta. */
   done: boolean;
+  /** Texto pra leitor de tela (padrão em português). */
+  labels?: { loading: string; ready: string };
 }
 
 /**
@@ -23,7 +25,7 @@ export interface HeroPreloaderProps {
  * JavaScript hidratar (no celular a hidratação pode levar segundos, e era
  * exatamente nessa janela que dava pra sair rolando com tudo congelado).
  */
-export function HeroPreloader({ progress, done }: HeroPreloaderProps) {
+export function HeroPreloader({ progress, done, labels = { loading: "Preparando a pintura:", ready: "Pronto" } }: HeroPreloaderProps) {
   const [mounted, setMounted] = useState(true);
   const pct = Math.round(Math.min(1, Math.max(0, progress)) * 100);
 
@@ -40,7 +42,7 @@ export function HeroPreloader({ progress, done }: HeroPreloaderProps) {
       data-hero-preloader=""
       role="status"
       aria-live="polite"
-      aria-label={done ? "Pronto" : `Preparando a pintura: ${pct}%`}
+      aria-label={done ? labels.ready : `${labels.loading} ${pct}%`}
       className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-6 bg-page px-6 text-center"
       style={{
         opacity: done ? 0 : 1,

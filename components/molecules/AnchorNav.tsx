@@ -2,6 +2,8 @@
 
 import { useState, type CSSProperties } from "react";
 import { Icon } from "@/components/atoms/Icon";
+import { LanguageSwitcher } from "@/components/molecules/LanguageSwitcher";
+import type { Locale } from "@/lib/i18n/dictionaries";
 
 export interface AnchorNavItem {
   href: string;
@@ -30,7 +32,13 @@ export interface AnchorNavProps {
    * nenhum.
    */
   startHiddenForHero?: boolean;
+  /** Idioma da página: mostra o seletor de idioma à direita. Sem ele, não há seletor. */
+  locale?: Locale;
+  /** Textos do próprio menu (padrão: português). */
+  labels?: { openMenu: string; home: string; language: string };
 }
+
+const PT_LABELS = { openMenu: "Abrir menu", home: "Gabriela & Emanuel — voltar ao início", language: "Idioma" };
 
 // Altura fixa (em vez de deixar o conteúdo interno definir) — usada tanto
 // na própria `<nav>` quanto no "espaçador" abaixo, então os dois batem
@@ -65,13 +73,18 @@ const NAV_HEIGHT_CLASS = "h-[72px]";
  * mais espaço sozinho, um "espaçador" do tamanho dele é renderizado logo
  * abaixo, pra o conteúdo da página não nascer escondido atrás do nav.
  */
-export function AnchorNav({ items, startHiddenForHero = false }: AnchorNavProps) {
+export function AnchorNav({ items, startHiddenForHero = false, locale, labels = PT_LABELS }: AnchorNavProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
+      {/*
+        Header em 3 colunas: menu à esquerda (hambúrguer abaixo de xl), a
+        logo do casal no centro e o seletor de idioma à direita. Em árabe
+        (dir="rtl") as colunas se espelham sozinhas.
+      */}
       <nav
-        className={`fixed inset-x-0 top-0 z-30 flex items-center justify-between bg-page/95 px-6 backdrop-blur transition-opacity duration-300 ${NAV_HEIGHT_CLASS}`}
+        className={`fixed inset-x-0 top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-4 bg-page/95 px-4 backdrop-blur transition-opacity duration-300 md:px-6 ${NAV_HEIGHT_CLASS}`}
         style={{
           opacity: startHiddenForHero ? "var(--hero-reveal, 0)" : "var(--hero-reveal, 1)",
           pointerEvents: (startHiddenForHero
@@ -79,36 +92,47 @@ export function AnchorNav({ items, startHiddenForHero = false }: AnchorNavProps)
             : "var(--hero-reveal-pointer-events, auto)") as CSSProperties["pointerEvents"],
         }}
       >
-        <a href="#topo" className="font-display text-400 text-text-primary">
-          Gabriela &amp; Emanuel
+        <div className="flex items-center justify-self-start">
+          <button
+            type="button"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center text-text-primary xl:hidden"
+            onClick={() => setIsOpen((open) => !open)}
+            aria-expanded={isOpen}
+            aria-label={labels.openMenu}
+          >
+            <Icon name="menu" />
+          </button>
+          <ul
+            className={[
+              "font-body text-100 xl:flex xl:items-center xl:gap-5",
+              isOpen
+                ? "absolute inset-x-0 top-full flex flex-col border-b border-caramelo-100 bg-page px-6 py-3 shadow-[0_12px_30px_-20px_rgba(45,43,35,0.5)]"
+                : "hidden",
+            ].join(" ")}
+          >
+            {items.map((item) => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  className="block whitespace-nowrap py-2 text-text-secondary hover:text-action-primary"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* só a logo do casal, no centro (sem os nomes escritos) */}
+        <a href="#topo" aria-label={labels.home} className="flex items-center justify-self-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo-ge.svg" alt="" width={470} height={401} className="h-11 w-auto" />
         </a>
-        <button
-          type="button"
-          className="text-text-primary lg:hidden"
-          onClick={() => setIsOpen((open) => !open)}
-          aria-expanded={isOpen}
-          aria-label="Abrir menu"
-        >
-          <Icon name="menu" />
-        </button>
-        <ul
-          className={[
-            "font-body text-100 gap-6 lg:flex lg:items-center",
-            isOpen ? "absolute left-0 right-0 top-full flex flex-col bg-surface p-4" : "hidden",
-          ].join(" ")}
-        >
-          {items.map((item) => (
-            <li key={item.href}>
-              <a
-                href={item.href}
-                className="block py-2 text-text-secondary hover:text-action-primary"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+
+        <div className="flex items-center justify-self-end">
+          {locale && <LanguageSwitcher locale={locale} label={labels.language} />}
+        </div>
       </nav>
       {/*
         Espaçador — só existe quando o nav é sempre visível (páginas sem

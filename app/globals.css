@@ -112,3 +112,31 @@ body {
     height: calc(100% + var(--crop-d, 64px));
   }
 }
+
+/*
+ * Versão em árabe (/ar, `lang="ar" dir="rtl"`): fontes árabes na frente
+ * (Aref Ruqaa na caligrafia, Amiri no corpo), com as latinas atrás pra nomes
+ * e números. Árabe é escrita cursiva: espaçamento entre letras quebra as
+ * ligações, então letter-spacing zera; e não existe itálico nem caixa alta.
+ */
+[lang="ar"] .font-display {
+  font-family: var(--font-aref), var(--font-italianno), cursive;
+  font-size-adjust: none;
+  line-height: 1.5;
+}
+[lang="ar"],
+[lang="ar"] .font-body {
+  font-family: var(--font-amiri), var(--font-cardo), Georgia, serif;
+}
+[lang="ar"] * {
+  letter-spacing: 0 !important;
+  font-synthesis: none;
+}
+[lang="ar"] .italic {
+  font-style: normal;
+}
+/* a Amiri tem olho (x-height) menor que a Cardo: reescala pra ficar do mesmo tamanho visual */
+[lang="ar"],
+[lang="ar"] .font-body {
+  font-size-adjust: 0.5;
+}

@@ -125,7 +125,11 @@ function useShouldLockForHero(trackRef: RefObject<HTMLDivElement | null>) {
 }
 
 /** Organism `HeroSection` — pintura em aquarela do casal amarrada à rolagem. */
-export function HeroSection() {
+export function HeroSection({
+  labels = { h1: "Gabriela & Emanuel — vamos nos casar em 17 de abril de 2027", loading: "Preparando a pintura:", ready: "Pronto" },
+}: {
+  labels?: { h1: string; loading: string; ready: string };
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
   const [phase, setPhase] = useState<HeroPhase>("loading");
@@ -173,9 +177,9 @@ export function HeroSection() {
         </div>
 
         {/*
-          Abertura com a identidade do casamento: monograma G&E + os nomes em
-          Italianno (caligrafia, sem caixa alta), os dois em branco chapado direto sobre a aquarela (pedido do
-          casal: sem halo/respiro de papel por trás). Só existe no primeiro
+          Abertura com a identidade do casamento: só o monograma G&E, em
+          branco chapado direto sobre a aquarela (pedido do casal: sem
+          halo/respiro de papel por trás e sem os nomes escritos). Só existe no primeiro
           momento (progress perto de 0) e some assim que a rolagem começa —
           `opacity` via `clamp()` lendo `--hero-progress` direto no CSS,
           acompanhando o dedo 1:1 sem re-render do React. Decorativo
@@ -187,23 +191,16 @@ export function HeroSection() {
           className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center"
           style={{ opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)` }}
         >
-          <div className="flex flex-col items-center gap-5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/logo-ge-branca.svg"
-              alt=""
-              width={470}
-              height={401}
-              className="h-auto"
-              style={{ width: "clamp(8.5rem, 26vw, 15rem)" }}
-            />
-            <p
-              className="font-display text-white"
-              style={{ fontSize: "clamp(1.6rem, 4.2vw, 2.4rem)" }}
-            >
-              Gabriela &amp; Emanuel
-            </p>
-          </div>
+          {/* só a logo do casal (os nomes escritos saíram a pedido do Manu) */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/logo-ge-branca.svg"
+            alt=""
+            width={470}
+            height={401}
+            className="h-auto"
+            style={{ width: "clamp(8.5rem, 26vw, 15rem)" }}
+          />
         </div>
 
         {/*
@@ -213,12 +210,13 @@ export function HeroSection() {
           apenas pra leitores de tela; a abertura com a logo já faz esse
           papel visualmente.
         */}
-        <h1 className="sr-only">Gabriela &amp; Emanuel — vamos nos casar em 17 de abril de 2027</h1>
+        <h1 className="sr-only">{labels.h1}</h1>
       </section>
       {lockForHero && (
         <HeroPreloader
           progress={phase === "loading" ? loadFraction / PRELOAD_READY_FRACTION : 1}
           done={phase !== "loading"}
+          labels={labels}
         />
       )}
     </div>
