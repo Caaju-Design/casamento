@@ -30,7 +30,7 @@ const CARRO_STAINS: StainPreset = { focusX: 0.42, focusY: 0.52, spreadX: 0.8, sp
 const SOFA_STAINS: StainPreset = { focusX: 0.5, focusY: 0.5, spreadX: 0.8, spreadY: 1.15, radius: 1.05 };
 
 const TRACK_VH = 260;
-const TEXT_STYLE = { fontSize: "clamp(1.4rem, 2.4vw, 2.25rem)" } as const;
+const TEXT_STYLE = { fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" } as const;
 /** Diferença (s) a partir da qual o segundo vídeo é realinhado ao primeiro. */
 const MAX_DRIFT = 0.25;
 
@@ -73,7 +73,7 @@ export function HomeMoment({ text }: { text: string }) {
         <Cloud id={7} className="bottom-[5%] right-[3%] w-[62vw] md:w-[32vw]" opacity={0.8} />
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
-            <p className="text-center font-display italic leading-snug text-text-primary md:text-start" style={TEXT_STYLE}>
+            <p className="text-center font-body leading-relaxed text-text-primary md:text-start" style={TEXT_STYLE}>
               {text}
             </p>
           </PaintReveal>

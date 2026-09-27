@@ -48,7 +48,7 @@ export interface PhotoCollageMomentProps {
   decor?: ReactNode;
 }
 
-const TEXT_STYLE = { fontSize: "clamp(1.4rem, 2.4vw, 2.25rem)" } as const;
+const TEXT_STYLE = { fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" } as const;
 /** Fração do trilho usada pra pintar (o resto é respiro com tudo pintado). */
 const PAINT_SPAN = 0.9;
 /** Quanto a pintura de uma foto invade a janela da próxima (fica mais fluido). */
@@ -75,7 +75,7 @@ export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380, de
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
           <PaintReveal variant="rise" delay={500} className="max-w-xl">
             <p
-              className="text-center font-display italic leading-snug text-text-primary md:text-start"
+              className="text-center font-body leading-relaxed text-text-primary md:text-start"
               style={TEXT_STYLE}
             >
               {text}
