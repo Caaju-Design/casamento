@@ -27,7 +27,7 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <HeroSection labels={t.hero} />
 
       <StorySection t={t.story} />
-      <EventSection t={t.event} />
+      <EventSection t={t.event} locale={locale} />
       <DressCodeSection t={t.dress} />
       <GiftSection t={t.gift} locale={locale} />
       <StaySection t={t.stay} />

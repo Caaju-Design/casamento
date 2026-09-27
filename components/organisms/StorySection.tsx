@@ -42,7 +42,7 @@ export function StorySection({ t }: { t: Dictionary["story"] }) {
           <p className="font-body text-100 uppercase tracking-[0.3em] text-text-secondary">{t.eyebrow}</p>
           <h2
             id="historia-titulo"
-            className="mt-4 font-display italic leading-tight text-text-primary"
+            className="mt-4 font-display italic leading-tight text-text-title"
             style={{ fontSize: "clamp(2.1rem, 6vw, 3.75rem)" }}
           >
             {t.title}
@@ -72,7 +72,7 @@ export function StorySection({ t }: { t: Dictionary["story"] }) {
         <Cloud id={1} className="bottom-[8%] right-0 w-[30vw] md:w-[16vw]" />
         <PaintReveal variant="rise" className="mx-auto max-w-3xl text-center">
           <p
-            className="font-display italic leading-tight text-text-primary"
+            className="font-display italic leading-tight text-text-title"
             style={{ fontSize: "clamp(2.1rem, 6vw, 3.75rem)" }}
           >
             {t.closing}

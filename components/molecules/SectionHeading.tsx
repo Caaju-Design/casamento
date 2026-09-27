@@ -10,17 +10,19 @@ export interface SectionHeadingProps {
   /** Linha de apoio logo abaixo do título. */
   lead?: string;
   align?: "center" | "left";
+  /** Título na cor de destaque (`text-title`, #bc6316) em vez do texto principal. */
+  highlight?: boolean;
 }
 
 /** Molecule `SectionHeading` — cabeçalho das seções informativas da home. */
-export function SectionHeading({ eyebrow, title, id, lead, align = "center" }: SectionHeadingProps) {
+export function SectionHeading({ eyebrow, title, id, lead, align = "center", highlight = false }: SectionHeadingProps) {
   const center = align === "center";
   return (
     <PaintReveal variant="rise" className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
       <p className="font-body text-100 uppercase tracking-[0.3em] text-terracota-700">{eyebrow}</p>
       <h2
         id={id}
-        className="mt-3 font-display leading-tight text-text-primary"
+        className={["mt-3 font-display leading-tight", highlight ? "text-text-title" : "text-text-primary"].join(" ")}
         style={{ fontSize: "clamp(2.2rem, 5.5vw, 3.6rem)" }}
       >
         {title}

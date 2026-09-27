@@ -23,6 +23,9 @@ const config: Config = {
         accent: designTokens.color.accent,
         "text-primary": designTokens.color.textPrimary,
         "text-secondary": designTokens.color.textSecondary,
+        // cor dos títulos em destaque (pedido do Manu, 2026-09-27). Contraste
+        // 3,8:1 sobre linho.50 → só em texto GRANDE (títulos), nunca em corpo.
+        "text-title": "#bc6316",
         "on-accent": designTokens.color.onAccent,
         "border-subtle": designTokens.color.borderSubtle,
         "border-focus": designTokens.color.borderFocus,

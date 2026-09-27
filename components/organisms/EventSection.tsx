@@ -2,8 +2,9 @@ import { Cloud } from "@/components/atoms/Cloud";
 import { Painting } from "@/components/atoms/Painting";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
+import { WeddingCalendar } from "@/components/molecules/WeddingCalendar";
 import { mapsSearch, wazeTo } from "@/lib/content/maps";
-import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
 
 /**
  * Organism `EventSection` (#evento) — "O grande dia": data, local, como
@@ -28,7 +29,10 @@ function googleCalendar(t: Dictionary["event"]) {
 const linkClass =
   "inline-flex min-h-[44px] items-center justify-center rounded-pill border border-terracota-500 px-5 font-body text-100 uppercase tracking-[0.14em] text-terracota-700 transition-colors hover:bg-terracota-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus";
 
-export function EventSection({ t }: { t: Dictionary["event"] }) {
+const primaryClass =
+  "inline-flex min-h-[48px] items-center justify-center gap-2 rounded-pill bg-terracota-500 px-7 font-body text-100 uppercase tracking-[0.16em] text-white shadow-[0_10px_24px_-16px_rgba(152,75,44,0.9)] transition-colors hover:bg-terracota-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus";
+
+export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Locale }) {
   return (
     <section id="evento" aria-labelledby="evento-titulo" className="relative isolate pb-[min(58vw,29rem)] pt-section-gap">
       {/* aquarelas: ramo no canto de cima, árvore à esquerda, a baía embaixo */}
@@ -45,7 +49,16 @@ export function EventSection({ t }: { t: Dictionary["event"] }) {
           eyebrow={t.eyebrow}
           title={t.title}
           lead={t.lead}
+          highlight
         />
+
+        {/* folhinha de abril com o 17 circulado no pincel + salvar na agenda */}
+        <WeddingCalendar locale={locale} className="mt-10" />
+        <PaintReveal variant="rise" delay={250} className="mt-6 flex justify-center">
+          <a className={primaryClass} href={googleCalendar(t)} target="_blank" rel="noopener noreferrer">
+            {t.calendar}
+          </a>
+        </PaintReveal>
 
         <div className="mt-12 grid gap-10 md:grid-cols-[1fr_1.1fr] md:gap-16">
           {/* local */}
@@ -67,9 +80,6 @@ export function EventSection({ t }: { t: Dictionary["event"] }) {
               </a>
               <a className={linkClass} href={wazeTo(ADDRESS)} target="_blank" rel="noopener noreferrer">
                 {t.waze}
-              </a>
-              <a className={linkClass} href={googleCalendar(t)} target="_blank" rel="noopener noreferrer">
-                {t.calendar}
               </a>
             </div>
 
