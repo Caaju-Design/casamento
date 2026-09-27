@@ -22,7 +22,7 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
     { href: "#dicas", label: t.nav.dicas },
   ];
   return (
-    <div lang={info.lang} dir={info.dir} className="flex flex-col">
+    <div lang={info.lang} dir={info.dir} className="flex flex-col overflow-x-clip">
       <AnchorNav items={navItems} startHiddenForHero locale={locale} labels={t.nav} />
       <HeroSection labels={t.hero} />
 
@@ -33,7 +33,7 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <StaySection t={t.stay} />
       <TipsSection t={t.tips} />
 
-      <footer className="relative isolate overflow-hidden px-6 pb-[clamp(9rem,24vw,16rem)] pt-section-gap text-center">
+      <footer className="relative isolate px-6 pb-[calc(min(75vw,320px)+1.5rem)] pt-section-gap text-center">
         <Painting name="baia-veleiro" className="absolute bottom-0 left-1/2 w-[min(80vw,340px)] -translate-x-1/2" />
         <p className="font-display leading-snug text-text-primary" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)" }}>
           {t.footer.title}

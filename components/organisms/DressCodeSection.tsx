@@ -50,7 +50,7 @@ function Card({ title, children, delay }: { title: string; children: React.React
 
 export function DressCodeSection({ t }: { t: Dictionary["dress"] }) {
   return (
-    <section id="dresscode" aria-labelledby="dresscode-titulo" className="relative isolate overflow-hidden py-section-gap">
+    <section id="dresscode" aria-labelledby="dresscode-titulo" className="relative isolate py-section-gap">
       <Painting name="ramo-pendente" flip className="absolute left-0 top-0 w-[38vw] max-w-[230px]" />
       <Painting name="arvore-grande" flip className="absolute bottom-[6%] right-0 hidden w-[15rem] md:block" />
       <Painting name="arbusto-pedra-canto" className="absolute bottom-0 left-0 w-[46vw] max-w-[300px]" />

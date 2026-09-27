@@ -36,7 +36,7 @@ const place =
 
 export function StaySection({ t }: { t: Dictionary["stay"] }) {
   return (
-    <section id="hospedagem" aria-labelledby="hospedagem-titulo" className="relative isolate overflow-hidden pb-[min(34vw,17rem)] pt-section-gap">
+    <section id="hospedagem" aria-labelledby="hospedagem-titulo" className="relative isolate pb-[min(34vw,17rem)] pt-section-gap">
       <Painting name="ramo-borda-dir" className="absolute right-0 top-[6%] hidden w-[10rem] md:block" />
       <Painting name="arvore-pequena" className="absolute left-[3%] top-[10%] hidden w-[10rem] md:block" />
       <Cloud id={4} className="left-0 top-[34%] w-[60vw] md:w-[28vw]" opacity={0.8} />

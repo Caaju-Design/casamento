@@ -7,8 +7,10 @@
  *
  * Os PDFs guardam essas artes em resolução baixa (~130 ppi), então cada uma
  * tem uma largura máxima sugerida (`w`, em px CSS) pra não ficar borrada.
- * Algumas têm lado RETO de propósito (ver `edge`): encoste esse lado na
- * borda da seção.
+ * As bordas de todas as artes foram "mastigadas" (fade com ruído, v2), então
+ * nenhuma tem mais lado reto; `edge` só registra de que lado a arte original
+ * era cortada. As seções não usam `overflow-hidden` — quem corta o excesso
+ * lateral é o `overflow-x-clip` da página (HomePageTemplate).
  *
  * Só decoração: `aria-hidden`, sem clique. Quando `behind`, fica atrás do
  * conteúdo (`-z-10`; o pai precisa ser `isolate`).
@@ -62,7 +64,7 @@ export function Painting({ name, className, flip = false, behind = true, eager =
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/decor/capetown/${name}.webp`}
+      src={`/decor/capetown/${name}.webp?v=2`}
       alt=""
       aria-hidden="true"
       width={p.w}

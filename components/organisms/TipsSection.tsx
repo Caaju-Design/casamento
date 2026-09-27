@@ -56,7 +56,7 @@ function PlaceList({ group, delay }: { group: Group; delay: number }) {
 
 export function TipsSection({ t }: { t: Dictionary["tips"] }) {
   return (
-    <section id="dicas" aria-labelledby="dicas-titulo" className="relative isolate overflow-hidden py-section-gap">
+    <section id="dicas" aria-labelledby="dicas-titulo" className="relative isolate pb-44 pt-section-gap md:pb-section-gap">
       <Painting name="ramo-solto" className="absolute left-[2%] top-[3%] w-[26vw] max-w-[170px]" />
       <Painting name="ramo-canto-dir-baixo-2" className="absolute right-0 top-[46%] w-[26vw] max-w-[150px]" />
       <Painting name="folhagem" flip className="absolute bottom-[3%] left-[2%] w-[28vw] max-w-[160px]" />

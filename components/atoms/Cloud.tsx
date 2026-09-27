@@ -3,9 +3,10 @@
  * ornamento. As imagens vêm do pattern enviado pelo casal, recortado em 9
  * nuvens soltas (`public/decor/nuvens/n1…n9.webp`, fundo transparente).
  *
- * Algumas nuvens têm um lado RETO de propósito — foram desenhadas pra
- * encostar na borda da tela (ver `edge`). Nessas, posicione com `left-0`,
- * `right-0` ou `top-0` do lado reto; as "soltas" podem ficar em qualquer lugar.
+ * Todas as bordas das imagens foram "mastigadas" (fade com ruído, v2): não
+ * existe mais lado reto, então a nuvem pode ficar cortada pela borda da
+ * tela ou atravessar o limite entre seções sem aparecer corte seco. `edge`
+ * só registra de que lado a nuvem original encostava no pattern.
  *
  * É só decoração: `aria-hidden`, sem clique, e fica ATRÁS do conteúdo
  * (`-z-10`) — o pai precisa ser um contexto de empilhamento (`isolate`,
@@ -42,7 +43,7 @@ export function Cloud({ id, className, opacity = 0.95 }: CloudProps) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/decor/nuvens/n${id}.webp`}
+      src={`/decor/nuvens/n${id}.webp?v=2`}
       alt=""
       aria-hidden="true"
       width={c.w}

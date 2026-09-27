@@ -14,7 +14,7 @@ import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
  */
 export function GiftSection({ t, locale }: { t: Dictionary["gift"]; locale: Locale }) {
   return (
-    <section id="presentes" aria-labelledby="presentes-titulo" className="relative isolate overflow-hidden px-6 py-section-gap">
+    <section id="presentes" aria-labelledby="presentes-titulo" className="relative isolate px-6 py-section-gap">
       <Cloud id={8} className="left-[2%] top-4 w-[60vw] md:w-[26vw]" opacity={0.7} />
 
       <PaintReveal

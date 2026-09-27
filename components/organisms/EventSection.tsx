@@ -30,7 +30,7 @@ const linkClass =
 
 export function EventSection({ t }: { t: Dictionary["event"] }) {
   return (
-    <section id="evento" aria-labelledby="evento-titulo" className="relative isolate overflow-hidden pb-[min(58vw,29rem)] pt-section-gap">
+    <section id="evento" aria-labelledby="evento-titulo" className="relative isolate pb-[min(58vw,29rem)] pt-section-gap">
       {/* aquarelas: ramo no canto de cima, árvore à esquerda, a baía embaixo */}
       <Painting name="ramo-canto-dir-cima" className="absolute right-0 top-0 w-[30vw] max-w-[190px]" />
       <Painting name="ramo-borda-esq" className="absolute left-0 top-[18%] hidden w-[9rem] md:block" />
