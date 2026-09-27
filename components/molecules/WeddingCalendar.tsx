@@ -69,12 +69,56 @@ function BrushCircle() {
   );
 }
 
+/**
+ * Argolas de encadernação pintadas em aquarela (tom caramelo/dourado): cada
+ * uma sai de um furo no topo da folha e dá a volta por cima, como calendário
+ * de mesa. Três camadas — lavagem larga e clara, traço principal e um brilho
+ * fino — passadas pelo mesmo filtro de "tremido" de pincel.
+ */
+function Ring() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 46" className="h-12 w-[1.6rem] overflow-visible">
+      {/* furo na folha */}
+      <ellipse cx="12" cy="38" rx="4.6" ry="3" fill="#614431" fillOpacity={0.45} filter="url(#ring-soft)" />
+      <g fill="none" strokeLinecap="round" filter="url(#ring-rough)">
+        {/* lavagem larga */}
+        <path d="M8.5 38 C7 26 6 9 12 5 C18 1.5 18.5 22 15.5 37" stroke="#cd9e80" strokeOpacity={0.45} strokeWidth={7} />
+        {/* traço principal */}
+        <path d="M8.5 38 C7 26 6 9 12 5 C18 1.5 18.5 22 15.5 37" stroke="#785a29" strokeOpacity={0.85} strokeWidth={3.2} />
+        {/* brilho */}
+        <path d="M9.4 30 C8.6 21 8.6 11 12 7.6" stroke="#f8e0b6" strokeOpacity={0.9} strokeWidth={0.9} />
+      </g>
+    </svg>
+  );
+}
+
+function Rings() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-x-8 -top-[27px] flex justify-between sm:inset-x-10">
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <filter id="ring-rough" x="-40%" y="-20%" width="180%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="1.3" />
+          </filter>
+          <filter id="ring-soft">
+            <feGaussianBlur stdDeviation="0.7" />
+          </filter>
+        </defs>
+      </svg>
+      {Array.from({ length: 5 }, (_, i) => (
+        <Ring key={i} />
+      ))}
+    </div>
+  );
+}
+
 export function WeddingCalendar({ locale, className }: { locale: Locale; className?: string }) {
   const intl = INTL[locale];
   const month = cap(new Intl.DateTimeFormat(intl, { month: "long", timeZone: "UTC" }).format(new Date(Date.UTC(YEAR, MONTH, 1))));
   // 2027-04-04 é domingo: gera os rótulos de domingo a sábado
   const weekdays = Array.from({ length: 7 }, (_, i) =>
-    new Intl.DateTimeFormat(intl, { weekday: locale === "ar" ? "short" : "narrow", timeZone: "UTC" }).format(new Date(Date.UTC(YEAR, MONTH, 4 + i))),
+    new Intl.DateTimeFormat(intl, { weekday: "narrow", timeZone: "UTC" }).format(new Date(Date.UTC(YEAR, MONTH, 4 + i))),
   );
   const firstWeekday = new Date(Date.UTC(YEAR, MONTH, 1)).getUTCDay();
   const days = new Date(Date.UTC(YEAR, MONTH + 1, 0)).getUTCDate();
@@ -82,11 +126,12 @@ export function WeddingCalendar({ locale, className }: { locale: Locale; classNa
   const fullDate = new Intl.DateTimeFormat(intl, { dateStyle: "full", timeZone: "UTC" }).format(new Date(Date.UTC(YEAR, MONTH, DAY)));
 
   return (
-    <PaintReveal variant="rise" delay={120} className={["mx-auto w-full max-w-sm", className].filter(Boolean).join(" ")}>
+    <PaintReveal variant="rise" delay={120} className={["mx-auto w-full", className].filter(Boolean).join(" ")}>
       <figure
         aria-label={fullDate}
-        className="rounded-card border border-caramelo-100 bg-page/85 px-5 pb-6 pt-5 shadow-[0_18px_40px_-30px_rgba(45,43,35,0.45)] backdrop-blur-[2px] sm:px-7"
+        className="relative rounded-card border border-caramelo-100 bg-page px-5 pb-6 pt-8 shadow-[0_18px_40px_-30px_rgba(45,43,35,0.45)] backdrop-blur-[2px] sm:px-7"
       >
+        <Rings />
         <figcaption className="flex items-baseline justify-between border-b border-caramelo-100 pb-3">
           <span className="font-display leading-none text-text-title" style={{ fontSize: "clamp(2rem, 4vw, 2.6rem)" }}>
             {month}

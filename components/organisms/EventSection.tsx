@@ -48,16 +48,36 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
           id="evento-titulo"
           eyebrow={t.eyebrow}
           title={t.title}
-          lead={t.lead}
           highlight
         />
 
-        {/* folhinha de abril com o 17 circulado no pincel + salvar na agenda */}
-        <WeddingCalendar locale={locale} className="mt-10" />
-        <PaintReveal variant="rise" delay={250} className="mt-6 flex justify-center">
-          <a className={primaryClass} href={googleCalendar(t)} target="_blank" rel="noopener noreferrer">
-            {t.calendar}
-          </a>
+        {/* card "Reserve a data" (mesmo estilo do card de Presentes): data por
+            extenso + botão à esquerda, folhinha com argolas à direita sobre
+            pinceladas de aquarela */}
+        <PaintReveal
+          variant="rise"
+          className="relative mt-12 grid items-center gap-4 rounded-[2rem] bg-salvia-50 shadow-[0_18px_50px_-30px_rgba(45,43,35,0.45)] md:grid-cols-[1.1fr_1fr]"
+        >
+          <div className="relative z-10 px-8 pb-2 pt-10 md:px-12 md:py-14">
+            <h3 className="font-body text-400 uppercase tracking-[0.2em] text-text-primary sm:tracking-[0.28em]">{t.saveTitle}</h3>
+            <span aria-hidden="true" className="mt-4 block h-px w-10 bg-salvia-700" />
+            <p className="mt-5 font-body leading-snug text-text-primary" style={{ fontSize: "clamp(1.35rem, 2.2vw, 1.75rem)" }}>{t.lead}</p>
+            <p className="mt-2 font-body text-200 italic leading-relaxed text-terracota-700">{t.dateWords}</p>
+            <p className="mt-3 max-w-md font-body text-200 leading-relaxed text-text-secondary">{t.saveNote}</p>
+            <a className={["mt-7", primaryClass].join(" ")} href={googleCalendar(t)} target="_blank" rel="noopener noreferrer">
+              {t.calendar} <span aria-hidden="true" className="rtl:-scale-x-100">›</span>
+            </a>
+          </div>
+
+          <div className="relative isolate px-10 pb-14 pt-12 md:py-16 md:pe-14 md:ps-6">
+            {/* pinceladas de aquarela atrás da folhinha */}
+            {/* eslint-disable @next/next/no-img-element */}
+            <img src="/decor/pinceladas/pessego.webp" alt="" aria-hidden="true" width={1000} height={260} className="pointer-events-none absolute -z-10 -start-[4%] top-[6%] w-[84%] -rotate-[9deg] select-none opacity-85 mix-blend-multiply md:-start-[8%]" />
+            <img src="/decor/pinceladas/amarelo.webp" alt="" aria-hidden="true" width={1000} height={260} className="pointer-events-none absolute -z-10 end-[1%] top-[40%] w-[74%] rotate-[7deg] select-none opacity-80 mix-blend-multiply" />
+            <img src="/decor/pinceladas/salvia.webp" alt="" aria-hidden="true" width={1000} height={260} className="pointer-events-none absolute -z-10 bottom-[2%] start-[6%] w-[80%] -rotate-[4deg] select-none opacity-75 mix-blend-multiply" />
+            {/* eslint-enable @next/next/no-img-element */}
+            <WeddingCalendar locale={locale} className="relative max-w-[20rem] sm:max-w-[21rem]" />
+          </div>
         </PaintReveal>
 
         <div className="mt-12 grid gap-10 md:grid-cols-[1fr_1.1fr] md:gap-16">
