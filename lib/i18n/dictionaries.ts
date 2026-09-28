@@ -144,29 +144,32 @@ export type Dictionary = {
     hotelsLead: string;
     arriveEyebrow: string;
     arriveTitle: string;
-    planeTitle: string;
-    plane: [string, string, string];
-    busTitle: string;
-    busLead: string;
-    busSteps: string[];
-    /** Rótulos do mapa do metrô (Tietê → Santa Cruz → Alto da Boa Vista). "{n}" = número de estações. */
-    metro: {
-      mapLabel: string;
-      line1: string;
-      line5: string;
-      toward: string;
-      board: string;
-      boardSub: string;
-      transfer: string;
-      transferSub: string;
-      getOff: string;
-      getOffSub: string;
-      stops: string;
-      ride: string;
-      time: string;
-      tip: string;
+    /** Seletor "Como você vai chegar?" + trajeto de metrô de cada chegada (ver lib/content/metro.ts). */
+    arrival: {
+      question: string;
+      lead: string;
+      tabs: Record<"congonhas" | "guarulhos" | "tiete", string>;
+      routes: Record<
+        "congonhas" | "guarulhos" | "tiete",
+        { title: string; lead: string; origin: string; originSub: string; steps: string[]; time: string; tip: string }
+      >;
+      /** Rótulos do mapa. "{origin}", "{line}" e "{n}" são trocados. */
+      metro: {
+        mapLabel: string;
+        lines: Record<"l1" | "l5" | "l13" | "l17", string>;
+        toward: string;
+        board: string;
+        transfer: string;
+        transferSub: string;
+        getOff: string;
+        getOffSub: string;
+        stops: string;
+        ride: string;
+      };
     };
   };
+  /** Seção final "Transmissão ao vivo" (em breve). */
+  live: { eyebrow: string; title: string; lead: string; when: string; badge: string };
   tips: {
     eyebrow: string;
     title: string;
@@ -179,7 +182,8 @@ export type Dictionary = {
     beauty: [Group, Group];
     beautyNote: string;
   };
-  footer: { title: string; signature: string };
+  /** `credit`: texto antes do link "Caáju Design Ltda." no rodapé fininho. */
+  footer: { title: string; signature: string; credit: string };
 };
 
 const pt: Dictionary = {
@@ -352,36 +356,69 @@ const pt: Dictionary = {
     hotelsLead: "Algumas opções na região para consultar:",
     arriveEyebrow: "Como chegar",
     arriveTitle: "Chegando em São Paulo",
-    planeTitle: "De avião",
-    plane: [
-      "Se puder escolher, dê preferência ao ",
-      "Aeroporto de Congonhas",
-      ", mais próximo da região do casamento. De lá, você pode pegar um Uber ou 99 até sua hospedagem.",
-    ],
-    busTitle: "De ônibus + metrô",
-    busLead: "Chegando pela Rodoviária do Tietê, dá pra vir de metrô até pertinho da gente, com uma baldeação só:",
-    busSteps: [
-      "Na rodoviária, siga as placas do Metrô: a estação Portuguesa-Tietê é ligada ao terminal por uma passarela.",
-      "Pegue a Linha 1-Azul, sentido Jabaquara, e desça em Santa Cruz (12 estações).",
-      "Em Santa Cruz, siga as placas da Linha 5-Lilás e embarque sentido Capão Redondo. A baldeação é dentro da estação, sem pagar de novo.",
-      "Desça em Alto da Boa Vista (8 estações).",
-      "De lá, pegue um Uber ou 99 até sua hospedagem.",
-    ],
-    metro: {
-      mapLabel: "Mapa do trajeto de metrô da Rodoviária do Tietê até a estação Alto da Boa Vista",
-      line1: "Linha 1 · Azul",
-      line5: "Linha 5 · Lilás",
-      toward: "sentido",
-      board: "Embarque aqui",
-      boardSub: "Rodoviária do Tietê",
-      transfer: "Baldeação",
-      transferSub: "Troque para a Linha 5",
-      getOff: "Desça aqui",
-      getOffSub: "Mais perto do casamento",
-      stops: "{n} estações",
-      ride: "Uber ou 99 até a hospedagem",
-      time: "Cerca de 45 min de metrô",
-      tip: "Compre o bilhete nas bilheterias ou nos totens da estação Portuguesa-Tietê. Evite os horários de pico (7h–9h e 17h–19h) se estiver com malas.",
+    arrival: {
+      question: "Como você vai chegar?",
+      lead: "Escolha por onde você chega em São Paulo e veja o caminho de metrô até pertinho do casamento. Se puder escolher o voo, prefira Congonhas: é o aeroporto mais perto de nós.",
+      tabs: { congonhas: "Aeroporto de Congonhas", guarulhos: "Aeroporto de Guarulhos", tiete: "Rodoviária do Tietê" },
+      routes: {
+        congonhas: {
+          title: "De avião, por Congonhas",
+          lead: "O aeroporto mais pertinho do casamento, com monotrilho saindo do próprio aeroporto e uma baldeação só:",
+          origin: "Aeroporto de Congonhas",
+          originSub: "Siga as placas do Metrô até a estação",
+          steps: [
+            "No desembarque, siga as placas do Metrô até a estação Aeroporto de Congonhas, da Linha 17-Ouro (o monotrilho).",
+            "Embarque sentido Morumbi e desça em Campo Belo (3 estações).",
+            "Em Campo Belo, faça a baldeação para a Linha 5-Lilás, sentido Capão Redondo.",
+            "Desça em Alto da Boa Vista (3 estações).",
+            "De lá, pegue um Uber ou 99 até sua hospedagem.",
+          ],
+          time: "Cerca de 30 min de metrô",
+          tip: "A Linha 17-Ouro é nova (abriu em 2026) e começou com horário reduzido: confira o funcionamento antes de viajar. De Uber ou 99, direto do aeroporto, são uns 20 a 30 minutos.",
+        },
+        guarulhos: {
+          title: "De avião, por Guarulhos",
+          lead: "Fica mais longe, mas dá pra vir de trem e metrô, com duas baldeações:",
+          origin: "Aeroporto de Guarulhos",
+          originSub: "Aeromóvel ou ônibus gratuito até a estação",
+          steps: [
+            "Dos terminais, pegue o Aeromóvel ou o ônibus gratuito até a estação Aeroporto-Guarulhos, da CPTM.",
+            "Embarque no Expresso Aeroporto (Linha 13-Jade) e desça na Luz (cerca de 35 min).",
+            "Na Luz, faça a baldeação para a Linha 1-Azul, sentido Jabaquara, e desça em Santa Cruz (9 estações).",
+            "Em Santa Cruz, troque para a Linha 5-Lilás, sentido Capão Redondo, e desça em Alto da Boa Vista (8 estações).",
+            "De lá, pegue um Uber ou 99 até sua hospedagem.",
+          ],
+          time: "Cerca de 1h30 a 2h",
+          tip: "O Expresso Aeroporto sai de hora em hora: confira os horários no site da CPTM. Com muita mala, Uber ou 99 pode compensar: de 1h a 1h30, dependendo do trânsito.",
+        },
+        tiete: {
+          title: "De ônibus, pela Rodoviária do Tietê",
+          lead: "Dá pra vir de metrô até pertinho da gente, com uma baldeação só:",
+          origin: "Rodoviária do Tietê",
+          originSub: "Passarela até o metrô",
+          steps: [
+            "Na rodoviária, siga as placas do Metrô: a estação Portuguesa-Tietê é ligada ao terminal por uma passarela.",
+            "Pegue a Linha 1-Azul, sentido Jabaquara, e desça em Santa Cruz (12 estações).",
+            "Em Santa Cruz, siga as placas da Linha 5-Lilás e embarque sentido Capão Redondo. A baldeação é dentro da estação, sem pagar de novo.",
+            "Desça em Alto da Boa Vista (8 estações).",
+            "De lá, pegue um Uber ou 99 até sua hospedagem.",
+          ],
+          time: "Cerca de 45 min de metrô",
+          tip: "Compre o bilhete nas bilheterias ou nos totens da estação Portuguesa-Tietê. Evite os horários de pico (7h–9h e 17h–19h) se estiver com malas.",
+        },
+      },
+      metro: {
+        mapLabel: "Mapa do trajeto de {origin} até a estação Alto da Boa Vista",
+        lines: { l1: "Linha 1 · Azul", l5: "Linha 5 · Lilás", l13: "Expresso Aeroporto · Linha 13", l17: "Linha 17 · Ouro" },
+        toward: "sentido",
+        board: "Embarque aqui",
+        transfer: "Baldeação",
+        transferSub: "Troque para a {line}",
+        getOff: "Desça aqui",
+        getOffSub: "Mais perto do casamento",
+        stops: "{n} estações",
+        ride: "Uber ou 99 até a hospedagem",
+      },
     },
   },
   tips: {
@@ -396,7 +433,7 @@ const pt: Dictionary = {
             name: "Casarão de Minas",
             desc: "Comida mineira para comer no local ou pedir pelo iFood. Nossa dica: os pratos executivos são bem servidos e, dependendo da fome, dão para duas pessoas!",
           },
-          { name: "Parrilaria Granja Julieta", desc: "Para quem gosta de comida de bar e espetinhos." },
+          { name: "Dumas Parrillaria", desc: "Para quem gosta de comida de bar e espetinhos." },
           { name: "Boteco Vila Cruzeiro", desc: "Uma opção para petiscar e conversar sem pressa." },
           { name: "Boteco São Paulo — Vila Cruzeiro", desc: "Outra alternativa de boteco no bairro." },
         ],
@@ -406,7 +443,7 @@ const pt: Dictionary = {
         places: [
           { name: "Padaria Flor das Américas", desc: "Para tomar um café e fazer uma pausa para um lanche." },
           {
-            name: "Giga",
+            name: "Giga Atacado",
             desc: "Além de mercado, tem padaria. Prático para tomar um café e aproveitar para comprar o que precisar para a hospedagem.",
           },
         ],
@@ -429,8 +466,8 @@ const pt: Dictionary = {
       {
         title: "Cabelo, maquiagem e unhas",
         places: [
-          { name: "Ritualle Bem Estar", desc: "Vila Cruzeiro — salão de beleza e estética na região." },
-          { name: "Geff Lima", desc: "Granja Julieta — salão especializado em cabelos e mechas, na Rua Booker Pittman, 57." },
+          { name: "Ritualle", desc: "Vila Cruzeiro — salão de beleza e estética na região." },
+          { name: "Gerferson Lima", desc: "Granja Julieta — salão especializado em cabelos e mechas, na Rua Booker Pittman, 57." },
           {
             name: "Jacques Janine",
             desc: "Granja Julieta — escova, penteados, maquiagem, manicure e pedicure. Também oferece corte masculino e barba.",
@@ -449,7 +486,14 @@ const pt: Dictionary = {
     beautyNote:
       "Agende com antecedência e confirme os serviços, valores e tempo de atendimento. Nosso encontro começa às 16h, então reserve uma folguinha para se vestir e chegar com calma! 🤍",
   },
-  footer: { title: "Esperamos vocês para celebrar com a gente!", signature: "Com amor, Gabriela & Emanuel" },
+  live: {
+    eyebrow: "Transmissão ao vivo",
+    title: "De longe, mas com a gente",
+    lead: "Não vai conseguir estar com a gente pessoalmente? Tudo bem: queremos você perto do mesmo jeito. Em breve, aqui mesmo, você vai poder assistir à cerimônia ao vivo, de onde estiver.",
+    when: "17 de abril de 2027 · a partir das 16h (horário de Brasília)",
+    badge: "Em breve",
+  },
+  footer: { title: "Esperamos vocês para celebrar com a gente!", signature: "Com amor, Gabriela & Emanuel", credit: "Site desenvolvido por" },
 };
 
 const en: Dictionary = {
@@ -622,36 +666,69 @@ const en: Dictionary = {
     hotelsLead: "A few options in the area:",
     arriveEyebrow: "Getting here",
     arriveTitle: "Arriving in São Paulo",
-    planeTitle: "By plane",
-    plane: [
-      "If you can choose, fly into ",
-      "Congonhas Airport",
-      ", the closest to the wedding area. From there, you can take an Uber or 99 to where you're staying.",
-    ],
-    busTitle: "By bus + subway",
-    busLead: "Arriving at the Tietê Bus Terminal, you can take the subway almost all the way to us, with just one transfer:",
-    busSteps: [
-      "At the terminal, follow the Metrô signs: Portuguesa-Tietê station is connected to the terminal by a walkway.",
-      "Take Line 1-Blue towards Jabaquara and get off at Santa Cruz (12 stations).",
-      "At Santa Cruz, follow the Line 5-Lilac signs and board towards Capão Redondo. The transfer is inside the station, no extra fare.",
-      "Get off at Alto da Boa Vista (8 stations).",
-      "From there, take an Uber or 99 to where you're staying.",
-    ],
-    metro: {
-      mapLabel: "Subway route map from the Tietê Bus Terminal to Alto da Boa Vista station",
-      line1: "Line 1 · Blue",
-      line5: "Line 5 · Lilac",
-      toward: "towards",
-      board: "Board here",
-      boardSub: "Tietê Bus Terminal",
-      transfer: "Transfer",
-      transferSub: "Switch to Line 5",
-      getOff: "Get off here",
-      getOffSub: "Closest to the wedding",
-      stops: "{n} stations",
-      ride: "Uber or 99 to where you're staying",
-      time: "About 45 min by subway",
-      tip: "Buy your ticket at the ticket office or machines at Portuguesa-Tietê station. If you have luggage, avoid rush hours (7–9am and 5–7pm).",
+    arrival: {
+      question: "How are you arriving?",
+      lead: "Pick where you arrive in São Paulo and see the subway route to right near the wedding. If you can choose your flight, go for Congonhas: it's the airport closest to us.",
+      tabs: { congonhas: "Congonhas Airport", guarulhos: "Guarulhos Airport", tiete: "Tietê Bus Terminal" },
+      routes: {
+        congonhas: {
+          title: "By plane, via Congonhas",
+          lead: "The airport closest to the wedding, with a monorail leaving from the airport itself and just one transfer:",
+          origin: "Congonhas Airport",
+          originSub: "Follow the Metrô signs to the station",
+          steps: [
+            "At arrivals, follow the Metrô signs to Aeroporto de Congonhas station, on Line 17-Gold (the monorail).",
+            "Board towards Morumbi and get off at Campo Belo (3 stations).",
+            "At Campo Belo, transfer to Line 5-Lilac towards Capão Redondo.",
+            "Get off at Alto da Boa Vista (3 stations).",
+            "From there, take an Uber or 99 to where you're staying.",
+          ],
+          time: "About 30 min by subway",
+          tip: "Line 17-Gold is new (opened in 2026) and started with reduced hours: check its schedule before you travel. By Uber or 99, straight from the airport, it's about 20 to 30 minutes.",
+        },
+        guarulhos: {
+          title: "By plane, via Guarulhos",
+          lead: "It's farther away, but you can come by train and subway, with two transfers:",
+          origin: "Guarulhos Airport",
+          originSub: "Aeromóvel people mover or free shuttle to the station",
+          steps: [
+            "From the terminals, take the Aeromóvel or the free shuttle bus to the CPTM Aeroporto-Guarulhos station.",
+            "Board the Airport Express (Line 13-Jade) and get off at Luz (about 35 min).",
+            "At Luz, transfer to Line 1-Blue towards Jabaquara and get off at Santa Cruz (9 stations).",
+            "At Santa Cruz, switch to Line 5-Lilac towards Capão Redondo and get off at Alto da Boa Vista (8 stations).",
+            "From there, take an Uber or 99 to where you're staying.",
+          ],
+          time: "About 1h30 to 2h",
+          tip: "The Airport Express leaves every hour: check the times on the CPTM website. With lots of luggage, an Uber or 99 may be worth it: 1h to 1h30, depending on traffic.",
+        },
+        tiete: {
+          title: "By bus, via the Tietê Terminal",
+          lead: "You can take the subway almost all the way to us, with just one transfer:",
+          origin: "Tietê Bus Terminal",
+          originSub: "Walkway to the subway",
+          steps: [
+            "At the terminal, follow the Metrô signs: Portuguesa-Tietê station is connected to the terminal by a walkway.",
+            "Take Line 1-Blue towards Jabaquara and get off at Santa Cruz (12 stations).",
+            "At Santa Cruz, follow the Line 5-Lilac signs and board towards Capão Redondo. The transfer is inside the station, no extra fare.",
+            "Get off at Alto da Boa Vista (8 stations).",
+            "From there, take an Uber or 99 to where you're staying.",
+          ],
+          time: "About 45 min by subway",
+          tip: "Buy your ticket at the ticket office or machines at Portuguesa-Tietê station. If you have luggage, avoid rush hours (7–9am and 5–7pm).",
+        },
+      },
+      metro: {
+        mapLabel: "Route map from {origin} to Alto da Boa Vista station",
+        lines: { l1: "Line 1 · Blue", l5: "Line 5 · Lilac", l13: "Airport Express · Line 13", l17: "Line 17 · Gold" },
+        toward: "towards",
+        board: "Board here",
+        transfer: "Transfer",
+        transferSub: "Switch to {line}",
+        getOff: "Get off here",
+        getOffSub: "Closest to the wedding",
+        stops: "{n} stations",
+        ride: "Uber or 99 to where you're staying",
+      },
     },
   },
   tips: {
@@ -666,7 +743,7 @@ const en: Dictionary = {
             name: "Casarão de Minas",
             desc: "Food from Minas Gerais to eat in or order on iFood. Our tip: the lunch specials are generous and, depending on how hungry you are, can feed two!",
           },
-          { name: "Parrilaria Granja Julieta", desc: "For fans of bar food and skewers." },
+          { name: "Dumas Parrillaria", desc: "For fans of bar food and skewers." },
           { name: "Boteco Vila Cruzeiro", desc: "A spot for snacks and unhurried conversation." },
           { name: "Boteco São Paulo — Vila Cruzeiro", desc: "Another neighborhood bar option." },
         ],
@@ -676,7 +753,7 @@ const en: Dictionary = {
         places: [
           { name: "Padaria Flor das Américas", desc: "A bakery for a coffee and a snack break." },
           {
-            name: "Giga",
+            name: "Giga Atacado",
             desc: "A supermarket with a bakery. Handy for a coffee and for picking up anything you need for your stay.",
           },
         ],
@@ -698,8 +775,8 @@ const en: Dictionary = {
       {
         title: "Hair, makeup & nails",
         places: [
-          { name: "Ritualle Bem Estar", desc: "Vila Cruzeiro — beauty and aesthetics salon in the area." },
-          { name: "Geff Lima", desc: "Granja Julieta — salon specialized in hair and highlights, at Rua Booker Pittman, 57." },
+          { name: "Ritualle", desc: "Vila Cruzeiro — beauty and aesthetics salon in the area." },
+          { name: "Gerferson Lima", desc: "Granja Julieta — salon specialized in hair and highlights, at Rua Booker Pittman, 57." },
           {
             name: "Jacques Janine",
             desc: "Granja Julieta — blow-dry, hairstyling, makeup, manicure and pedicure. Also offers men's haircuts and beard trims.",
@@ -718,7 +795,14 @@ const en: Dictionary = {
     beautyNote:
       "Book in advance and confirm services, prices and how long it takes. Our celebration starts at 4 pm, so leave yourself some time to get dressed and arrive calmly! 🤍",
   },
-  footer: { title: "We can't wait to celebrate with you!", signature: "With love, Gabriela & Emanuel" },
+  live: {
+    eyebrow: "Live stream",
+    title: "Far away, but with us",
+    lead: "Can't be with us in person? That's okay: we still want you close. Soon, right here, you'll be able to watch the ceremony live, wherever you are.",
+    when: "April 17, 2027 · from 4pm (Brasília time, UTC−3)",
+    badge: "Coming soon",
+  },
+  footer: { title: "We can't wait to celebrate with you!", signature: "With love, Gabriela & Emanuel", credit: "Website developed by" },
 };
 
 const ar: Dictionary = {
@@ -889,36 +973,69 @@ const ar: Dictionary = {
     hotelsLead: "بعض الخيارات في المنطقة:",
     arriveEyebrow: "كيف تصلون",
     arriveTitle: "الوصول إلى ساو باولو",
-    planeTitle: "بالطائرة",
-    plane: [
-      "إن استطعتم الاختيار، فضّلوا ",
-      "مطار كونغونياس",
-      "، فهو الأقرب إلى منطقة الزفاف. ومن هناك يمكنكم أخذ Uber أو 99 إلى مكان إقامتكم.",
-    ],
-    busTitle: "بالحافلة + المترو",
-    busLead: "عند الوصول إلى محطة حافلات Tietê، يمكنكم أخذ المترو حتى مكان قريب منّا، مع تبديل واحد فقط:",
-    busSteps: [
-      "في المحطة، اتبعوا لافتات المترو: محطة Portuguesa-Tietê متصلة بالمحطة بممرّ علوي.",
-      "خذوا الخط 1 (الأزرق) باتجاه Jabaquara وانزلوا في Santa Cruz (12 محطة).",
-      "في Santa Cruz، اتبعوا لافتات الخط 5 (الليلكي) واركبوا باتجاه Capão Redondo. التبديل داخل المحطة ودون دفع أجرة جديدة.",
-      "انزلوا في Alto da Boa Vista (8 محطات).",
-      "ومن هناك خذوا Uber أو 99 إلى مكان إقامتكم.",
-    ],
-    metro: {
-      mapLabel: "خريطة رحلة المترو من محطة حافلات Tietê إلى محطة Alto da Boa Vista",
-      line1: "الخط 1 · الأزرق",
-      line5: "الخط 5 · الليلكي",
-      toward: "باتجاه",
-      board: "اركبوا هنا",
-      boardSub: "محطة حافلات Tietê",
-      transfer: "تبديل",
-      transferSub: "انتقلوا إلى الخط 5",
-      getOff: "انزلوا هنا",
-      getOffSub: "الأقرب إلى الزفاف",
-      stops: "{n} محطات",
-      ride: "Uber أو 99 إلى مكان الإقامة",
-      time: "نحو 45 دقيقة بالمترو",
-      tip: "اشتروا التذكرة من شبابيك التذاكر أو الأجهزة في محطة Portuguesa-Tietê. وإن كانت معكم حقائب، فتجنّبوا أوقات الذروة (7–9 صباحًا و5–7 مساءً).",
+    arrival: {
+      question: "كيف ستصلون؟",
+      lead: "اختاروا مكان وصولكم إلى ساو باولو وشاهدوا طريق المترو حتى مكان قريب من الزفاف. وإن استطعتم اختيار الرحلة، ففضّلوا مطار كونغونياس: فهو الأقرب إلينا.",
+      tabs: { congonhas: "مطار كونغونياس", guarulhos: "مطار غواروليوس", tiete: "محطة حافلات Tietê" },
+      routes: {
+        congonhas: {
+          title: "بالطائرة عبر كونغونياس",
+          lead: "المطار الأقرب إلى الزفاف، مع قطار أحادي السكة ينطلق من المطار نفسه وتبديل واحد فقط:",
+          origin: "مطار كونغونياس",
+          originSub: "اتبعوا لافتات المترو حتى المحطة",
+          steps: [
+            "عند الوصول، اتبعوا لافتات المترو حتى محطة Aeroporto de Congonhas على الخط 17 (الذهبي، القطار أحادي السكة).",
+            "اركبوا باتجاه Morumbi وانزلوا في Campo Belo (3 محطات).",
+            "في Campo Belo، انتقلوا إلى الخط 5 (الليلكي) باتجاه Capão Redondo.",
+            "انزلوا في Alto da Boa Vista (3 محطات).",
+            "ومن هناك خذوا Uber أو 99 إلى مكان إقامتكم.",
+          ],
+          time: "نحو 30 دقيقة بالمترو",
+          tip: "الخط 17 (الذهبي) جديد (افتُتح في 2026) وبدأ بساعات عمل محدودة: تحقّقوا من مواعيده قبل السفر. أمّا بـ Uber أو 99 مباشرةً من المطار فتستغرق الرحلة نحو 20 إلى 30 دقيقة.",
+        },
+        guarulhos: {
+          title: "بالطائرة عبر غواروليوس",
+          lead: "المطار أبعد، لكن يمكنكم القدوم بالقطار والمترو مع تبديلين:",
+          origin: "مطار غواروليوس",
+          originSub: "Aeromóvel أو الحافلة المجانية حتى المحطة",
+          steps: [
+            "من مباني الركاب، خذوا Aeromóvel أو الحافلة المجانية إلى محطة Aeroporto-Guarulhos التابعة لـ CPTM.",
+            "اركبوا قطار المطار السريع (الخط 13، اليشمي) وانزلوا في Luz (نحو 35 دقيقة).",
+            "في Luz، انتقلوا إلى الخط 1 (الأزرق) باتجاه Jabaquara وانزلوا في Santa Cruz (9 محطات).",
+            "في Santa Cruz، انتقلوا إلى الخط 5 (الليلكي) باتجاه Capão Redondo وانزلوا في Alto da Boa Vista (8 محطات).",
+            "ومن هناك خذوا Uber أو 99 إلى مكان إقامتكم.",
+          ],
+          time: "نحو ساعة ونصف إلى ساعتين",
+          tip: "ينطلق قطار المطار السريع كل ساعة: تحقّقوا من المواعيد على موقع CPTM. وإن كانت معكم حقائب كثيرة، فقد يكون Uber أو 99 أنسب: من ساعة إلى ساعة ونصف بحسب الازدحام.",
+        },
+        tiete: {
+          title: "بالحافلة عبر محطة Tietê",
+          lead: "يمكنكم أخذ المترو حتى مكان قريب منّا، مع تبديل واحد فقط:",
+          origin: "محطة حافلات Tietê",
+          originSub: "ممرّ علوي إلى المترو",
+          steps: [
+            "في المحطة، اتبعوا لافتات المترو: محطة Portuguesa-Tietê متصلة بالمحطة بممرّ علوي.",
+            "خذوا الخط 1 (الأزرق) باتجاه Jabaquara وانزلوا في Santa Cruz (12 محطة).",
+            "في Santa Cruz، اتبعوا لافتات الخط 5 (الليلكي) واركبوا باتجاه Capão Redondo. التبديل داخل المحطة ودون دفع أجرة جديدة.",
+            "انزلوا في Alto da Boa Vista (8 محطات).",
+            "ومن هناك خذوا Uber أو 99 إلى مكان إقامتكم.",
+          ],
+          time: "نحو 45 دقيقة بالمترو",
+          tip: "اشتروا التذكرة من شبابيك التذاكر أو الأجهزة في محطة Portuguesa-Tietê. وإن كانت معكم حقائب، فتجنّبوا أوقات الذروة (7–9 صباحًا و5–7 مساءً).",
+        },
+      },
+      metro: {
+        mapLabel: "خريطة الطريق من {origin} إلى محطة Alto da Boa Vista",
+        lines: { l1: "الخط 1 · الأزرق", l5: "الخط 5 · الليلكي", l13: "قطار المطار · الخط 13", l17: "الخط 17 · الذهبي" },
+        toward: "باتجاه",
+        board: "اركبوا هنا",
+        transfer: "تبديل",
+        transferSub: "انتقلوا إلى {line}",
+        getOff: "انزلوا هنا",
+        getOffSub: "الأقرب إلى الزفاف",
+        stops: "{n} محطات",
+        ride: "Uber أو 99 إلى مكان الإقامة",
+      },
     },
   },
   tips: {
@@ -933,7 +1050,7 @@ const ar: Dictionary = {
             name: "Casarão de Minas",
             desc: "مطبخ ولاية ميناس جيرايس، للأكل في المكان أو الطلب عبر iFood. نصيحتنا: وجبات الغداء سخية وقد تكفي شخصين!",
           },
-          { name: "Parrilaria Granja Julieta", desc: "لمحبّي أطباق المقاهي والأسياخ المشوية." },
+          { name: "Dumas Parrillaria", desc: "لمحبّي أطباق المقاهي والأسياخ المشوية." },
           { name: "Boteco Vila Cruzeiro", desc: "مكانٌ للمقبّلات والحديث على مهل." },
           { name: "Boteco São Paulo — Vila Cruzeiro", desc: "خيارٌ آخر في الحيّ." },
         ],
@@ -942,7 +1059,7 @@ const ar: Dictionary = {
         title: "فطور أو وجبة خفيفة",
         places: [
           { name: "Padaria Flor das Américas", desc: "مخبزٌ لفنجان قهوة واستراحةٍ مع وجبةٍ خفيفة." },
-          { name: "Giga", desc: "سوبرماركت فيه مخبز. عمليّ لشرب القهوة وشراء ما تحتاجونه لإقامتكم." },
+          { name: "Giga Atacado", desc: "سوبرماركت فيه مخبز. عمليّ لشرب القهوة وشراء ما تحتاجونه لإقامتكم." },
         ],
       },
       {
@@ -962,8 +1079,8 @@ const ar: Dictionary = {
       {
         title: "شعر ومكياج وأظافر",
         places: [
-          { name: "Ritualle Bem Estar", desc: "Vila Cruzeiro — صالون تجميل وعناية." },
-          { name: "Geff Lima", desc: "Granja Julieta — صالون متخصّص في الشعر والخصلات، Rua Booker Pittman, 57." },
+          { name: "Ritualle", desc: "Vila Cruzeiro — صالون تجميل وعناية." },
+          { name: "Gerferson Lima", desc: "Granja Julieta — صالون متخصّص في الشعر والخصلات، Rua Booker Pittman, 57." },
           { name: "Jacques Janine", desc: "Granja Julieta — تصفيف ومكياج وعناية بالأظافر. ويقدّم أيضًا قصّ الشعر للرجال وتهذيب اللحية." },
           { name: "Espaço Dharma", desc: "Vila Cruzeiro — شعر وتصفيف وعناية بالأظافر، وفيه أيضًا ركنٌ للحلاقة." },
         ],
@@ -978,7 +1095,14 @@ const ar: Dictionary = {
     ],
     beautyNote: "احجزوا مسبقًا وتأكّدوا من الخدمات والأسعار ومدّة الموعد. يبدأ لقاؤنا في الرابعة عصرًا، فخصّصوا وقتًا كافيًا لتتجهّزوا وتصلوا بهدوء! 🤍",
   },
-  footer: { title: "ننتظركم لنحتفل معًا!", signature: "مع الحب، غابرييلا وإيمانويل" },
+  live: {
+    eyebrow: "بثّ مباشر",
+    title: "بعيدون، لكن معنا",
+    lead: "لن تتمكّنوا من الحضور شخصيًا؟ لا بأس: نريدكم قريبين منّا رغم ذلك. قريبًا، هنا في هذه الصفحة، ستتمكّنون من مشاهدة المراسم مباشرةً أينما كنتم.",
+    when: "17 أبريل 2027 · ابتداءً من الرابعة عصرًا (بتوقيت برازيليا، UTC−3)",
+    badge: "قريبًا",
+  },
+  footer: { title: "ننتظركم لنحتفل معًا!", signature: "مع الحب، غابرييلا وإيمانويل", credit: "تصميم وتطوير الموقع:" },
 };
 
 export const DICTIONARIES: Record<Locale, Dictionary> = { pt, en, ar };

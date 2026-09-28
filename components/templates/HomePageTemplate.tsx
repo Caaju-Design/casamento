@@ -1,9 +1,9 @@
-import { Painting } from "@/components/atoms/Painting";
 import { AnchorNav } from "@/components/molecules/AnchorNav";
 import { DressCodeSection } from "@/components/organisms/DressCodeSection";
 import { RsvpButton, RsvpSection } from "@/components/organisms/RsvpSection";
 import { EventSection } from "@/components/organisms/EventSection";
 import { GiftSection } from "@/components/organisms/GiftSection";
+import { LiveSection } from "@/components/organisms/LiveSection";
 import { PreWeddingSection } from "@/components/organisms/PreWeddingSection";
 import { HeroSection } from "@/components/organisms/HeroSection";
 import { StorySection } from "@/components/organisms/StorySection";
@@ -36,9 +36,11 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <ArriveSection t={t.stay} />
       <GiftSection t={t.gift} locale={locale} />
       <PreWeddingSection t={t.prewedding} />
+      {/* pra quem não vai conseguir vir: transmissão ao vivo (em breve) */}
+      <LiveSection t={t.live} />
 
-      <footer className="relative isolate px-6 pb-[calc(min(75vw,320px)+1.5rem)] pt-section-gap text-center">
-        <Painting name="baia-veleiro" className="absolute bottom-0 left-1/2 w-[min(80vw,340px)] -translate-x-1/2" />
+      {/* rodapé: a aquarela da baía saiu; aqui vai entrar uma foto do pré-wedding (pedido do Manu) */}
+      <footer className="relative isolate px-6 pb-section-gap pt-section-gap text-center">
         <p className="font-display leading-snug text-text-primary" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)" }}>
           {t.footer.title}
         </p>
@@ -46,6 +48,18 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
         <RsvpButton t={t.rsvp} locale={locale} className="mt-7" />
         <p className="mt-7 font-body text-100 uppercase tracking-[0.24em] text-text-secondary">{t.footer.signature}</p>
       </footer>
+      {/* rodapé fininho: crédito da Caáju */}
+      <div className="border-t border-caramelo-100 px-6 py-4 text-center font-body text-[0.72rem] tracking-[0.06em] text-text-secondary">
+        {t.footer.credit}{" "}
+        <a
+          href="https://www.caaju.com.br"
+          target="_blank"
+          rel="noopener"
+          className="font-bold text-text-primary underline decoration-caramelo-200 underline-offset-4 transition-colors hover:text-terracota-700 hover:decoration-terracota-500"
+        >
+          Caáju Design Ltda.
+        </a>
+      </div>
     </div>
   );
 }

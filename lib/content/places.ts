@@ -3,10 +3,9 @@
  * aproveitar" (#hospedagem). Os nomes não se traduzem; as descrições vêm do
  * dicionário (`t.around.desc[id]`).
  *
- * ⚠️ COORDENADAS APROXIMADAS: foram estimadas sem acesso a um geocodificador
- * (a rede da sessão bloqueava). Os lugares marcados `approx: true` precisam
- * ser conferidos: abrir o lugar no Google Maps, clicar com o botão direito no
- * pin e copiar "lat, lng" pra cá. O endereço do salão também.
+ * Coordenadas conferidas no Google Maps (set/2026), lugar por lugar. Se
+ * algum mudar de endereço: abrir no Google Maps, clicar com o botão direito
+ * no pin e copiar "lat, lng" pra cá.
  */
 
 export type PlaceCategory = "hotel" | "cafe" | "restaurante" | "shopping" | "beleza";
@@ -27,37 +26,36 @@ export interface Place {
 /** Salão de festas do casamento — Rua Luís Correia de Melo, 86. */
 export const VENUE = {
   name: "Ed. Square 2 · Salão de Festas",
-  lat: -23.6335,
-  lng: -46.7055,
-  query: "Rua Luís Correia de Melo, 86 - Chácara Santo Antônio, São Paulo - SP, 04726-220",
-  approx: true,
+  lat: -23.634003,
+  lng: -46.713821,
+  query: "Rua Luís Correia de Melo, 86 - Santo Amaro, São Paulo - SP, 04726-220",
 };
 
 export const PLACES: Place[] = [
   // hotéis
-  { id: "intercity", name: "Intercity Nações Unidas", category: "hotel", lat: -23.6392, lng: -46.7106, query: "Intercity Nações Unidas, São Paulo", approx: true, photo: "/lugares/intercity.webp" },
-  { id: "transamerica", name: "Transamerica Executive Chácara Santo Antônio", category: "hotel", lat: -23.6329, lng: -46.7022, query: "Transamerica Executive Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/transamerica.webp" },
-  { id: "novotel", name: "Novotel São Paulo Berrini", category: "hotel", lat: -23.6069, lng: -46.6938, query: "Novotel São Paulo Berrini", approx: true, photo: "/lugares/novotel.webp" },
-  { id: "ibis", name: "ibis budget São Paulo Morumbi", category: "hotel", lat: -23.6219, lng: -46.6975, query: "ibis budget São Paulo Morumbi", approx: true, photo: "/lugares/ibis.webp" },
+  { id: "intercity", name: "Hotel Intercity Nações Unidas", category: "hotel", lat: -23.6294, lng: -46.707302, query: "Hotel Intercity Nações Unidas, São Paulo", photo: "/lugares/intercity.webp" },
+  { id: "transamerica", name: "Transamerica Executive Chácara Santo Antônio", category: "hotel", lat: -23.628854, lng: -46.706791, query: "Transamerica Executive Chácara Santo Antônio, São Paulo", photo: "/lugares/transamerica.webp" },
+  { id: "novotel", name: "Novotel São Paulo Berrini", category: "hotel", lat: -23.62759, lng: -46.69881, query: "Novotel São Paulo Berrini", photo: "/lugares/novotel.webp" },
+  { id: "ibis", name: "ibis budget São Paulo Morumbi", category: "hotel", lat: -23.621733, lng: -46.696065, query: "ibis budget São Paulo Morumbi", photo: "/lugares/ibis.webp" },
   // cafés e padarias
-  { id: "flor", name: "Padaria Flor das Américas", category: "cafe", lat: -23.6292, lng: -46.7043, query: "Padaria Flor das Américas, São Paulo", approx: true, photo: "/lugares/flor.webp" },
-  { id: "giga", name: "Giga", category: "cafe", lat: -23.6318, lng: -46.7031, query: "Giga, Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/giga.webp" },
+  { id: "flor", name: "Padaria Flor das Américas", category: "cafe", lat: -23.637897, lng: -46.711934, query: "Panificadora Flor das Américas, Vila Cruzeiro, São Paulo", photo: "/lugares/flor.webp" },
+  { id: "giga", name: "Giga Atacado", category: "cafe", lat: -23.634198, lng: -46.71733, query: "Giga Atacado Nações Unidas, São Paulo", photo: "/lugares/giga.webp" },
   // restaurantes e botecos
-  { id: "casarao", name: "Casarão de Minas", category: "restaurante", lat: -23.6347, lng: -46.7071, query: "Casarão de Minas, São Paulo", approx: true, photo: "/lugares/casarao.webp" },
-  { id: "parrilaria", name: "Parrilaria Granja Julieta", category: "restaurante", lat: -23.6372, lng: -46.7083, query: "Parrilaria Granja Julieta, São Paulo", approx: true, photo: "/lugares/parrilaria.webp" },
-  { id: "boteco-vc", name: "Boteco Vila Cruzeiro", category: "restaurante", lat: -23.6398, lng: -46.7147, query: "Boteco Vila Cruzeiro, São Paulo", approx: true, photo: "/lugares/boteco-vc.webp" },
-  { id: "boteco-sp", name: "Boteco São Paulo — Vila Cruzeiro", category: "restaurante", lat: -23.6412, lng: -46.7128, query: "Boteco São Paulo, Vila Cruzeiro, São Paulo", approx: true, photo: "/lugares/boteco-sp.webp" },
+  { id: "casarao", name: "Casarão de Minas", category: "restaurante", lat: -23.634195, lng: -46.712846, query: "Casarão de Minas, São Paulo", photo: "/lugares/casarao.webp" },
+  { id: "parrilaria", name: "Dumas Parrillaria", category: "restaurante", lat: -23.630789, lng: -46.706196, query: "Dumas Parrillaria, Chácara Santo Antônio, São Paulo", photo: "/lugares/parrilaria.webp" },
+  { id: "boteco-vc", name: "Boteco Vila Cruzeiro", category: "restaurante", lat: -23.635214, lng: -46.711534, query: "Boteco Vila Cruzeiro, São Paulo", photo: "/lugares/boteco-vc.webp" },
+  { id: "boteco-sp", name: "Boteco São Paulo — Vila Cruzeiro", category: "restaurante", lat: -23.636661, lng: -46.711534, query: "Boteco São Paulo, Vila Cruzeiro, São Paulo", photo: "/lugares/boteco-sp.webp" },
   // shoppings
-  { id: "parque-cidade", name: "Shopping Parque da Cidade", category: "shopping", lat: -23.6262, lng: -46.7011, query: "Shopping Parque da Cidade, São Paulo", approx: true, photo: "/lugares/parque-cidade.webp" },
-  { id: "morumbi", name: "MorumbiShopping", category: "shopping", lat: -23.6231, lng: -46.6989, query: "MorumbiShopping, São Paulo", approx: true, photo: "/lugares/morumbi.webp" },
-  { id: "market-place", name: "Shopping Market Place", category: "shopping", lat: -23.6177, lng: -46.6969, query: "Shopping Market Place, São Paulo", approx: true, photo: "/lugares/market-place.webp" },
+  { id: "parque-cidade", name: "Shopping Parque da Cidade", category: "shopping", lat: -23.625357, lng: -46.706049, query: "Shopping Parque da Cidade, São Paulo", photo: "/lugares/parque-cidade.webp" },
+  { id: "morumbi", name: "MorumbiShopping", category: "shopping", lat: -23.623362, lng: -46.698835, query: "MorumbiShopping, São Paulo", photo: "/lugares/morumbi.webp" },
+  { id: "market-place", name: "Shopping Market Place", category: "shopping", lat: -23.62153, lng: -46.700566, query: "Shopping Market Place, São Paulo", photo: "/lugares/market-place.webp" },
   // salões e barbearias
-  { id: "ritualle", name: "Ritualle Bem Estar", category: "beleza", lat: -23.6405, lng: -46.7162, query: "Ritualle Bem Estar, Vila Cruzeiro, São Paulo", approx: true, photo: "/lugares/ritualle.webp" },
-  { id: "geff", name: "Geff Lima", category: "beleza", lat: -23.6361, lng: -46.7092, query: "Geff Lima, Rua Booker Pittman, 57, São Paulo", approx: true, photo: "/lugares/geff.webp" },
-  { id: "jacques", name: "Jacques Janine", category: "beleza", lat: -23.6356, lng: -46.7058, query: "Jacques Janine Granja Julieta, São Paulo", approx: true, photo: "/lugares/jacques.webp" },
-  { id: "dharma", name: "Espaço Dharma", category: "beleza", lat: -23.6389, lng: -46.7171, query: "Espaço Dharma, Vila Cruzeiro, São Paulo", approx: true, photo: "/lugares/dharma.webp" },
-  { id: "tarantino", name: "Tarantino", category: "beleza", lat: -23.6309, lng: -46.7049, query: "Barbearia Tarantino, Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/tarantino.webp" },
-  { id: "corleone", name: "Corleone", category: "beleza", lat: -23.6228, lng: -46.6994, query: "Barbearia Corleone, MorumbiShopping, São Paulo", approx: true, photo: "/lugares/corleone.webp" },
+  { id: "ritualle", name: "Ritualle", category: "beleza", lat: -23.636344, lng: -46.713217, query: "Ritualle, Vila Cruzeiro, São Paulo", photo: "/lugares/ritualle.webp" },
+  { id: "geff", name: "Gerferson Lima", category: "beleza", lat: -23.632058, lng: -46.70873, query: "Gerferson Lima Salão, Esmalteria e Estética, São Paulo", photo: "/lugares/geff.webp" },
+  { id: "jacques", name: "Jacques Janine", category: "beleza", lat: -23.640002, lng: -46.698333, query: "Jacques Janine Granja Julieta, São Paulo", photo: "/lugares/jacques.webp" },
+  { id: "dharma", name: "Espaço Dharma", category: "beleza", lat: -23.640162, lng: -46.710641, query: "Espaço Dharma Salão de Beleza, Vila Cruzeiro, São Paulo", photo: "/lugares/dharma.webp" },
+  { id: "tarantino", name: "Tarantino", category: "beleza", lat: -23.630832, lng: -46.703228, query: "Barbearia Tarantino, Chácara Santo Antônio, São Paulo", photo: "/lugares/tarantino.webp" },
+  { id: "corleone", name: "Corleone", category: "beleza", lat: -23.623117, lng: -46.698607, query: "Barbearia Corleone, MorumbiShopping, São Paulo", photo: "/lugares/corleone.webp" },
 ];
 
 /** Distância em linha reta (km), fórmula de haversine. */

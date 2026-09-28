@@ -1,41 +1,37 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import {
-  METRO_END,
-  METRO_L1_STOPS,
-  METRO_L5_STOPS,
-  METRO_LINES,
-  METRO_START,
-  METRO_TRANSFER,
-} from "@/lib/content/metro";
+import { Fragment, useId, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { LINE_COLORS, ROUTES, type ArrivalId, type LineId } from "@/lib/content/metro";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /**
- * Molecule `MetroRoute` — o trajeto de metrô da Rodoviária do Tietê até o
- * Alto da Boa Vista, redesenhado no estilo dos "mapas de embarque" das
- * estações, mas limpo: um trilho vertical PINTADO em aquarela (pincelada
- * com a mesma receita do círculo do calendário) na cor de cada linha, com TODAS
- * as estações do caminho (dá pra ir contando), e as três paradas que
- * importam em destaque — Embarque (Tietê), Baldeação (Santa Cruz, bolinha
- * meio azul, meio lilás) e Desça aqui (Alto da Boa Vista). No fim, um
- * tracejado até o carro (Uber/99).
+ * Molecule `MetroRoute` — o trajeto de trem/metrô de um ponto de chegada
+ * (Congonhas, Guarulhos ou Tietê) até o Alto da Boa Vista, redesenhado no
+ * estilo dos "mapas de embarque" das estações, mas PINTADO em aquarela: um
+ * trilho vertical na cor de cada linha (pincelada com a mesma receita do
+ * círculo do calendário), com TODAS as estações do caminho (dá pra ir
+ * contando) e as paradas que importam em destaque — Embarque, Baldeação
+ * (disco com as duas cores) e Desça aqui. Antes, um tracejado do terminal
+ * (avião/ônibus) até a estação; no fim, um tracejado até o carro (Uber/99).
  *
- * Feito em HTML (não SVG) pra quebrar linha, traduzir e espelhar no árabe.
+ * O texto é HTML (quebra linha, traduz, espelha no árabe); a tinta é um SVG
+ * só, por baixo, desenhado a partir das posições medidas das bolinhas.
  */
 
-const L1 = METRO_LINES.l1.color;
-const L5 = METRO_LINES.l5.color;
-const RIDE = "#c9a88a"; // caramelo do tracejado final
+const RIDE = "#c9a88a"; // caramelo dos tracejados (a pé / de carro)
 
-/** Uma linha do diagrama: coluna do trilho (só o nó; a tinta é desenhada por baixo, num SVG só) + conteúdo. */
-function Row({ node, nodeRef, children, className = "" }: { node: ReactNode; nodeRef?: RefObject<HTMLSpanElement | null>; children: ReactNode; className?: string }) {
+type NodeKind = "origin" | "ring" | "dot" | "transfer" | "end" | "car";
+
+/** Uma linha do diagrama: coluna do trilho (lugar do nó; a tinta vem do SVG) + conteúdo. */
+function Row({ kind, c1, c2, node, children, className = "" }: { kind?: NodeKind; c1?: string; c2?: string; node?: ReactNode; children: ReactNode; className?: string }) {
   return (
     <li className="relative flex items-stretch gap-4">
       <span aria-hidden="true" className="relative flex w-10 shrink-0 items-center justify-center">
-        <span ref={nodeRef} className="relative z-10 flex items-center">
-          {node}
-        </span>
+        {kind && (
+          <span data-node={kind} data-c1={c1} data-c2={c2} className="relative z-10 flex items-center">
+            {node ?? <span className={kind === "dot" ? "block h-3 w-3" : "block h-9 w-9"} />}
+          </span>
+        )}
       </span>
       <div className={["min-w-0 flex-1 self-center", className].join(" ")}>{children}</div>
     </li>
@@ -69,17 +65,17 @@ function strokePath(x: number, y0: number, y1: number, seed: number, amp: number
  * principal e duas passadas finas deslocadas — mesma receita do círculo do
  * calendário (`brush-rough`): contorno ondulado + falhas de tinta seca.
  */
-function InkLine({ x, y0, y1, color, seed }: { x: number; y0: number; y1: number; color: string; seed: number }) {
+function InkLine({ x, y0, y1, color, seed, f }: { x: number; y0: number; y1: number; color: string; seed: number; f: string }) {
   if (y1 - y0 < 4) return null;
   return (
     <g stroke={color} fill="none" strokeLinecap="round">
       {/* água que vaza em volta */}
-      <path d={strokePath(x, y0 - 4, y1 + 4, seed, 3)} strokeWidth={26} strokeOpacity={0.13} filter="url(#metro-bleed)" />
+      <path d={strokePath(x, y0 - 4, y1 + 4, seed, 3)} strokeWidth={26} strokeOpacity={0.13} filter={`url(#${f}-bleed)`} />
       {/* corpo da pincelada: tinta rala, granulada e arrastada */}
-      <path d={strokePath(x, y0, y1, seed + 1, 2)} strokeWidth={13} strokeOpacity={0.5} filter="url(#metro-wash)" />
-      <path d={strokePath(x + 1.5, y0 + 8, y1 - 6, seed + 2, 2.6)} strokeWidth={6} strokeOpacity={0.35} filter="url(#metro-wash)" />
+      <path d={strokePath(x, y0, y1, seed + 1, 2)} strokeWidth={13} strokeOpacity={0.5} filter={`url(#${f}-wash)`} />
+      <path d={strokePath(x + 1.5, y0 + 8, y1 - 6, seed + 2, 2.6)} strokeWidth={6} strokeOpacity={0.35} filter={`url(#${f}-wash)`} />
       {/* bordas mais escuras, onde o pigmento acumula quando a água seca */}
-      <g filter="url(#metro-brush)">
+      <g filter={`url(#${f}-brush)`}>
         <path d={strokePath(x - 5.5, y0 + 3, y1 - 3, seed + 1, 2)} strokeWidth={1.7} strokeOpacity={0.6} />
         <path d={strokePath(x + 5.5, y0 + 5, y1 - 2, seed + 1, 2)} strokeWidth={1.4} strokeOpacity={0.5} />
       </g>
@@ -91,139 +87,177 @@ function InkLine({ x, y0, y1, color, seed }: { x: number; y0: number; y1: number
 const PAPER = "#fbfaf6";
 
 /** Anel pintado: miolo de papel + aro de tinta rala com a borda mais escura. */
-function PaintRing({ cx, cy, r, width, color }: { cx: number; cy: number; r: number; width: number; color: string }) {
+function PaintRing({ cx, cy, r, width, color, f }: { cx: number; cy: number; r: number; width: number; color: string; f: string }) {
   return (
     <g>
-      <circle cx={cx} cy={cy} r={r + width / 2} fill={color} fillOpacity={0.12} filter="url(#metro-bleed)" />
-      <circle cx={cx} cy={cy} r={r + width / 2} fill={PAPER} filter="url(#metro-paper)" />
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={width} strokeOpacity={0.72} filter="url(#metro-dab)" />
-      <circle cx={cx} cy={cy} r={r + width / 2 - 0.6} fill="none" stroke={color} strokeWidth={1.1} strokeOpacity={0.55} filter="url(#metro-dab)" />
+      <circle cx={cx} cy={cy} r={r + width / 2} fill={color} fillOpacity={0.12} filter={`url(#${f}-bleed)`} />
+      <circle cx={cx} cy={cy} r={r + width / 2} fill={PAPER} filter={`url(#${f}-paper)`} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={width} strokeOpacity={0.72} filter={`url(#${f}-dab)`} />
+      <circle cx={cx} cy={cy} r={r + width / 2 - 0.6} fill="none" stroke={color} strokeWidth={1.1} strokeOpacity={0.55} filter={`url(#${f}-dab)`} />
     </g>
   );
 }
 
-type Geo = { w: number; h: number; x: number; start: number; transfer: number; end: number; car: number; dots: { y: number; color: string }[] };
+type MNode = { kind: NodeKind; y: number; c1?: string; c2?: string };
+type Geo = { w: number; h: number; x: number; nodes: MNode[] };
 
-function useGeo(box: RefObject<HTMLOListElement | null>, refs: RefObject<HTMLSpanElement | null>[]) {
+function useGeo(box: RefObject<HTMLOListElement | null>, key: string) {
   const [geo, setGeo] = useState<Geo | null>(null);
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
     const measure = () => {
       const r = el.getBoundingClientRect();
-      const c = refs.map((ref) => {
-        const n = ref.current?.getBoundingClientRect();
-        return n ? { x: n.left + n.width / 2 - r.left, y: n.top + n.height / 2 - r.top } : { x: 0, y: 0 };
+      let x = 0;
+      const nodes = [...el.querySelectorAll<HTMLElement>("[data-node]")].map((n) => {
+        const b = n.getBoundingClientRect();
+        x = b.left + b.width / 2 - r.left;
+        return { kind: n.dataset.node as NodeKind, y: b.top + b.height / 2 - r.top, c1: n.dataset.c1, c2: n.dataset.c2 };
       });
-      const [a, b, e, car] = c as [(typeof c)[0], (typeof c)[0], (typeof c)[0], (typeof c)[0]];
-      const dots = [...el.querySelectorAll<HTMLElement>("[data-metro-dot]")].map((d) => {
-        const n = d.getBoundingClientRect();
-        return { y: n.top + n.height / 2 - r.top, color: d.dataset.metroDot ?? L1 };
-      });
-      setGeo({ w: r.width, h: r.height, x: a.x, start: a.y, transfer: b.y, end: e.y, car: car.y, dots });
+      setGeo({ w: r.width, h: r.height, x, nodes });
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [box, key]);
   return geo;
 }
 
-function Ink({ geo }: { geo: Geo }) {
-  const { w, h, x } = geo;
+const RADIUS: Record<NodeKind, number> = { origin: 18, ring: 17, dot: 6, transfer: 20, end: 17, car: 18 };
+
+/** Cor que SAI de um nó pra baixo ("dash" = tracejado a pé/de carro). */
+function downColor(n: MNode): string | null {
+  if (n.kind === "origin" || n.kind === "end") return "dash";
+  if (n.kind === "transfer") return n.c2 ?? null;
+  if (n.kind === "car") return null;
+  return n.c1 ?? null;
+}
+
+function Ink({ geo, f }: { geo: Geo; f: string }) {
+  const { w, h, x, nodes } = geo;
+  // junta trechos seguidos da mesma cor numa pincelada só
+  const runs: { color: string; a: MNode; b: MNode }[] = [];
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const c = downColor(nodes[i]!);
+    if (!c) continue;
+    const last = runs[runs.length - 1];
+    if (last && last.color === c && last.b === nodes[i]) last.b = nodes[i + 1]!;
+    else runs.push({ color: c, a: nodes[i]!, b: nodes[i + 1]! });
+  }
   return (
     <svg aria-hidden="true" width={w} height={h} className="pointer-events-none absolute inset-0 overflow-visible">
-      <defs>
-        {/* contorno ondulado (ruído grosso) + tinta seca arrastada no sentido da pincelada (ruído fino esticado na vertical) */}
-        <filter id="metro-brush" filterUnits="userSpaceOnUse" x={-20} y={-20} width={w + 40} height={h + 40}>
-          <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="4" result="wob" />
-          <feDisplacementMap in="SourceGraphic" in2="wob" scale="5" result="shape" />
-          <feTurbulence type="fractalNoise" baseFrequency="0.7 0.05" numOctaves="2" seed="9" result="grain" />
-          <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.75" result="dry" />
-          <feComposite in="shape" in2="dry" operator="in" />
-        </filter>
-        {/* corpo: ondulado + pigmento granulado em faixas verticais (a tinta falha e acumula no sentido do pincel) */}
-        <filter id="metro-wash" filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
-          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4" result="wob" />
-          <feDisplacementMap in="SourceGraphic" in2="wob" scale="7" result="shape" />
-          <feTurbulence type="fractalNoise" baseFrequency="0.3 0.035" numOctaves="3" seed="21" result="grain" />
-          <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.1 1.35" result="pig" />
-          <feComposite in="shape" in2="pig" operator="in" />
-        </filter>
-        {/* bolinhas: ondulado bem leve (círculo pequeno deforma fácil) + granulado suave */}
-        <filter id="metro-dab" filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
-          <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="6" result="wob" />
-          <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.6" result="shape" />
-          <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="2" seed="13" result="grain" />
-          <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.8 1.3" result="pig" />
-          <feComposite in="shape" in2="pig" operator="in" />
-        </filter>
-        {/* papel: só o contorno levemente irregular, sem granulado (tampa a linha por baixo) */}
-        <filter id="metro-paper" filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
-          <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="6" result="wob" />
-          <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.6" />
-        </filter>
-        {/* água que vaza em volta da pincelada */}
-        <filter id="metro-bleed" filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
-          <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="2" result="wob" />
-          <feDisplacementMap in="SourceGraphic" in2="wob" scale="14" result="d" />
-          <feGaussianBlur in="d" stdDeviation="3" />
-        </filter>
-      </defs>
-      <InkLine x={x} y0={geo.start} y1={geo.transfer} color={L1} seed={11} />
-      <InkLine x={x} y0={geo.transfer} y1={geo.end} color={L5} seed={37} />
-      {/* estações do caminho */}
-      {geo.dots.map((d, i) => (
-        <PaintRing key={i} cx={x} cy={d.y} r={5.2} width={3} color={d.color} />
-      ))}
-      {/* embarque e desembarque: aros grandes; no desembarque, um pingo de tinta no meio */}
-      <PaintRing cx={x} cy={geo.start} r={13.5} width={6} color={L1} />
-      <PaintRing cx={x} cy={geo.end} r={13.5} width={6} color={L5} />
-      <circle cx={x} cy={geo.end} r={5} fill={L5} fillOpacity={0.8} filter="url(#metro-dab)" />
-      {/* baldeação: disco meio azul, meio lilás, com o miolo de papel (a setinha fica por cima, em HTML) */}
-      <circle cx={x} cy={geo.transfer} r={19} fill={PAPER} filter="url(#metro-paper)" />
-      <g filter="url(#metro-dab)">
-        <path d={`M${x - 19} ${geo.transfer} A19 19 0 0 1 ${x + 19} ${geo.transfer} Z`} fill={L1} fillOpacity={0.78} />
-        <path d={`M${x + 19} ${geo.transfer} A19 19 0 0 1 ${x - 19} ${geo.transfer} Z`} fill={L5} fillOpacity={0.78} />
-      </g>
-      <circle cx={x} cy={geo.transfer} r={11.5} fill={PAPER} filter="url(#metro-paper)" />
-      <circle cx={x} cy={geo.transfer} r={21} fill="none" stroke={L5} strokeOpacity={0.1} strokeWidth={6} filter="url(#metro-bleed)" />
-      {/* do desembarque até o carro: pontinhos de pincel caramelo */}
-      <path
-        d={`M${x} ${geo.end + 22} L${x} ${geo.car - 20}`}
-        stroke={RIDE}
-        strokeWidth={4}
-        strokeLinecap="round"
-        strokeDasharray="0.1 9"
-        filter="url(#metro-brush)"
-      />
+        <defs>
+          {/* contorno ondulado (ruído grosso) + tinta seca arrastada no sentido da pincelada (ruído fino esticado na vertical) */}
+          <filter id={`${f}-brush`} filterUnits="userSpaceOnUse" x={-20} y={-20} width={w + 40} height={h + 40}>
+            <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="4" result="wob" />
+            <feDisplacementMap in="SourceGraphic" in2="wob" scale="5" result="shape" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.7 0.05" numOctaves="2" seed="9" result="grain" />
+            <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.75" result="dry" />
+            <feComposite in="shape" in2="dry" operator="in" />
+          </filter>
+          {/* corpo: ondulado + pigmento granulado em faixas verticais (a tinta falha e acumula no sentido do pincel) */}
+          <filter id={`${f}-wash`} filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
+            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4" result="wob" />
+            <feDisplacementMap in="SourceGraphic" in2="wob" scale="7" result="shape" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.3 0.035" numOctaves="3" seed="21" result="grain" />
+            <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.1 1.35" result="pig" />
+            <feComposite in="shape" in2="pig" operator="in" />
+          </filter>
+          {/* bolinhas: ondulado bem leve (círculo pequeno deforma fácil) + granulado suave */}
+          <filter id={`${f}-dab`} filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
+            <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="6" result="wob" />
+            <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.6" result="shape" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="2" seed="13" result="grain" />
+            <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.8 1.3" result="pig" />
+            <feComposite in="shape" in2="pig" operator="in" />
+          </filter>
+          {/* papel: só o contorno levemente irregular, sem granulado (tampa a linha por baixo) */}
+          <filter id={`${f}-paper`} filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
+            <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="6" result="wob" />
+            <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.6" />
+          </filter>
+          {/* água que vaza em volta da pincelada */}
+          <filter id={`${f}-bleed`} filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="2" result="wob" />
+            <feDisplacementMap in="SourceGraphic" in2="wob" scale="14" result="d" />
+            <feGaussianBlur in="d" stdDeviation="3" />
+          </filter>
+        </defs>
+      {runs.map((r, i) =>
+        r.color === "dash" ? (
+          <path
+            key={i}
+            d={`M${x} ${r.a.y + RADIUS[r.a.kind] + 6} L${x} ${r.b.y - RADIUS[r.b.kind] - 6}`}
+            stroke={RIDE}
+            strokeWidth={4}
+            strokeLinecap="round"
+            strokeDasharray="0.1 9"
+            filter={`url(#${f}-brush)`}
+          />
+        ) : (
+          <InkLine key={i} x={x} y0={r.a.y} y1={r.b.y} color={r.color} seed={11 + i * 26} f={f} />
+        ),
+      )}
+      {nodes.map((n, i) => {
+        if (n.kind === "dot") return <PaintRing key={i} cx={x} cy={n.y} r={5.2} width={3} color={n.c1!} f={f} />;
+        if (n.kind === "ring" || n.kind === "end")
+          return (
+            <g key={i}>
+              <PaintRing cx={x} cy={n.y} r={13.5} width={6} color={n.c1!} f={f} />
+              {n.kind === "end" && <circle cx={x} cy={n.y} r={5} fill={n.c1} fillOpacity={0.8} filter={`url(#${f}-dab)`} />}
+            </g>
+          );
+        if (n.kind === "transfer")
+          return (
+            <g key={i}>
+              <circle cx={x} cy={n.y} r={21} fill="none" stroke={n.c2} strokeOpacity={0.1} strokeWidth={6} filter={`url(#${f}-bleed)`} />
+              <circle cx={x} cy={n.y} r={19} fill={PAPER} filter={`url(#${f}-paper)`} />
+              <g filter={`url(#${f}-dab)`}>
+                <path d={`M${x - 19} ${n.y} A19 19 0 0 1 ${x + 19} ${n.y} Z`} fill={n.c1} fillOpacity={0.78} />
+                <path d={`M${x + 19} ${n.y} A19 19 0 0 1 ${x - 19} ${n.y} Z`} fill={n.c2} fillOpacity={0.78} />
+              </g>
+              <circle cx={x} cy={n.y} r={11.5} fill={PAPER} filter={`url(#${f}-paper)`} />
+            </g>
+          );
+        return null;
+      })}
     </svg>
   );
 }
 
-/** Lugar da bolinha da estação (a bolinha é pintada no SVG por baixo). */
-const dot = (color: string) => <span data-metro-dot={color} className="block h-3 w-3" />;
-
-/** Lugar dos aros grandes (pintados no SVG). */
-function Big() {
-  return <span className="block h-9 w-9" />;
-}
-
-function Badge({ children, color }: { children: ReactNode; color: string }) {
+function Badge({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-block rounded-pill px-2.5 py-0.5 font-body text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white" style={{ background: color }}>
+    <span className="inline-block rounded-pill bg-terracota-500 px-2.5 py-0.5 font-body text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white">
       {children}
     </span>
   );
 }
 
-function LineLabel({ color, name, toward, stops }: { color: string; name: string; toward: string; stops: string }) {
+/** Nome da linha numa PINCELADA de aquarela na cor dela (em vez de etiqueta). */
+function LineLabel({ color, name, toward, stops, f, seed }: { color: string; name: string; toward: string; stops: string; f: string; seed: number }) {
+  const id = `${f}-swash-${seed}`;
   return (
     <div className="py-2.5 font-body text-100 leading-tight">
-      <span className="inline-block rounded-[0.4rem] px-2 py-1 font-bold text-white" style={{ background: color }}>
-        {name}
+      <span className="relative inline-flex px-3.5 py-1.5">
+        <svg aria-hidden="true" viewBox="0 0 120 32" preserveAspectRatio="none" className="absolute -inset-x-1 -inset-y-0.5 h-[calc(100%+4px)] w-[calc(100%+8px)] overflow-visible">
+          <defs>
+            <filter id={id} x="-10%" y="-30%" width="120%" height="160%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.06 0.18" numOctaves="2" seed={seed} result="wob" />
+              <feDisplacementMap in="SourceGraphic" in2="wob" scale="4" result="shape" />
+              <feTurbulence type="fractalNoise" baseFrequency="0.9 0.12" numOctaves="2" seed={seed + 5} result="grain" />
+              <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.9 1.45" result="pig" />
+              <feComposite in="shape" in2="pig" operator="in" />
+            </filter>
+          </defs>
+          <g fill={color} filter={`url(#${id})`}>
+            {/* passada principal, com a ponta de saída do pincel mais fina */}
+            <path d="M4 9 C22 3 62 2 104 4 C112 4 118 7 117 11 C116 17 117 22 114 26 C84 30 40 30 7 27 C2 24 1 14 4 9 Z" fillOpacity={0.9} />
+            {/* segunda passada, mais rala e deslocada */}
+            <path d="M10 5 C40 1 80 1 110 3 C114 6 114 9 112 11 C80 9 40 10 12 12 Z" fillOpacity={0.35} />
+          </g>
+        </svg>
+        <span className="relative font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.25)]">{name}</span>
       </span>
       <p className="mt-1.5 text-text-primary">
         {toward} <span className="text-text-secondary">· {stops}</span>
@@ -232,87 +266,123 @@ function LineLabel({ color, name, toward, stops }: { color: string; name: string
   );
 }
 
-function Minor({ names, color }: { names: string[]; color: string }) {
-  return names.map((n) => (
-    <Row key={n} node={dot(color)} className="py-[3px]">
-      <span className="font-body text-100 leading-tight text-text-secondary">{n}</span>
-    </Row>
-  ));
+function Bubble({ children }: { children: ReactNode }) {
+  return (
+    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-page text-terracota-700 shadow-[0_4px_12px_-6px_rgba(152,75,44,0.7)]">
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+        {children}
+      </svg>
+    </span>
+  );
 }
 
-export function MetroRoute({ t }: { t: Dictionary["stay"]["metro"] }) {
-  const n1 = METRO_L1_STOPS.length + 1; // estações andadas até a baldeação
-  const n5 = METRO_L5_STOPS.length + 1;
+const ICON = {
+  plane: <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />,
+  bus: (
+    <>
+      <rect x="5" y="3.5" width="14" height="14" rx="2.5" />
+      <path d="M5 11h14M8 17.5v2M16 17.5v2" />
+      <circle cx="8.5" cy="14.5" r=".8" />
+      <circle cx="15.5" cy="14.5" r=".8" />
+    </>
+  ),
+  car: (
+    <>
+      <path d="M5 16V11.5L7 6.8A2 2 0 0 1 8.8 5.6h6.4A2 2 0 0 1 17 6.8l2 4.7V16" />
+      <path d="M3.5 16h17M4.5 11.5h15" />
+      <circle cx="7.5" cy="16.5" r="1.7" />
+      <circle cx="16.5" cy="16.5" r="1.7" />
+    </>
+  ),
+};
+
+const ARROWS = (
+  <span className="flex h-10 w-10 items-center justify-center">
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="#2d2b23" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 4v13m0 0-3-3m3 3 3-3M17 20V7m0 0-3 3m3-3 3 3" />
+    </svg>
+  </span>
+);
+
+export function MetroRoute({
+  arrival,
+  t,
+  origin,
+  originSub,
+}: {
+  arrival: ArrivalId;
+  t: Dictionary["stay"]["arrival"]["metro"];
+  origin: string;
+  originSub: string;
+}) {
+  const route = ROUTES[arrival];
+  const f = `metro${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  const box = useRef<HTMLOListElement>(null);
+  const geo = useGeo(box, arrival);
   const major = "font-body text-200 font-bold leading-tight text-text-primary";
   const sub = "mt-0.5 font-body text-100 leading-tight text-text-secondary";
-  const box = useRef<HTMLOListElement>(null);
-  const rStart = useRef<HTMLSpanElement>(null);
-  const rTransfer = useRef<HTMLSpanElement>(null);
-  const rEnd = useRef<HTMLSpanElement>(null);
-  const rCar = useRef<HTMLSpanElement>(null);
-  const geo = useGeo(box, [rStart, rTransfer, rEnd, rCar]);
+  const color = (l: LineId) => LINE_COLORS[l];
+  const last = route.legs[route.legs.length - 1]!;
 
   return (
-    <figure aria-label={t.mapLabel} className="rounded-[1.25rem] bg-white/70 px-4 py-5 sm:px-6">
+    <figure aria-label={t.mapLabel.replace("{origin}", origin)} className="rounded-[1.25rem] bg-white/70 px-4 py-5 sm:px-6">
       <div className="relative">
-        {geo && <Ink geo={geo} />}
+        {geo && <Ink geo={geo} f={f} />}
         <ol ref={box} className="relative">
-        {/* embarque */}
-        <Row nodeRef={rStart} node={<Big />} className="pb-1">
-          <Badge color="#984b2c">{t.board}</Badge>
-          <p className={`${major} mt-1`}>{METRO_START}</p>
-          <p className={sub}>{t.boardSub}</p>
-        </Row>
-        <Row node={null}>
-          <LineLabel color={L1} name={t.line1} toward={`${t.toward} ${METRO_LINES.l1.toward}`} stops={t.stops.replace("{n}", String(n1))} />
-        </Row>
-        <Minor names={METRO_L1_STOPS} color={L1} />
+          {/* de onde a pessoa chega (terminal) */}
+          <Row kind="origin" node={<Bubble>{ICON[route.origin]}</Bubble>} className="pb-3">
+            <p className={major}>{origin}</p>
+            <p className={sub}>{originSub}</p>
+          </Row>
 
-        {/* baldeação: bolinha meio azul, meio lilás */}
-        <Row
-          nodeRef={rTransfer}
-          className="py-2"
-          node={
-            <span className="flex h-10 w-10 items-center justify-center">
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="#2d2b23" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M7 4v13m0 0-3-3m3 3 3-3M17 20V7m0 0-3 3m3-3 3 3" />
-              </svg>
-            </span>
-          }
-        >
-          <Badge color="#984b2c">{t.transfer}</Badge>
-          <p className={`${major} mt-1`}>{METRO_TRANSFER}</p>
-          <p className={sub}>{t.transferSub}</p>
-        </Row>
-        <Row node={null}>
-          <LineLabel color={L5} name={t.line5} toward={`${t.toward} ${METRO_LINES.l5.toward}`} stops={t.stops.replace("{n}", String(n5))} />
-        </Row>
-        <Minor names={METRO_L5_STOPS} color={L5} />
+          {route.legs.map((leg, i) => {
+            const prev = route.legs[i - 1];
+            const board = leg.stations[0]!;
+            const middle = leg.stations.slice(1, -1);
+            return (
+              <Fragment key={leg.line + i}>
+                {i === 0 ? (
+                  <Row kind="ring" c1={color(leg.line)} className="pb-1 pt-3">
+                    <Badge>{t.board}</Badge>
+                    <p className={`${major} mt-1`}>{board}</p>
+                  </Row>
+                ) : (
+                  <Row kind="transfer" c1={color(prev!.line)} c2={color(leg.line)} node={ARROWS} className="py-2">
+                    <Badge>{t.transfer}</Badge>
+                    <p className={`${major} mt-1`}>{board}</p>
+                    <p className={sub}>{t.transferSub.replace("{line}", t.lines[leg.line])}</p>
+                  </Row>
+                )}
+                <Row>
+                  <LineLabel
+                    color={color(leg.line)}
+                    name={t.lines[leg.line]}
+                    toward={`${t.toward} ${leg.toward}`}
+                    stops={t.stops.replace("{n}", String(leg.stations.length - 1))}
+                    f={f}
+                    seed={3 + i * 7}
+                  />
+                </Row>
+                {middle.map((n) => (
+                  <Row key={n} kind="dot" c1={color(leg.line)} className="py-[3px]">
+                    <span className="font-body text-100 leading-tight text-text-secondary">{n}</span>
+                  </Row>
+                ))}
+              </Fragment>
+            );
+          })}
 
-        {/* desembarque */}
-        <Row nodeRef={rEnd} node={<Big />} className="py-2">
-          <Badge color="#984b2c">{t.getOff}</Badge>
-          <p className={`${major} mt-1`}>{METRO_END}</p>
-          <p className={sub}>{t.getOffSub}</p>
-        </Row>
+          {/* desembarque */}
+          <Row kind="end" c1={color(last.line)} className="py-2">
+            <Badge>{t.getOff}</Badge>
+            <p className={`${major} mt-1`}>{last.stations[last.stations.length - 1]}</p>
+            <p className={sub}>{t.getOffSub}</p>
+          </Row>
 
-        {/* Uber / 99 */}
-        <Row
-          nodeRef={rCar}
-          className="pt-2"
-          node={
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-page text-terracota-700 shadow-[0_4px_12px_-6px_rgba(152,75,44,0.7)]">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 16V11.5L7 6.8A2 2 0 0 1 8.8 5.6h6.4A2 2 0 0 1 17 6.8l2 4.7V16" />
-                <path d="M3.5 16h17M4.5 11.5h15" />
-                <circle cx="7.5" cy="16.5" r="1.7" />
-                <circle cx="16.5" cy="16.5" r="1.7" />
-              </svg>
-            </span>
-          }
-        >
-          <p className="font-body text-200 leading-tight text-text-primary">{t.ride}</p>
-        </Row>
+          {/* Uber / 99 */}
+          <Row kind="car" node={<Bubble>{ICON.car}</Bubble>} className="pt-3">
+            <p className="font-body text-200 leading-tight text-text-primary">{t.ride}</p>
+          </Row>
         </ol>
       </div>
     </figure>
