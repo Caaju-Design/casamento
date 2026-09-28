@@ -36,20 +36,25 @@ export default async function GiftListPage({ searchParams }: Props) {
 
   return (
     <main lang={info.lang} dir={info.dir} className="flex h-[100svh] flex-col bg-page">
-      <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-caramelo-100 bg-page px-4 md:px-6">
+      <header className="relative z-10 grid h-[72px] shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 bg-white px-4 shadow-[0_10px_30px_-24px_rgba(45,43,35,0.45)] md:px-6">
         <Link
           href={`${info.href}#presentes`}
-          className="inline-flex min-h-[44px] items-center gap-2 font-body text-100 uppercase tracking-[0.18em] text-text-primary hover:text-terracota-700"
+          className="inline-flex min-h-[44px] items-center gap-2 justify-self-start font-body text-100 uppercase tracking-[0.18em] text-text-primary hover:text-terracota-700"
         >
           <span aria-hidden="true" className="rtl:-scale-x-100">←</span> {t.back}
         </Link>
-        <h1 className="truncate font-display text-400 leading-none text-text-primary sm:text-600">{t.pageTitle}</h1>
+        {/* no centro, só a logo do casal (igual ao menu do site); o título fica pra leitor de tela */}
+        <h1 className="justify-self-center">
+          <span className="sr-only">{t.pageTitle}</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo-ge.svg" alt="" width={470} height={401} className="h-11 w-auto" />
+        </h1>
         <a
           href={LIST_URL}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={t.newTabLabel}
-          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-end gap-1 whitespace-nowrap font-body text-100 uppercase tracking-[0.12em] text-text-secondary hover:text-terracota-700"
+          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-end gap-1 justify-self-end whitespace-nowrap font-body text-100 uppercase tracking-[0.12em] text-text-secondary hover:text-terracota-700"
         >
           <span className="hidden sm:inline">{t.newTab}</span>
           <span aria-hidden="true" className="text-200">↗</span>

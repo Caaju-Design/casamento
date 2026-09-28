@@ -78,12 +78,12 @@ function Notice({ icon, title, text }: { icon: React.ReactNode; title: string; t
 
 export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Locale }) {
   return (
-    <section id="evento" aria-labelledby="evento-titulo" className="relative isolate pb-[calc(49vw+1rem)] pt-section-gap">
+    <section id="evento" aria-labelledby="evento-titulo" className="relative isolate pb-[calc(44vw+1rem)] pt-section-gap">
       {/* aquarelas: ramo no canto de cima, árvore à esquerda, a baía embaixo */}
       <Painting name="ramo-canto-dir-cima" className="absolute right-0 top-0 w-[30vw] max-w-[190px]" />
       <Painting name="ramo-borda-esq" className="absolute left-0 top-[18%] hidden w-[9rem] md:block" />
       <Cloud id={5} className="left-[8%] top-10 w-[46vw] md:w-[24vw]" opacity={0.8} />
-      <Painting name="baia-ilhas" className="absolute bottom-0 left-0 w-full" />
+      <Painting name="baia-ilhas" className="absolute bottom-0 left-1/2 w-[90%] -translate-x-1/2" />
       <Painting name="arvore" className="absolute bottom-0 left-0 w-[28vw] max-w-[230px]" />
       <Painting name="ramo-canto-dir-baixo" className="absolute bottom-0 right-0 w-[34vw] max-w-[240px]" />
 
