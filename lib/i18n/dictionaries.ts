@@ -149,6 +149,23 @@ export type Dictionary = {
     busTitle: string;
     busLead: string;
     busSteps: string[];
+    /** Rótulos do mapa do metrô (Tietê → Santa Cruz → Alto da Boa Vista). "{n}" = número de estações. */
+    metro: {
+      mapLabel: string;
+      line1: string;
+      line5: string;
+      toward: string;
+      board: string;
+      boardSub: string;
+      transfer: string;
+      transferSub: string;
+      getOff: string;
+      getOffSub: string;
+      stops: string;
+      ride: string;
+      time: string;
+      tip: string;
+    };
   };
   tips: {
     eyebrow: string;
@@ -341,15 +358,31 @@ const pt: Dictionary = {
       "Aeroporto de Congonhas",
       ", mais próximo da região do casamento. De lá, você pode pegar um Uber ou 99 até sua hospedagem.",
     ],
-    busTitle: "De ônibus",
-    busLead: "Chegando pela Rodoviária do Tietê:",
+    busTitle: "De ônibus + metrô",
+    busLead: "Chegando pela Rodoviária do Tietê, dá pra vir de metrô até pertinho da gente, com uma baldeação só:",
     busSteps: [
-      "Na rodoviária, siga as placas para a estação Portuguesa–Tietê.",
-      "Pegue a Linha 1–Azul, sentido Jabaquara, e desça na estação Santa Cruz.",
-      "Faça a transferência para a Linha 5–Lilás, sentido Capão Redondo.",
-      "Desça na estação Alto da Boa Vista.",
+      "Na rodoviária, siga as placas do Metrô: a estação Portuguesa-Tietê é ligada ao terminal por uma passarela.",
+      "Pegue a Linha 1-Azul, sentido Jabaquara, e desça em Santa Cruz (12 estações).",
+      "Em Santa Cruz, siga as placas da Linha 5-Lilás e embarque sentido Capão Redondo. A baldeação é dentro da estação, sem pagar de novo.",
+      "Desça em Alto da Boa Vista (8 estações).",
       "De lá, pegue um Uber ou 99 até sua hospedagem.",
     ],
+    metro: {
+      mapLabel: "Mapa do trajeto de metrô da Rodoviária do Tietê até a estação Alto da Boa Vista",
+      line1: "Linha 1 · Azul",
+      line5: "Linha 5 · Lilás",
+      toward: "sentido",
+      board: "Embarque aqui",
+      boardSub: "Rodoviária do Tietê",
+      transfer: "Baldeação",
+      transferSub: "Troque para a Linha 5",
+      getOff: "Desça aqui",
+      getOffSub: "Mais perto do casamento",
+      stops: "{n} estações",
+      ride: "Uber ou 99 até a hospedagem",
+      time: "Cerca de 45 min de metrô",
+      tip: "Compre o bilhete nas bilheterias ou nos totens da estação Portuguesa-Tietê. Evite os horários de pico (7h–9h e 17h–19h) se estiver com malas.",
+    },
   },
   tips: {
     eyebrow: "Dicas da região",
@@ -595,15 +628,31 @@ const en: Dictionary = {
       "Congonhas Airport",
       ", the closest to the wedding area. From there, you can take an Uber or 99 to where you're staying.",
     ],
-    busTitle: "By bus",
-    busLead: "Arriving at the Tietê Bus Terminal:",
+    busTitle: "By bus + subway",
+    busLead: "Arriving at the Tietê Bus Terminal, you can take the subway almost all the way to us, with just one transfer:",
     busSteps: [
-      "At the terminal, follow the signs to Portuguesa–Tietê station.",
-      "Take Line 1–Blue towards Jabaquara and get off at Santa Cruz station.",
-      "Transfer to Line 5–Lilac towards Capão Redondo.",
-      "Get off at Alto da Boa Vista station.",
+      "At the terminal, follow the Metrô signs: Portuguesa-Tietê station is connected to the terminal by a walkway.",
+      "Take Line 1-Blue towards Jabaquara and get off at Santa Cruz (12 stations).",
+      "At Santa Cruz, follow the Line 5-Lilac signs and board towards Capão Redondo. The transfer is inside the station, no extra fare.",
+      "Get off at Alto da Boa Vista (8 stations).",
       "From there, take an Uber or 99 to where you're staying.",
     ],
+    metro: {
+      mapLabel: "Subway route map from the Tietê Bus Terminal to Alto da Boa Vista station",
+      line1: "Line 1 · Blue",
+      line5: "Line 5 · Lilac",
+      toward: "towards",
+      board: "Board here",
+      boardSub: "Tietê Bus Terminal",
+      transfer: "Transfer",
+      transferSub: "Switch to Line 5",
+      getOff: "Get off here",
+      getOffSub: "Closest to the wedding",
+      stops: "{n} stations",
+      ride: "Uber or 99 to where you're staying",
+      time: "About 45 min by subway",
+      tip: "Buy your ticket at the ticket office or machines at Portuguesa-Tietê station. If you have luggage, avoid rush hours (7–9am and 5–7pm).",
+    },
   },
   tips: {
     eyebrow: "Local tips",
@@ -846,15 +895,31 @@ const ar: Dictionary = {
       "مطار كونغونياس",
       "، فهو الأقرب إلى منطقة الزفاف. ومن هناك يمكنكم أخذ Uber أو 99 إلى مكان إقامتكم.",
     ],
-    busTitle: "بالحافلة",
-    busLead: "عند الوصول إلى محطة حافلات Tietê:",
+    busTitle: "بالحافلة + المترو",
+    busLead: "عند الوصول إلى محطة حافلات Tietê، يمكنكم أخذ المترو حتى مكان قريب منّا، مع تبديل واحد فقط:",
     busSteps: [
-      "في المحطة، اتبعوا اللافتات إلى محطة مترو Portuguesa–Tietê.",
-      "خذوا الخط 1 (الأزرق) باتجاه Jabaquara وانزلوا في محطة Santa Cruz.",
-      "انتقلوا إلى الخط 5 (الليلكي) باتجاه Capão Redondo.",
-      "انزلوا في محطة Alto da Boa Vista.",
+      "في المحطة، اتبعوا لافتات المترو: محطة Portuguesa-Tietê متصلة بالمحطة بممرّ علوي.",
+      "خذوا الخط 1 (الأزرق) باتجاه Jabaquara وانزلوا في Santa Cruz (12 محطة).",
+      "في Santa Cruz، اتبعوا لافتات الخط 5 (الليلكي) واركبوا باتجاه Capão Redondo. التبديل داخل المحطة ودون دفع أجرة جديدة.",
+      "انزلوا في Alto da Boa Vista (8 محطات).",
       "ومن هناك خذوا Uber أو 99 إلى مكان إقامتكم.",
     ],
+    metro: {
+      mapLabel: "خريطة رحلة المترو من محطة حافلات Tietê إلى محطة Alto da Boa Vista",
+      line1: "الخط 1 · الأزرق",
+      line5: "الخط 5 · الليلكي",
+      toward: "باتجاه",
+      board: "اركبوا هنا",
+      boardSub: "محطة حافلات Tietê",
+      transfer: "تبديل",
+      transferSub: "انتقلوا إلى الخط 5",
+      getOff: "انزلوا هنا",
+      getOffSub: "الأقرب إلى الزفاف",
+      stops: "{n} محطات",
+      ride: "Uber أو 99 إلى مكان الإقامة",
+      time: "نحو 45 دقيقة بالمترو",
+      tip: "اشتروا التذكرة من شبابيك التذاكر أو الأجهزة في محطة Portuguesa-Tietê. وإن كانت معكم حقائب، فتجنّبوا أوقات الذروة (7–9 صباحًا و5–7 مساءً).",
+    },
   },
   tips: {
     eyebrow: "نصائح المنطقة",

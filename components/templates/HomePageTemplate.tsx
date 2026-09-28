@@ -19,8 +19,8 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
     { href: "#historia", label: t.nav.historia },
     { href: "#evento", label: t.nav.evento },
     { href: "#dresscode", label: t.nav.dresscode },
-    { href: "#presentes", label: t.nav.presentes },
     { href: "#hospedagem", label: t.nav.hospedagem },
+    { href: "#presentes", label: t.nav.presentes },
   ];
   return (
     <div lang={info.lang} dir={info.dir} className="flex flex-col overflow-x-clip">
@@ -31,10 +31,11 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <EventSection t={t.event} locale={locale} />
       <RsvpSection t={t.rsvp} locale={locale} />
       <DressCodeSection t={t.dress} />
-      <GiftSection t={t.gift} locale={locale} />
-      <PreWeddingSection t={t.prewedding} />
+      {/* hospedagem e dicas vêm antes dos presentes (pedido do Manu) */}
       <AroundSection t={t.around} tips={t.tips} stay={t.stay} locale={locale} />
       <ArriveSection t={t.stay} />
+      <GiftSection t={t.gift} locale={locale} />
+      <PreWeddingSection t={t.prewedding} />
 
       <footer className="relative isolate px-6 pb-[calc(min(75vw,320px)+1.5rem)] pt-section-gap text-center">
         <Painting name="baia-veleiro" className="absolute bottom-0 left-1/2 w-[min(80vw,340px)] -translate-x-1/2" />
