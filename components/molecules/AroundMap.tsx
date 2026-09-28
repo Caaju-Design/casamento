@@ -7,8 +7,8 @@ import { ICON_PATHS } from "@/components/molecules/PlaceIcon";
 import { VENUE, type Place } from "@/lib/content/places";
 
 /**
- * Molecule `AroundMap` — mapa leve (Leaflet + base clara da CARTO sobre o
- * OpenStreetMap) TRAVADO na região do casamento: o pan não sai de um raio
+ * Molecule `AroundMap` — mapa leve (Leaflet + base padrão do OpenStreetMap,
+ * sem chave de API, amaciada por filtro CSS nos tons do site) TRAVADO na região do casamento: o pan não sai de um raio
  * de uns 3 km e o zoom vai de 13 a 18. Só carrega os pedacinhos (tiles) da
  * área vista, e o Leaflet só é baixado quando a seção chega perto da tela.
  *
@@ -87,11 +87,11 @@ export function AroundMap({
           attributionControl: true,
         });
         leaflet
-          .tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-            subdomains: "abcd",
+          // base padrão do OpenStreetMap: não precisa de chave (a da CARTO passou a exigir)
+          .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
             maxZoom: 18,
             attribution:
-              '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+              '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'',
           })
           .addTo(m);
         leaflet

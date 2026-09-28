@@ -20,6 +20,8 @@ export interface Place {
   /** Busca no Google Maps (rota a partir do salão). */
   query: string;
   approx?: boolean;
+  /** Foto do lugar (16:10) em public/lugares/<id>.webp. Sem ela, o card mostra uma aquarela da categoria. */
+  photo?: string;
 }
 
 /** Salão de festas do casamento — Rua Luís Correia de Melo, 86. */

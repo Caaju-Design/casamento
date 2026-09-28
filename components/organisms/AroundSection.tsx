@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { AroundMap } from "@/components/molecules/AroundMap";
 import { PlaceIcon } from "@/components/molecules/PlaceIcon";
+import { PlaceThumb } from "@/components/molecules/PlaceThumb";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
 import { PLACES, VENUE, directionsUrl, distanceKm, type PlaceCategory } from "@/lib/content/places";
@@ -114,10 +115,14 @@ export function AroundSection({
               >
                 <article
                   className={[
-                    "flex h-full flex-col rounded-card border bg-white/85 p-5 transition-[border-color,box-shadow,transform] duration-200",
+                    "flex h-full flex-col overflow-hidden rounded-card border bg-white/85 transition-[border-color,box-shadow,transform] duration-200",
                     active ? "-translate-y-1 border-terracota-500 shadow-[0_16px_34px_-22px_rgba(152,75,44,0.8)]" : "border-caramelo-100 hover:border-terracota-200",
                   ].join(" ")}
                 >
+                  <button type="button" onClick={() => select(p.id)} aria-label={p.name} className="block w-full">
+                    <PlaceThumb place={p} />
+                  </button>
+                  <div className="flex flex-1 flex-col p-5">
                   <button type="button" onClick={() => select(p.id)} aria-pressed={active} className="flex items-start gap-3 text-start">
                     <span className={["mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full", active ? "bg-terracota-700 text-white" : "bg-pessego-50 text-terracota-700"].join(" ")}>
                       <PlaceIcon kind={p.category} />
@@ -141,6 +146,7 @@ export function AroundSection({
                     >
                       {t.route}
                     </a>
+                  </div>
                   </div>
                 </article>
               </li>
