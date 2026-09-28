@@ -2,7 +2,7 @@ import { PaintReveal } from "@/components/molecules/PaintReveal";
 
 export interface SectionHeadingProps {
   /** Rótulo pequeno em caixa alta (Cardo), acima do título. */
-  eyebrow: string;
+  eyebrow?: string;
   /** Título em caligrafia (Italianno). */
   title: string;
   /** id do título, pra `aria-labelledby` da seção. */
@@ -19,10 +19,10 @@ export function SectionHeading({ eyebrow, title, id, lead, align = "center", hig
   const center = align === "center";
   return (
     <PaintReveal variant="rise" className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
-      <p className="font-body text-100 uppercase tracking-[0.3em] text-terracota-700">{eyebrow}</p>
+      {eyebrow && <p className="font-body text-100 uppercase tracking-[0.3em] text-terracota-700">{eyebrow}</p>}
       <h2
         id={id}
-        className={["mt-3 font-display leading-tight", highlight ? "text-text-title" : "text-text-primary"].join(" ")}
+        className={[eyebrow ? "mt-3" : "", "font-display leading-tight", highlight ? "text-text-title" : "text-text-primary"].join(" ")}
         style={{ fontSize: "clamp(2.2rem, 5.5vw, 3.6rem)" }}
       >
         {title}

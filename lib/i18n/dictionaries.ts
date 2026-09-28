@@ -43,6 +43,10 @@ export type Dictionary = {
     title: string;
     lead: string;
     where: string;
+    /** títulos das sub-seções "Onde será" e "Itinerário" + selo de aviso */
+    whereTitle: string;
+    importantLabel: string;
+    facadeAlt: string;
     venue: [string, string];
     address: [string, string];
     maps: string;
@@ -168,6 +172,9 @@ const pt: Dictionary = {
     title: "Nosso encontro está marcado",
     lead: "Sábado, 17 de abril de 2027",
     where: "Onde",
+    whereTitle: "Onde será",
+    importantLabel: "Importante",
+    facadeAlt: "Fachada do condomínio Square, com duas torres e palmeiras na entrada",
     venue: ["Ed. Square 2", "Salão de Festas, Andar “L”"],
     address: ["Rua Luís Correia de Melo, 86", "Chácara Santo Antônio · São Paulo · CEP 04726-220"],
     maps: "Google Maps",
@@ -382,6 +389,9 @@ const en: Dictionary = {
     title: "Save the date",
     lead: "Saturday, April 17, 2027",
     where: "Where",
+    whereTitle: "Where it will be",
+    importantLabel: "Important",
+    facadeAlt: "Front of the Square condominium, with two towers and palm trees at the entrance",
     venue: ["Ed. Square 2", "Party Hall, Floor “L”"],
     address: ["Rua Luís Correia de Melo, 86", "Chácara Santo Antônio · São Paulo · Brazil · 04726-220"],
     maps: "Google Maps",
@@ -595,6 +605,9 @@ const ar: Dictionary = {
     title: "موعدنا محدَّد",
     lead: "السبت، 17 أبريل 2027",
     where: "المكان",
+    whereTitle: "أين سيكون",
+    importantLabel: "مهم",
+    facadeAlt: "واجهة مجمّع سكوير، ببرجين وأشجار نخيل عند المدخل",
     venue: ["مبنى Square 2", "قاعة الحفلات، الطابق «L»"],
     address: ["Rua Luís Correia de Melo, 86", "Chácara Santo Antônio · ساو باولو · البرازيل"],
     maps: "خرائط Google",
