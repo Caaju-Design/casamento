@@ -126,7 +126,7 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
         <div className="mt-24">
           <SectionHeading id="evento-onde" title={t.whereTitle} highlight />
 
-          <div className="mt-10 grid items-center gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-14">
+          <div className="mt-10 grid items-center gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-12">
             {/* fachada do condomínio, com bordas mastigadas */}
             <PaintReveal variant="paint" className="mx-auto w-full max-w-[22rem] md:max-w-none">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -160,23 +160,22 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
                   {t.waze}
                 </a>
               </div>
+
+              {/* avisos importantes: estacionamento e acesso */}
+              <div
+                className="relative mt-10 rounded-[1.75rem] border border-terracota-200 bg-pessego-50/80 px-6 pb-6 pt-8 text-start md:px-7"
+              >
+                <span className="absolute -top-3.5 start-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-pill bg-terracota-500 px-4 py-1.5 font-body text-100 font-bold uppercase tracking-[0.2em] text-white rtl:translate-x-1/2">
+                  <IconAlert /> {t.importantLabel}
+                </span>
+                <div className="grid gap-6">
+                  <Notice icon={<IconParking />} title={t.parkingTitle} text={t.parking} />
+                  <Notice icon={<IconAccess />} title={t.accessTitle} text={t.access} />
+                </div>
+              </div>
             </PaintReveal>
           </div>
 
-          {/* avisos importantes: estacionamento e acesso */}
-          <PaintReveal
-            variant="rise"
-            delay={200}
-            className="relative mt-12 rounded-[1.75rem] border border-terracota-200 bg-pessego-50/80 px-6 pb-7 pt-9 md:px-10"
-          >
-            <span className="absolute -top-3.5 start-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-pill bg-terracota-500 px-4 py-1.5 font-body text-100 font-bold uppercase tracking-[0.2em] text-white rtl:translate-x-1/2">
-              <IconAlert /> {t.importantLabel}
-            </span>
-            <div className="grid gap-7 md:grid-cols-2 md:gap-10">
-              <Notice icon={<IconParking />} title={t.parkingTitle} text={t.parking} />
-              <Notice icon={<IconAccess />} title={t.accessTitle} text={t.access} />
-            </div>
-          </PaintReveal>
         </div>
 
         {/* ── Itinerário ───────────────────────────────────────────── */}
