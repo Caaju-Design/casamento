@@ -191,3 +191,13 @@ body {
 }
 .around-pin__label--venue { background: #984b2c; color: #fff; font-size: 13px; }
 .around-map .leaflet-control-attribution { font-size: 10px; background: rgba(255, 255, 255, 0.75); }
+
+/* Hero: a dica "Role para baixo" flutua suavemente pra cima e pra baixo */
+@keyframes hero-hint-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.hero-hint-float { animation: hero-hint-float 2.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-hint-float { animation: none; }
+}
