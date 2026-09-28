@@ -3,6 +3,7 @@ import { AnchorNav } from "@/components/molecules/AnchorNav";
 import { DressCodeSection } from "@/components/organisms/DressCodeSection";
 import { EventSection } from "@/components/organisms/EventSection";
 import { GiftSection } from "@/components/organisms/GiftSection";
+import { PreWeddingSection } from "@/components/organisms/PreWeddingSection";
 import { HeroSection } from "@/components/organisms/HeroSection";
 import { StorySection } from "@/components/organisms/StorySection";
 import { AroundSection } from "@/components/organisms/AroundSection";
@@ -29,6 +30,7 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <EventSection t={t.event} locale={locale} />
       <DressCodeSection t={t.dress} />
       <GiftSection t={t.gift} locale={locale} />
+      <PreWeddingSection t={t.prewedding} />
       <AroundSection t={t.around} tips={t.tips} stay={t.stay} locale={locale} />
       <ArriveSection t={t.stay} />
 

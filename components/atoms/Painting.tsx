@@ -23,6 +23,8 @@ export const PAINTINGS = {
   "baia-veleiro": { w: 325, h: 305 },
   /** só a cena de cima da baia-veleiro (baía com veleiros), ampliada 2× e com bordas mastigadas */
   "baia-veleiro-topo": { w: 650, h: 364 },
+  /** só a cena de baixo da baia-veleiro (enseada com veleiro e arbustos), ampliada 2× */
+  "baia-veleiro-baixo": { w: 650, h: 246 },
   "faixa-mesa": { w: 753, h: 210 },
   "faixa-praia": { w: 753, h: 240 },
   "faixa-arbustos": { w: 753, h: 215 },

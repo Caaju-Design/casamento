@@ -25,7 +25,7 @@ type Group = { title: string; places: Place[] };
 
 export type Dictionary = {
   meta: { title: string; description: string };
-  hero: { h1: string; loading: string; ready: string };
+  hero: { h1: string; loading: string; ready: string; scroll: string };
   nav: {
     historia: string;
     evento: string;
@@ -101,6 +101,8 @@ export type Dictionary = {
     fallback: string;
     iframeTitle: string;
   };
+  /** Card "Em breve: fotos do pré-wedding" (sem botão). */
+  prewedding: { title: string; sub: string; lead: string };
   /** Mapa "Onde ficar e aproveitar" (#hospedagem): filtros, cards e controles. */
   around: {
     eyebrow: string;
@@ -161,6 +163,7 @@ const pt: Dictionary = {
     h1: "Gabriela & Emanuel — vamos nos casar em 17 de abril de 2027",
     loading: "Preparando a pintura:",
     ready: "Pronto",
+    scroll: "Role para baixo",
   },
   nav: {
     historia: "Nossa história",
@@ -254,6 +257,11 @@ const pt: Dictionary = {
     avoidName: "Branco e off-white",
     avoidWhy: "ficam para a noiva",
     climate: "Em abril, as noites em São Paulo costumam ser mais fresquinhas: leve um casaquinho ou uma pashmina.",
+  },
+  prewedding: {
+    title: "Pré-wedding",
+    sub: "Em breve",
+    lead: "Estamos preparando as fotos do nosso pré-wedding com muito carinho. Logo, logo elas aparecem por aqui!",
   },
   gift: {
     title: "Presenteie os noivos",
@@ -399,6 +407,7 @@ const en: Dictionary = {
     h1: "Gabriela & Emanuel — we're getting married on April 17, 2027",
     loading: "Preparing the painting:",
     ready: "Ready",
+    scroll: "Scroll down",
   },
   nav: {
     historia: "Our story",
@@ -492,6 +501,11 @@ const en: Dictionary = {
     avoidName: "White and off-white",
     avoidWhy: "are for the bride",
     climate: "In April, evenings in São Paulo tend to be cool: bring a light jacket or a pashmina.",
+  },
+  prewedding: {
+    title: "Pre-wedding",
+    sub: "Coming soon",
+    lead: "We are lovingly preparing our pre-wedding photos. They will be here very soon!",
   },
   gift: {
     title: "Gifts for the couple",
@@ -636,6 +650,7 @@ const ar: Dictionary = {
     h1: "غابرييلا وإيمانويل — سنتزوّج في 17 أبريل 2027",
     loading: "نُحضّر اللوحة:",
     ready: "جاهز",
+    scroll: "مرّر للأسفل",
   },
   nav: {
     historia: "قصتنا",
@@ -727,6 +742,11 @@ const ar: Dictionary = {
     avoidName: "الأبيض والأوف وايت",
     avoidWhy: "للعروس",
     climate: "في أبريل تكون أمسيات ساو باولو منعشةً عادةً: أحضروا سترةً خفيفة أو شالًا.",
+  },
+  prewedding: {
+    title: "صور ما قبل الزفاف",
+    sub: "قريبًا",
+    lead: "نُحضّر صور ما قبل الزفاف بكل حب، وستكون هنا قريبًا جدًا!",
   },
   gift: {
     title: "هدية للعروسين",

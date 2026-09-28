@@ -126,9 +126,9 @@ function useShouldLockForHero(trackRef: RefObject<HTMLDivElement | null>) {
 
 /** Organism `HeroSection` — pintura em aquarela do casal amarrada à rolagem. */
 export function HeroSection({
-  labels = { h1: "Gabriela & Emanuel — vamos nos casar em 17 de abril de 2027", loading: "Preparando a pintura:", ready: "Pronto" },
+  labels = { h1: "Gabriela & Emanuel — vamos nos casar em 17 de abril de 2027", loading: "Preparando a pintura:", ready: "Pronto", scroll: "Role para baixo" },
 }: {
-  labels?: { h1: string; loading: string; ready: string };
+  labels?: { h1: string; loading: string; ready: string; scroll: string };
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
@@ -211,6 +211,28 @@ export function HeroSection({
           papel visualmente.
         */}
         <h1 className="sr-only">{labels.h1}</h1>
+
+        {/*
+          Dica de rolagem (pedido do Manu: o pessoal ficava parado no hero sem
+          saber o que fazer). Pílula de vidro no pé da tela com "Role para
+          baixo" + seta pulando; some junto com a logo quando a rolagem
+          começa. Clicar rola um pouco, pra pintura começar a andar.
+        */}
+        <div
+          className="absolute inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-30 flex justify-center"
+          style={{ opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)` }}
+        >
+          <button
+            type="button"
+            onClick={() => window.scrollBy({ top: window.innerHeight * 0.9, behavior: "smooth" })}
+            className="group flex flex-col items-center gap-1.5 rounded-pill border border-white/50 bg-page/60 px-5 pb-2.5 pt-2 font-body text-100 uppercase tracking-[0.24em] text-text-primary shadow-[0_10px_28px_-18px_rgba(45,43,35,0.6)] backdrop-blur-md transition-colors hover:bg-page/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus"
+          >
+            {labels.scroll}
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 animate-bounce text-terracota-700 motion-reduce:animate-none" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
       </section>
       {lockForHero && (
         <HeroPreloader
