@@ -4,9 +4,9 @@ import { DressCodeSection } from "@/components/organisms/DressCodeSection";
 import { EventSection } from "@/components/organisms/EventSection";
 import { GiftSection } from "@/components/organisms/GiftSection";
 import { HeroSection } from "@/components/organisms/HeroSection";
-import { StaySection } from "@/components/organisms/StaySection";
 import { StorySection } from "@/components/organisms/StorySection";
-import { TipsSection } from "@/components/organisms/TipsSection";
+import { AroundSection } from "@/components/organisms/AroundSection";
+import { ArriveSection } from "@/components/organisms/ArriveSection";
 import { getDictionary, localeInfo, type Locale } from "@/lib/i18n/dictionaries";
 
 /** Template `HomePageTemplate` — esqueleto da home one-page. */
@@ -19,7 +19,6 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
     { href: "#dresscode", label: t.nav.dresscode },
     { href: "#presentes", label: t.nav.presentes },
     { href: "#hospedagem", label: t.nav.hospedagem },
-    { href: "#dicas", label: t.nav.dicas },
   ];
   return (
     <div lang={info.lang} dir={info.dir} className="flex flex-col overflow-x-clip">
@@ -30,8 +29,8 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <EventSection t={t.event} locale={locale} />
       <DressCodeSection t={t.dress} />
       <GiftSection t={t.gift} locale={locale} />
-      <StaySection t={t.stay} />
-      <TipsSection t={t.tips} />
+      <AroundSection t={t.around} tips={t.tips} stay={t.stay} locale={locale} />
+      <ArriveSection t={t.stay} />
 
       <footer className="relative isolate px-6 pb-[calc(min(75vw,320px)+1.5rem)] pt-section-gap text-center">
         <Painting name="baia-veleiro" className="absolute bottom-0 left-1/2 w-[min(80vw,340px)] -translate-x-1/2" />

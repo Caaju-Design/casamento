@@ -165,3 +165,28 @@ body {
   .rise-reveal .brush-draw,
   .rise-reveal:not([data-shown]) .brush-draw { stroke-dashoffset: 0; animation: none; }
 }
+
+/* AroundMap (#hospedagem): pins do mapa e tom quente na base */
+.around-map { background: #efe9df; font-family: inherit; }
+.around-map .leaflet-tile-pane { filter: sepia(0.22) saturate(0.85) brightness(1.02); }
+.around-marker { background: none; border: 0; }
+.around-pin {
+  width: var(--s); height: var(--s);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9999px; background: var(--bg);
+  border: 2px solid #fff;
+  box-shadow: 0 6px 16px -6px rgba(45, 43, 35, 0.55);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+.around-pin:hover { transform: scale(1.1); }
+.around-pin__label {
+  position: absolute; left: 50%; top: calc(100% + 4px); transform: translateX(-50%);
+  white-space: nowrap; padding: 2px 8px; border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.95); color: #3a3834;
+  font-family: var(--font-cardo), serif; font-size: 12px; font-weight: 700;
+  box-shadow: 0 4px 10px -6px rgba(45, 43, 35, 0.5);
+  pointer-events: none;
+}
+.around-pin__label--venue { background: #984b2c; color: #fff; font-size: 13px; }
+.around-map .leaflet-control-attribution { font-size: 10px; background: rgba(255, 255, 255, 0.75); }

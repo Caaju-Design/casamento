@@ -101,6 +101,24 @@ export type Dictionary = {
     fallback: string;
     iframeTitle: string;
   };
+  /** Mapa "Onde ficar e aproveitar" (#hospedagem): filtros, cards e controles. */
+  around: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    filters: { all: string; hotel: string; cafe: string; restaurante: string; shopping: string; beleza: string };
+    venue: string;
+    /** "{km}" é trocado pela distância, ex.: "1,2 km". */
+    distance: string;
+    straight: string;
+    route: string;
+    mapLabel: string;
+    zoomIn: string;
+    zoomOut: string;
+    recenter: string;
+    hotelDesc: Record<string, string>;
+    notesTitle: string;
+  };
   stay: {
     eyebrow: string;
     title: string;
@@ -149,7 +167,7 @@ const pt: Dictionary = {
     evento: "O grande dia",
     dresscode: "Dress code",
     presentes: "Presentes",
-    hospedagem: "Hospedagem",
+    hospedagem: "Onde ficar",
     dicas: "Dicas da região",
     openMenu: "Abrir menu",
     home: "Gabriela & Emanuel — voltar ao início",
@@ -248,6 +266,27 @@ const pt: Dictionary = {
     newTabLabel: "Abrir a lista em outra aba",
     fallback: "Se a lista não aparecer, use “Abrir em outra aba” lá em cima.",
     iframeTitle: "Lista de presentes de Gabriela & Emanuel",
+  },
+  around: {
+    eyebrow: "Hospedagem e dicas",
+    title: "Onde ficar e aproveitar",
+    lead: "O salão fica na Chácara Santo Antônio, Zona Sul de São Paulo. No mapa estão os lugares que separamos por perto: onde se hospedar, tomar um café, comer, passear no shopping e se arrumar para a festa.",
+    filters: { all: "Todos", hotel: "Hotéis", cafe: "Cafés e padarias", restaurante: "Restaurantes", shopping: "Shoppings", beleza: "Salões e barbearias" },
+    venue: "Nosso casamento",
+    distance: "{km} do salão",
+    straight: "em linha reta",
+    route: "Ver rota",
+    mapLabel: "Mapa da região do casamento com os lugares recomendados",
+    zoomIn: "Aproximar",
+    zoomOut: "Afastar",
+    recenter: "Voltar para o salão",
+    hotelDesc: {
+      intercity: "Hotel executivo na Av. das Nações Unidas, perto da estação Granja Julieta.",
+      transamerica: "Hotel executivo no próprio bairro do casamento.",
+      novotel: "Hotel na região da Berrini, com restaurante e boa estrutura.",
+      ibis: "Opção econômica ao lado do MorumbiShopping.",
+    },
+    notesTitle: "Bom saber",
   },
   stay: {
     eyebrow: "Hospedagem",
@@ -466,6 +505,27 @@ const en: Dictionary = {
     fallback: "If the registry doesn't show up, use “Open in a new tab” above.",
     iframeTitle: "Gabriela & Emanuel's gift registry",
   },
+  around: {
+    eyebrow: "Stay & local tips",
+    title: "Where to stay and enjoy",
+    lead: "The venue is in Chácara Santo Antônio, in the South Zone of São Paulo. The map shows the places we picked nearby: where to stay, grab a coffee, eat, go to the mall and get ready for the party.",
+    filters: { all: "All", hotel: "Hotels", cafe: "Cafés & bakeries", restaurante: "Restaurants", shopping: "Malls", beleza: "Salons & barbers" },
+    venue: "Our wedding",
+    distance: "{km} from the venue",
+    straight: "as the crow flies",
+    route: "Directions",
+    mapLabel: "Map of the wedding area with our recommended places",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    recenter: "Back to the venue",
+    hotelDesc: {
+      intercity: "Business hotel on Av. das Nações Unidas, near Granja Julieta station.",
+      transamerica: "Business hotel in the wedding's own neighborhood.",
+      novotel: "Hotel in the Berrini area, with a restaurant and good facilities.",
+      ibis: "Budget option right next to MorumbiShopping.",
+    },
+    notesTitle: "Good to know",
+  },
   stay: {
     eyebrow: "Where to stay",
     title: "Where to stay",
@@ -582,7 +642,7 @@ const ar: Dictionary = {
     evento: "اليوم الكبير",
     dresscode: "قواعد اللباس",
     presentes: "الهدايا",
-    hospedagem: "الإقامة",
+    hospedagem: "أين تقيمون",
     dicas: "نصائح المنطقة",
     openMenu: "فتح القائمة",
     home: "غابرييلا وإيمانويل — العودة إلى البداية",
@@ -679,6 +739,27 @@ const ar: Dictionary = {
     newTabLabel: "فتح القائمة في علامة تبويب جديدة",
     fallback: "إن لم تظهر القائمة، استخدموا «فتح في علامة تبويب جديدة» في الأعلى.",
     iframeTitle: "قائمة هدايا غابرييلا وإيمانويل",
+  },
+  around: {
+    eyebrow: "الإقامة ونصائح المنطقة",
+    title: "أين تقيمون وتستمتعون",
+    lead: "تقع القاعة في حي Chácara Santo Antônio في المنطقة الجنوبية من ساو باولو. على الخريطة الأماكن التي اخترناها بالقرب: للإقامة، وشرب القهوة، والأكل، والتسوّق، والاستعداد للحفل.",
+    filters: { all: "الكل", hotel: "فنادق", cafe: "مقاهٍ ومخابز", restaurante: "مطاعم", shopping: "مراكز تسوّق", beleza: "صالونات وحلاقون" },
+    venue: "حفل زفافنا",
+    distance: "{km} من القاعة",
+    straight: "بخط مستقيم",
+    route: "الاتجاهات",
+    mapLabel: "خريطة منطقة الزفاف مع الأماكن التي نوصي بها",
+    zoomIn: "تكبير",
+    zoomOut: "تصغير",
+    recenter: "العودة إلى القاعة",
+    hotelDesc: {
+      intercity: "فندق أعمال في Av. das Nações Unidas قرب محطة Granja Julieta.",
+      transamerica: "فندق أعمال في حي الزفاف نفسه.",
+      novotel: "فندق في منطقة Berrini مع مطعم ومرافق جيدة.",
+      ibis: "خيار اقتصادي بجوار MorumbiShopping.",
+    },
+    notesTitle: "من المفيد معرفته",
   },
   stay: {
     eyebrow: "الإقامة",
