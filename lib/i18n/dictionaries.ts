@@ -54,6 +54,7 @@ export type Dictionary = {
     calendar: string;
     /** card "Reserve a data": título e nota */
     saveTitle: string;
+    countdown: { many: [string, string]; one: [string, string]; today: string };
     saveNote: string;
     calendarTitle: string;
     calendarDetails: string;
@@ -181,6 +182,7 @@ const pt: Dictionary = {
     waze: "Waze",
     calendar: "Salvar na agenda",
     saveTitle: "Reserve a data",
+    countdown: { many: ["Faltam", "dias"], one: ["Falta", "dia"], today: "É hoje!" },
     saveNote: "A partir das 16h, em São Paulo. Salve na sua agenda e venha celebrar com a gente!",
     calendarTitle: "Casamento Gabriela & Emanuel",
     calendarDetails: "16h chegada · 16h30 cerimônia · 17h recepção · 22h encerramento",
@@ -398,6 +400,7 @@ const en: Dictionary = {
     waze: "Waze",
     calendar: "Add to calendar",
     saveTitle: "Save the date",
+    countdown: { many: ["", "days to go"], one: ["", "day to go"], today: "It's today!" },
     saveNote: "From 4 pm, in São Paulo. Add it to your calendar and come celebrate with us!",
     calendarTitle: "Gabriela & Emanuel's wedding",
     calendarDetails: "4 pm arrival · 4:30 pm ceremony · 5 pm reception · 10 pm farewell",
@@ -614,6 +617,7 @@ const ar: Dictionary = {
     waze: "Waze",
     calendar: "أضِف إلى التقويم",
     saveTitle: "احفظوا الموعد",
+    countdown: { many: ["باقي", "يومًا"], one: ["باقي", "يوم"], today: "إنه اليوم!" },
     saveNote: "ابتداءً من الساعة 4:00 م، في ساو باولو. أضيفوه إلى تقويمكم وتعالوا نحتفل معًا!",
     calendarTitle: "زفاف غابرييلا وإيمانويل",
     calendarDetails: "4:00 م الوصول · 4:30 م المراسم · 5:00 م الاستقبال · 10:00 م الختام",

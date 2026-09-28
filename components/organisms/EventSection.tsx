@@ -2,6 +2,7 @@ import { Cloud } from "@/components/atoms/Cloud";
 import { Painting } from "@/components/atoms/Painting";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
+import { Countdown } from "@/components/molecules/Countdown";
 import { WeddingCalendar } from "@/components/molecules/WeddingCalendar";
 import { mapsSearch, wazeTo } from "@/lib/content/maps";
 import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
@@ -102,6 +103,7 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
           className="relative mt-12 grid items-center gap-4 rounded-[2rem] bg-salvia-50 shadow-[0_18px_50px_-30px_rgba(45,43,35,0.45)] md:grid-cols-[1.1fr_1fr]"
         >
           <div className="relative z-10 px-8 pb-2 pt-10 md:px-12 md:py-14">
+            <Countdown labels={t.countdown} className="mb-5" />
             <h3 className="font-body text-400 uppercase tracking-[0.2em] text-text-primary sm:tracking-[0.28em]">{t.saveTitle}</h3>
             <span aria-hidden="true" className="mt-4 block h-px w-10 bg-salvia-700" />
             <p className="mt-5 font-body leading-snug text-text-primary" style={{ fontSize: "clamp(1.35rem, 2.2vw, 1.75rem)" }}>{t.lead}</p>
