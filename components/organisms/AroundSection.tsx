@@ -13,8 +13,9 @@ import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
  * Organism `AroundSection` (#hospedagem) — "Onde ficar e aproveitar": junta a
  * antiga Hospedagem com as Dicas da região (onde comer + salões e
  * barbearias). Filtros em cima, mapa travado na região (`AroundMap`) com o
- * pin do salão e dos lugares, e os cards embaixo, do mais perto pro mais
- * longe, cada um com a distância até o salão e o link de rota.
+ * pin do salão e dos lugares, e a lista de cards horizontais (miniatura à
+ * esquerda) do mais perto pro mais longe — no desktop ao lado do mapa, com
+ * rolagem própria — cada um com a distância até o salão e o link de rota.
  * Card e pin conversam: tocar num destaca o outro.
  */
 
@@ -35,6 +36,7 @@ export function AroundSection({
   const [filter, setFilter] = useState<Filter>("all");
   const [activeId, setActiveId] = useState<string | null>(null);
   const cardRefs = useRef(new Map<string, HTMLLIElement>());
+  const listRef = useRef<HTMLUListElement>(null);
 
   // descrições: as de comer/beleza vêm das Dicas (por nome), as de hotel do próprio bloco
   const descByName = useMemo(() => {
@@ -55,7 +57,15 @@ export function AroundSection({
 
   const select = (id: string, fromMap = false) => {
     setActiveId((cur) => (cur === id && !fromMap ? null : id));
-    if (fromMap) cardRefs.current.get(id)?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    if (fromMap) {
+      const card = cardRefs.current.get(id);
+      const list = listRef.current;
+      if (card && list && list.scrollHeight > list.clientHeight) {
+        list.scrollTo({ top: card.offsetTop - list.offsetTop - 8, behavior: "smooth" });
+      } else {
+        card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
   };
 
   const chip = (active: boolean) =>
@@ -89,70 +99,78 @@ export function AroundSection({
           ))}
         </div>
 
-        {/* mapa */}
-        <div className="mt-5">
-          <AroundMap
-            places={places}
-            activeId={activeId}
-            onSelect={(id) => select(id, true)}
-            labels={{ venue: t.venue, mapLabel: t.mapLabel, zoomIn: t.zoomIn, zoomOut: t.zoomOut, recenter: t.recenter }}
-          />
-        </div>
+        {/* mapa + lista: no desktop, duas colunas (lista com rolagem própria); no celular, empilhados */}
+        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-start">
+          <div className="lg:sticky lg:top-24">
+            <AroundMap
+              places={places}
+              activeId={activeId}
+              onSelect={(id) => select(id, true)}
+              labels={{ venue: t.venue, mapLabel: t.mapLabel, zoomIn: t.zoomIn, zoomOut: t.zoomOut, recenter: t.recenter }}
+            />
+          </div>
 
-        {/* cards */}
-        <ul className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:snap-none md:grid-cols-3 md:overflow-visible md:px-0">
-          {places.map((p) => {
-            const active = p.id === activeId;
-            const desc = p.category === "hotel" ? t.hotelDesc[p.id] : descByName.get(p.name);
-            return (
-              <li
-                key={p.id}
-                ref={(el) => {
-                  if (el) cardRefs.current.set(p.id, el);
-                  else cardRefs.current.delete(p.id);
-                }}
-                className="w-[78%] shrink-0 snap-center sm:w-[46%] md:w-auto"
-              >
-                <article
-                  className={[
-                    "flex h-full flex-col overflow-hidden rounded-card border bg-white/85 transition-[border-color,box-shadow,transform] duration-200",
-                    active ? "-translate-y-1 border-terracota-500 shadow-[0_16px_34px_-22px_rgba(152,75,44,0.8)]" : "border-caramelo-100 hover:border-terracota-200",
-                  ].join(" ")}
+          <ul
+            ref={listRef}
+            className="space-y-3 lg:max-h-[560px] lg:overflow-y-auto lg:overscroll-contain lg:pe-2 [scrollbar-color:theme(colors.caramelo.200)_transparent] [scrollbar-width:thin]"
+          >
+            {places.map((p) => {
+              const active = p.id === activeId;
+              const desc = p.category === "hotel" ? t.hotelDesc[p.id] : descByName.get(p.name);
+              return (
+                <li
+                  key={p.id}
+                  ref={(el) => {
+                    if (el) cardRefs.current.set(p.id, el);
+                    else cardRefs.current.delete(p.id);
+                  }}
                 >
-                  <button type="button" onClick={() => select(p.id)} aria-label={p.name} className="block w-full">
-                    <PlaceThumb place={p} />
-                  </button>
-                  <div className="flex flex-1 flex-col p-5">
-                  <button type="button" onClick={() => select(p.id)} aria-pressed={active} className="flex items-start gap-3 text-start">
-                    <span className={["mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full", active ? "bg-terracota-700 text-white" : "bg-pessego-50 text-terracota-700"].join(" ")}>
-                      <PlaceIcon kind={p.category} />
-                    </span>
-                    <span>
-                      <span className="block font-body text-200 font-bold leading-snug text-text-primary">{p.name}</span>
-                      <span className="mt-0.5 block font-body text-100 uppercase tracking-[0.14em] text-salvia-800">{t.filters[p.category]}</span>
-                    </span>
-                  </button>
-                  {desc && <p className="mt-3 flex-1 font-body text-200 leading-relaxed text-text-secondary">{desc}</p>}
-                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-caramelo-100 pt-3">
-                    <span className="font-body text-100 text-text-primary">
-                      <strong className="text-terracota-700">{t.distance.replace("{km}", `${nf.format(p.km)} km`)}</strong>
-                      <span className="block text-[0.7rem] text-text-secondary">{t.straight}</span>
-                    </span>
-                    <a
-                      href={directionsUrl(p.query)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex min-h-[40px] items-center rounded-pill border border-terracota-500 px-4 font-body text-100 uppercase tracking-[0.12em] text-terracota-700 transition-colors hover:bg-terracota-500 hover:text-white"
+                  <article
+                    className={[
+                      "flex gap-4 rounded-card border bg-white/85 p-3 transition-[border-color,box-shadow] duration-200 sm:p-4",
+                      active ? "border-terracota-500 shadow-[0_14px_30px_-22px_rgba(152,75,44,0.8)]" : "border-caramelo-100 hover:border-terracota-200",
+                    ].join(" ")}
+                  >
+                    {/* miniatura à esquerda */}
+                    <button
+                      type="button"
+                      onClick={() => select(p.id)}
+                      aria-label={p.name}
+                      className="h-24 w-24 shrink-0 overflow-hidden rounded-[0.9rem] sm:h-28 sm:w-28"
                     >
-                      {t.route}
-                    </a>
-                  </div>
-                  </div>
-                </article>
-              </li>
-            );
-          })}
-        </ul>
+                      <PlaceThumb place={p} />
+                    </button>
+
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <button type="button" onClick={() => select(p.id)} aria-pressed={active} className="text-start">
+                        <span className="block font-body text-200 font-bold leading-snug text-text-primary">{p.name}</span>
+                        <span className="mt-0.5 inline-flex items-center gap-1.5 font-body text-[0.7rem] uppercase tracking-[0.14em] text-salvia-800">
+                          <PlaceIcon kind={p.category} className="h-3.5 w-3.5" />
+                          {t.filters[p.category]}
+                        </span>
+                      </button>
+                      {desc && <p className="mt-1.5 line-clamp-2 font-body text-100 leading-relaxed text-text-secondary">{desc}</p>}
+                      <div className="mt-auto flex items-end justify-between gap-2 pt-2">
+                        <span className="font-body text-100 leading-tight text-text-primary">
+                          <strong className="text-terracota-700">{t.distance.replace("{km}", `${nf.format(p.km)} km`)}</strong>
+                          <span className="block text-[0.65rem] text-text-secondary">{t.straight}</span>
+                        </span>
+                        <a
+                          href={directionsUrl(p.query)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex min-h-[36px] shrink-0 items-center rounded-pill border border-terracota-500 px-3 font-body text-[0.7rem] uppercase tracking-[0.12em] text-terracota-700 transition-colors hover:bg-terracota-500 hover:text-white"
+                        >
+                          {t.route}
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         {/* bom saber: airbnb, bairros e avisos */}
         <PaintReveal variant="rise" className="mx-auto mt-10 max-w-3xl rounded-card border border-caramelo-100 bg-page/80 p-7 backdrop-blur-[2px]">

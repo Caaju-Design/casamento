@@ -33,8 +33,9 @@ export interface AroundMapLabels {
 
 function iconHtml(kind: keyof typeof ICON_PATHS, label: string, active: boolean, venue = false) {
   const size = venue ? 46 : active ? 40 : 32;
-  const bg = venue ? "#984b2c" : active ? "#723921" : "#fbf8f2";
-  const fg = venue || active ? "#ffffff" : "#723921";
+  // fora de foco: oliva (salvia.700) pra contrastar com o mapa; ativo: terracota escuro
+  const bg = venue ? "#984b2c" : active ? "#723921" : "#848169";
+  const fg = "#ffffff";
   const svg = `<svg viewBox="0 0 24 24" width="${Math.round(size * 0.5)}" height="${Math.round(size * 0.5)}" fill="${venue ? "#fff" : "none"}" stroke="${fg}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON_PATHS[kind]}</svg>`;
   const name =
     venue || active
