@@ -79,9 +79,11 @@ export function AnchorNav({ items, startHiddenForHero = false, locale, labels = 
   return (
     <>
       {/*
-        Header em 3 colunas: menu à esquerda (hambúrguer abaixo de xl), a
-        logo do casal no centro e o seletor de idioma à direita. Em árabe
-        (dir="rtl") as colunas se espelham sozinhas.
+        Header em 3 colunas: botão hambúrguer à esquerda (em TODAS as telas,
+        pedido do Manu), a logo do casal no centro e o seletor de idioma à
+        direita. Ao abrir, o menu aparece logo abaixo da logo, centralizado:
+        no desktop os itens ficam lado a lado; no celular, um embaixo do
+        outro. Em árabe (dir="rtl") as colunas se espelham sozinhas.
       */}
       <nav
         className={`fixed inset-x-0 top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-4 bg-page/95 px-4 backdrop-blur transition-opacity duration-300 md:px-6 ${NAV_HEIGHT_CLASS}`}
@@ -95,7 +97,7 @@ export function AnchorNav({ items, startHiddenForHero = false, locale, labels = 
         <div className="flex items-center justify-self-start">
           <button
             type="button"
-            className="inline-flex min-h-[44px] min-w-[44px] items-center text-text-primary xl:hidden"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center text-text-primary"
             onClick={() => setIsOpen((open) => !open)}
             aria-expanded={isOpen}
             aria-label={labels.openMenu}
@@ -104,9 +106,9 @@ export function AnchorNav({ items, startHiddenForHero = false, locale, labels = 
           </button>
           <ul
             className={[
-              "font-body text-100 xl:flex xl:items-center xl:gap-5",
+              "font-body text-100",
               isOpen
-                ? "absolute inset-x-0 top-full flex flex-col border-b border-caramelo-100 bg-page px-6 py-3 shadow-[0_12px_30px_-20px_rgba(45,43,35,0.5)]"
+                ? "absolute inset-x-0 top-full flex flex-col items-center border-b border-caramelo-100 bg-page px-6 py-3 text-center shadow-[0_12px_30px_-20px_rgba(45,43,35,0.5)] md:flex-row md:flex-wrap md:justify-center md:gap-x-8 md:py-2"
                 : "hidden",
             ].join(" ")}
           >
