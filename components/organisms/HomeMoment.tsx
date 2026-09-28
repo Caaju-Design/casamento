@@ -30,7 +30,7 @@ const SOFA: VideoSources = {
 const CARRO_STAINS: StainPreset = { focusX: 0.42, focusY: 0.52, spreadX: 0.8, spreadY: 1.15, radius: 1.05 };
 const SOFA_STAINS: StainPreset = { focusX: 0.5, focusY: 0.5, spreadX: 0.8, spreadY: 1.15, radius: 1.05 };
 
-const TRACK_VH = 260;
+const TRACK_VH = 150;
 const TEXT_STYLE = { fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" } as const;
 /** Diferença (s) a partir da qual o segundo vídeo é realinhado ao primeiro. */
 const MAX_DRIFT = 0.25;

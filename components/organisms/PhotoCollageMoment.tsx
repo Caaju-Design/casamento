@@ -65,9 +65,9 @@ const OVERLAP = 0.35;
  * de baixo continuam aparecendo em volta. No celular: fotos em cima e texto
  * embaixo, numa tela só.
  */
-export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 380, decor, quoteTone = "azul" }: PhotoCollageMomentProps) {
+export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 160, decor, quoteTone = "azul" }: PhotoCollageMomentProps) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const progressRef = useTrackProgress(trackRef);
+  const progressRef = useTrackProgress(trackRef, 5200);
   const right = photosSide === "right";
   const slot = PAINT_SPAN / Math.max(1, photos.length);
 

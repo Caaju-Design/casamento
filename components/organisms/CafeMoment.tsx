@@ -80,7 +80,7 @@ export function CafeMoment({ text }: { text: string }) {
       text={text}
       photos={ITEMS}
       photosSide="left"
-      trackVh={460}
+      trackVh={170}
       decor={
         <>
           <Cloud id={6} className="right-0 top-[14%] w-[42vw] md:w-[24vw]" />

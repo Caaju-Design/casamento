@@ -40,7 +40,7 @@ export interface PhotoPairMomentProps {
   decor?: ReactNode;
 }
 
-const TRACK_VH = 240;
+const TRACK_VH = 150;
 const TEXT_STYLE = { fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" } as const;
 
 /**

@@ -19,7 +19,7 @@ const WatercolorScene = dynamic(
 const STAINS: StainPreset = { focusX: 0.5, focusY: 0.5, spreadX: 0.55, spreadY: 0.85, radius: 0.8 };
 
 /** Altura do trilho: a tela fica presa enquanto o voo sobre a cidade acontece. */
-const TRACK_VH = 220;
+const TRACK_VH = 140;
 
 /**
  * Momento 1 da "Nossa história" — Cape Town. Uma tela inteira: à esquerda
