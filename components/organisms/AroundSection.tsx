@@ -19,8 +19,9 @@ import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
  * Card e pin conversam: tocar num destaca o outro.
  */
 
-type Filter = "all" | PlaceCategory;
-const FILTERS: Filter[] = ["all", "hotel", "cafe", "restaurante", "shopping", "beleza"];
+// sem "Todos": a seção já abre filtrada em hotéis (pedido do Manu)
+type Filter = PlaceCategory;
+const FILTERS: Filter[] = ["hotel", "cafe", "restaurante", "shopping", "beleza"];
 
 export function AroundSection({
   t,
@@ -33,7 +34,7 @@ export function AroundSection({
   stay: Dictionary["stay"];
   locale: Locale;
 }) {
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<Filter>("hotel");
   const [activeId, setActiveId] = useState<string | null>(null);
   const cardRefs = useRef(new Map<string, HTMLLIElement>());
   const listRef = useRef<HTMLUListElement>(null);
@@ -49,7 +50,7 @@ export function AroundSection({
 
   const places = useMemo(
     () =>
-      PLACES.filter((p) => filter === "all" || p.category === filter)
+      PLACES.filter((p) => p.category === filter)
         .map((p) => ({ ...p, km: distanceKm(VENUE, p) }))
         .sort((a, b) => a.km - b.km),
     [filter],
@@ -93,7 +94,7 @@ export function AroundSection({
               }}
               className={chip(filter === f)}
             >
-              {f !== "all" && <PlaceIcon kind={f} className="h-4 w-4" />}
+              <PlaceIcon kind={f} className="h-4 w-4" />
               {t.filters[f]}
             </button>
           ))}
