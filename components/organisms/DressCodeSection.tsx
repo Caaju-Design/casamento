@@ -1,7 +1,6 @@
 import { Cloud } from "@/components/atoms/Cloud";
 import { Painting } from "@/components/atoms/Painting";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
-import { DressPalette } from "@/components/molecules/DressPalette";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
@@ -9,35 +8,12 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
  * Organism `DressCodeSection` (#dresscode) — traje dos CONVIDADOS (o dos
  * padrinhos e madrinhas fica só no manual deles). Proposta montada a
  * partir do "esporte fino" dos manuais e da paleta do casamento:
- *  - a paleta do dress code é a da identidade visual (7 famílias × 7 tons),
- *    em `DressPalette`: tocar numa cor abre os sobretons, do claro ao escuro;
- *  - pedido com carinho: branco/off-white ficam pra noiva.
+ *  - só os cards Para elas / Para eles. A paleta interativa (`DressPalette`)
+ *    e o bloco "Pedimos com carinho" (branco/off-white + dica de clima)
+ *    saíram a pedido do Manu; o componente e os textos continuam no projeto
+ *    caso voltem.
  */
 
-
-const MASK = {
-  WebkitMaskImage: "url(/decor/capetown/mancha.webp)",
-  maskImage: "url(/decor/capetown/mancha.webp)",
-  WebkitMaskSize: "contain",
-  maskSize: "contain",
-  WebkitMaskRepeat: "no-repeat",
-  maskRepeat: "no-repeat",
-  WebkitMaskPosition: "center",
-  maskPosition: "center",
-} as const;
-
-function Swatch({ color, name, outline = false }: { color: string; name: string; outline?: boolean }) {
-  return (
-    <div className="flex w-20 flex-col items-center gap-2 text-center">
-      <span
-        aria-hidden="true"
-        className={["block h-14 w-14", outline ? "drop-shadow-[0_0_1px_rgba(58,56,52,0.55)]" : ""].join(" ")}
-        style={{ ...MASK, backgroundColor: color }}
-      />
-      <span className="font-body text-100 leading-tight text-text-secondary">{name}</span>
-    </div>
-  );
-}
 
 function Card({ title, children, delay }: { title: string; children: React.ReactNode; delay: number }) {
   return (
@@ -75,39 +51,6 @@ export function DressCodeSection({ t }: { t: Dictionary["dress"] }) {
             <p>{t.him[1]}</p>
           </Card>
         </div>
-
-        <PaintReveal variant="rise" delay={150} className="mt-14 text-center">
-          <h3 className="font-body text-100 uppercase tracking-[0.24em] text-salvia-800">{t.paletteTitle}</h3>
-          <p className="mx-auto mt-2 max-w-xl font-body text-200 leading-relaxed text-text-secondary">
-            {t.paletteLead}
-          </p>
-          <div className="mt-6">
-            <DressPalette
-              labels={{
-                families: t.families,
-                group: t.paletteGroup,
-                hint: t.paletteHint,
-                range: t.paletteRange,
-                base: t.base,
-                lighter: t.lighter,
-                darker: t.darker,
-              }}
-            />
-          </div>
-        </PaintReveal>
-
-        <PaintReveal variant="rise" delay={250} className="mx-auto mt-12 max-w-2xl rounded-card border border-caramelo-100 bg-page/80 p-7 text-center backdrop-blur-[2px]">
-          <h3 className="font-body text-100 uppercase tracking-[0.24em] text-terracota-700">{t.askTitle}</h3>
-          <div className="mt-5 flex flex-wrap items-start justify-center gap-8">
-            <div className="flex max-w-[12rem] flex-col items-center gap-2">
-              <Swatch color="#fbf8f2" name={t.avoidName} outline />
-              <span className="font-body text-100 italic text-text-secondary">{t.avoidWhy}</span>
-            </div>
-          </div>
-          <p className="mt-6 font-body text-200 leading-relaxed text-text-secondary">
-            {t.climate}
-          </p>
-        </PaintReveal>
       </div>
     </section>
   );
