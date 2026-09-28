@@ -36,15 +36,15 @@ export const VENUE = {
 export const PLACES: Place[] = [
   // hotéis
   { id: "intercity", name: "Intercity Nações Unidas", category: "hotel", lat: -23.6392, lng: -46.7106, query: "Intercity Nações Unidas, São Paulo", approx: true },
-  { id: "transamerica", name: "Transamerica Executive Chácara Santo Antônio", category: "hotel", lat: -23.6329, lng: -46.7022, query: "Transamerica Executive Chácara Santo Antônio, São Paulo", approx: true },
+  { id: "transamerica", name: "Transamerica Executive Chácara Santo Antônio", category: "hotel", lat: -23.6329, lng: -46.7022, query: "Transamerica Executive Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/transamerica.webp" },
   { id: "novotel", name: "Novotel São Paulo Berrini", category: "hotel", lat: -23.6069, lng: -46.6938, query: "Novotel São Paulo Berrini", approx: true },
   { id: "ibis", name: "ibis budget São Paulo Morumbi", category: "hotel", lat: -23.6219, lng: -46.6975, query: "ibis budget São Paulo Morumbi", approx: true },
   // cafés e padarias
-  { id: "flor", name: "Padaria Flor das Américas", category: "cafe", lat: -23.6292, lng: -46.7043, query: "Padaria Flor das Américas, São Paulo", approx: true },
+  { id: "flor", name: "Padaria Flor das Américas", category: "cafe", lat: -23.6292, lng: -46.7043, query: "Padaria Flor das Américas, São Paulo", approx: true, photo: "/lugares/flor.webp" },
   { id: "giga", name: "Giga", category: "cafe", lat: -23.6318, lng: -46.7031, query: "Giga, Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/giga.webp" },
   // restaurantes e botecos
   { id: "casarao", name: "Casarão de Minas", category: "restaurante", lat: -23.6347, lng: -46.7071, query: "Casarão de Minas, São Paulo", approx: true, photo: "/lugares/casarao.webp" },
-  { id: "parrilaria", name: "Parrilaria Granja Julieta", category: "restaurante", lat: -23.6372, lng: -46.7083, query: "Parrilaria Granja Julieta, São Paulo", approx: true },
+  { id: "parrilaria", name: "Parrilaria Granja Julieta", category: "restaurante", lat: -23.6372, lng: -46.7083, query: "Parrilaria Granja Julieta, São Paulo", approx: true, photo: "/lugares/parrilaria.webp" },
   { id: "boteco-vc", name: "Boteco Vila Cruzeiro", category: "restaurante", lat: -23.6398, lng: -46.7147, query: "Boteco Vila Cruzeiro, São Paulo", approx: true },
   { id: "boteco-sp", name: "Boteco São Paulo — Vila Cruzeiro", category: "restaurante", lat: -23.6412, lng: -46.7128, query: "Boteco São Paulo, Vila Cruzeiro, São Paulo", approx: true },
   // shoppings
@@ -53,7 +53,7 @@ export const PLACES: Place[] = [
   { id: "market-place", name: "Shopping Market Place", category: "shopping", lat: -23.6177, lng: -46.6969, query: "Shopping Market Place, São Paulo", approx: true },
   // salões e barbearias
   { id: "ritualle", name: "Ritualle Bem Estar", category: "beleza", lat: -23.6405, lng: -46.7162, query: "Ritualle Bem Estar, Vila Cruzeiro, São Paulo", approx: true },
-  { id: "geff", name: "Geff Lima", category: "beleza", lat: -23.6361, lng: -46.7092, query: "Geff Lima, Rua Booker Pittman, 57, São Paulo", approx: true },
+  { id: "geff", name: "Geff Lima", category: "beleza", lat: -23.6361, lng: -46.7092, query: "Geff Lima, Rua Booker Pittman, 57, São Paulo", approx: true, photo: "/lugares/geff.webp" },
   { id: "jacques", name: "Jacques Janine", category: "beleza", lat: -23.6356, lng: -46.7058, query: "Jacques Janine Granja Julieta, São Paulo", approx: true, photo: "/lugares/jacques.webp" },
   { id: "dharma", name: "Espaço Dharma", category: "beleza", lat: -23.6389, lng: -46.7171, query: "Espaço Dharma, Vila Cruzeiro, São Paulo", approx: true },
   { id: "tarantino", name: "Tarantino", category: "beleza", lat: -23.6309, lng: -46.7049, query: "Barbearia Tarantino, Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/tarantino.webp" },
