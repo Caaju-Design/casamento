@@ -72,6 +72,9 @@ export type Dictionary = {
     title: string;
     lead: string;
     herTitle: string;
+    /** texto alternativo das ilustrações de calçados */
+    herArt: string;
+    himArt: string;
     her: [string, string];
     himTitle: string;
     him: [string, string];
@@ -206,6 +209,8 @@ const pt: Dictionary = {
     title: "Esporte fino",
     lead: "Queremos todo mundo lindo, confortável e com vontade de dançar. Pense em tecidos leves e elegantes, que combinem com um fim de tarde de outono em São Paulo.",
     herTitle: "Para elas",
+    herArt: "Ilustração em aquarela de um par de sapatos femininos de salto bloco, em tom pêssego",
+    himArt: "Ilustração em aquarela de um par de mocassins masculinos em couro caramelo",
     her: [
       "Vestidos midi ou longos, macacões e conjuntos de alfaiataria. Tecidos fluidos, como seda, crepe, linho e viscose, caem muito bem.",
       "No pé, vale o que deixar você dançar a noite toda: salto bloco, sandália ou sapatilha.",
@@ -424,6 +429,8 @@ const en: Dictionary = {
     title: "Smart casual",
     lead: "We want everyone to feel beautiful, comfortable and ready to dance. Think light, elegant fabrics that suit a late autumn afternoon in São Paulo.",
     herTitle: "For her",
+    herArt: "Watercolor illustration of a pair of peach block-heel women's shoes",
+    himArt: "Watercolor illustration of a pair of caramel leather men's loafers",
     her: [
       "Midi or long dresses, jumpsuits and tailored sets. Flowing fabrics such as silk, crêpe, linen and viscose work beautifully.",
       "For shoes, choose whatever lets you dance all night: block heels, sandals or flats.",
@@ -640,6 +647,8 @@ const ar: Dictionary = {
     title: "أنيق غير رسمي",
     lead: "نريد أن يشعر الجميع بالجمال والراحة والرغبة في الرقص. اختاروا أقمشةً خفيفةً وأنيقة تناسب عصرَ يومٍ خريفيّ في ساو باولو.",
     herTitle: "لها",
+    herArt: "رسم بالألوان المائية لزوج من الأحذية النسائية بكعب عريض بلون الخوخ",
+    himArt: "رسم بالألوان المائية لزوج من أحذية الموكاسين الرجالية من الجلد بلون الكراميل",
     her: [
       "فساتين متوسطة الطول أو طويلة، أو أفرولات، أو أطقم مفصّلة. الأقمشة الانسيابية مثل الحرير والكريب والكتان والفسكوز تبدو رائعة.",
       "أما الحذاء، فاختاري ما يتيح لكِ الرقص طوال الليل: كعبًا عريضًا أو صندلًا أو حذاءً مسطّحًا.",
