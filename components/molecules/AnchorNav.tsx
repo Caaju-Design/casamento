@@ -84,9 +84,12 @@ export function AnchorNav({ items, startHiddenForHero = false, locale, labels = 
         direita. Ao abrir, o menu aparece logo abaixo da logo, centralizado:
         no desktop os itens ficam lado a lado; no celular, um embaixo do
         outro. Em árabe (dir="rtl") as colunas se espelham sozinhas.
+        Efeito VIDRO (pedido do Manu): fundo linho translúcido (45%) com
+        backdrop-blur + saturação, fio claro embaixo — dá pra ver o
+        conteúdo passando por baixo, embaçado.
       */}
       <nav
-        className={`fixed inset-x-0 top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-4 bg-page/95 px-4 backdrop-blur transition-opacity duration-300 md:px-6 ${NAV_HEIGHT_CLASS}`}
+        className={`fixed inset-x-0 top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 transition-opacity duration-300 md:px-6 ${NAV_HEIGHT_CLASS}`}
         style={{
           opacity: startHiddenForHero ? "var(--hero-reveal, 0)" : "var(--hero-reveal, 1)",
           pointerEvents: (startHiddenForHero
@@ -94,6 +97,15 @@ export function AnchorNav({ items, startHiddenForHero = false, locale, labels = 
             : "var(--hero-reveal-pointer-events, auto)") as CSSProperties["pointerEvents"],
         }}
       >
+        {/*
+          Camada de vidro num elemento próprio (e não no <nav>): um elemento
+          com backdrop-filter vira "raiz" do backdrop dos filhos, e aí o
+          painel do menu aberto não conseguiria embaçar a página por baixo.
+        */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 border-b border-white/40 bg-page/45 shadow-[0_1px_0_rgba(255,255,255,0.5)_inset,0_10px_30px_-24px_rgba(45,43,35,0.45)] backdrop-blur-xl backdrop-saturate-150"
+        />
         <div className="flex items-center justify-self-start">
           <button
             type="button"
@@ -108,7 +120,7 @@ export function AnchorNav({ items, startHiddenForHero = false, locale, labels = 
             className={[
               "font-body text-100",
               isOpen
-                ? "absolute inset-x-0 top-full flex flex-col items-center border-b border-caramelo-100 bg-page px-6 py-3 text-center shadow-[0_12px_30px_-20px_rgba(45,43,35,0.5)] md:flex-row md:flex-wrap md:justify-center md:gap-x-8 md:py-2"
+                ? "absolute inset-x-0 top-full flex flex-col items-center border-b border-white/40 bg-page/70 px-6 py-3 backdrop-blur-xl backdrop-saturate-150 text-center shadow-[0_12px_30px_-20px_rgba(45,43,35,0.5)] md:flex-row md:flex-wrap md:justify-center md:gap-x-8 md:py-2"
                 : "hidden",
             ].join(" ")}
           >
