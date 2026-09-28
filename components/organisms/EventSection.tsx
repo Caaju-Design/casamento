@@ -142,7 +142,7 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
             </PaintReveal>
 
             <PaintReveal variant="rise" delay={150} className="text-center md:text-start">
-              <p className="font-display leading-tight text-text-primary" style={{ fontSize: "clamp(2rem, 4vw, 2.8rem)" }}>
+              <p className="font-body font-bold leading-snug text-text-primary" style={{ fontSize: "clamp(1.5rem, 2.6vw, 2rem)" }}>
                 {t.venue[0]}
                 <br />
                 {t.venue[1]}
