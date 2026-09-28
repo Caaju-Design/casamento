@@ -94,7 +94,6 @@ export type Dictionary = {
     sub: string;
     lead: string;
     cta: string;
-    script: [string, string];
     pageTitle: string;
     back: string;
     newTab: string;
@@ -243,7 +242,6 @@ const pt: Dictionary = {
     sub: "Lista de presentes",
     lead: "Sua presença é o nosso maior presente. Mas, se quiser nos mimar, preparamos uma lista com muito carinho.",
     cta: "Ver lista de presentes",
-    script: ["Com", "carinho"],
     pageTitle: "Lista de presentes",
     back: "Voltar",
     newTab: "Abrir em outra aba",
@@ -461,7 +459,6 @@ const en: Dictionary = {
     sub: "Gift registry",
     lead: "Your presence is the greatest gift of all. But if you'd like to spoil us, we've put together a registry with lots of love.",
     cta: "See the gift registry",
-    script: ["With", "love"],
     pageTitle: "Gift registry",
     back: "Back",
     newTab: "Open in a new tab",
@@ -676,7 +673,6 @@ const ar: Dictionary = {
     sub: "قائمة الهدايا",
     lead: "حضوركم هو أجمل هدية لنا. وإن أحببتم تدليلنا، فقد أعددنا قائمةً بكل حب.",
     cta: "عرض قائمة الهدايا",
-    script: ["مع", "الحب"],
     pageTitle: "قائمة الهدايا",
     back: "رجوع",
     newTab: "فتح في علامة تبويب جديدة",

@@ -8,8 +8,8 @@ import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
  * Organism `GiftSection` (#presentes) — "Presenteie os noivos". Card no
  * estilo dos cards de Dress code / RSVP da referência do casal: fundo
  * sálvia claro, título em caixa alta espaçada, fio, subtítulo, uma linha
- * em itálico e botão pílula; à direita, aquarela da Cidade do Cabo com uma
- * frase em caligrafia. O botão leva pra /presentes, que mostra a lista
+ * em itálico e botão pílula (só o texto); à direita, uma aquarela grande
+ * da baía com veleiros. O botão leva pra /presentes, que mostra a lista
  * (site externo) dentro do nosso site.
  */
 export function GiftSection({ t, locale }: { t: Dictionary["gift"]; locale: Locale }) {
@@ -34,22 +34,14 @@ export function GiftSection({ t, locale }: { t: Dictionary["gift"]; locale: Loca
             href={locale === "pt" ? "/presentes" : `/presentes?lang=${locale}`}
             className="mt-7 inline-flex min-h-[44px] items-center gap-3 whitespace-nowrap rounded-pill bg-salvia-800 px-6 font-body text-100 uppercase tracking-[0.12em] text-white sm:px-7 sm:tracking-[0.2em] transition-colors hover:bg-salvia-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus"
           >
-            {t.cta} <span aria-hidden="true" className="rtl:-scale-x-100">›</span>
+            {t.cta}
           </Link>
         </div>
 
-        {/* aquarela + frase em caligrafia */}
-        <div aria-hidden="true" className="relative min-h-[16rem] md:min-h-0">
-          <Painting name="baia-veleiro" behind={false} className="absolute bottom-0 right-4 w-[min(62%,300px)] md:right-8 md:w-[min(78%,300px)]" />
-          <Painting name="ramo-canto-dir-cima" behind={false} className="absolute right-0 top-0 w-[7.5rem]" />
-          <p
-            className="absolute left-8 top-4 z-10 font-display leading-[0.9] text-salvia-700/80 md:left-4 md:top-8"
-            style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.6rem)", transform: "rotate(-8deg)" }}
-          >
-            {t.script[0]}
-            <br />
-            {t.script[1]}
-          </p>
+        {/* aquarela da baía com veleiros, grande, ocupando o lado direito */}
+        <div aria-hidden="true" className="relative flex items-center justify-center px-4 pb-8 md:py-6 md:pe-6 md:ps-0">
+          <Painting name="baia-veleiro-topo" behind={false} className="relative h-auto w-full max-w-[34rem] mix-blend-multiply" />
+          <Painting name="ramo-canto-dir-cima" behind={false} className="absolute right-0 top-0 w-[6.5rem] md:w-[7.5rem]" />
         </div>
       </PaintReveal>
     </section>
