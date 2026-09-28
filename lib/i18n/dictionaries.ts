@@ -120,6 +120,7 @@ export type Dictionary = {
     recenter: string;
     hotelDesc: Record<string, string>;
     notesTitle: string;
+    noteFoodTitle: string;
   };
   stay: {
     eyebrow: string;
@@ -295,6 +296,7 @@ const pt: Dictionary = {
       ibis: "Opção econômica ao lado do MorumbiShopping.",
     },
     notesTitle: "Bom saber",
+    noteFoodTitle: "Horários e delivery",
   },
   stay: {
     eyebrow: "Hospedagem",
@@ -539,6 +541,7 @@ const en: Dictionary = {
       ibis: "Budget option right next to MorumbiShopping.",
     },
     notesTitle: "Good to know",
+    noteFoodTitle: "Opening hours & delivery",
   },
   stay: {
     eyebrow: "Where to stay",
@@ -780,6 +783,7 @@ const ar: Dictionary = {
       ibis: "خيار اقتصادي بجوار MorumbiShopping.",
     },
     notesTitle: "من المفيد معرفته",
+    noteFoodTitle: "المواعيد والتوصيل",
   },
   stay: {
     eyebrow: "الإقامة",

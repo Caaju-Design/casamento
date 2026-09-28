@@ -3,6 +3,7 @@ import { Painting } from "@/components/atoms/Painting";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
 import { Countdown } from "@/components/molecules/Countdown";
+import { Notice, NoticeCard } from "@/components/molecules/Notice";
 import { WeddingCalendar } from "@/components/molecules/WeddingCalendar";
 import { mapsSearch, wazeTo } from "@/lib/content/maps";
 import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
@@ -50,29 +51,6 @@ function IconAccess() {
       <circle cx="12" cy="10.3" r="2.2" />
       <path d="M12 12.5v3.6" />
     </svg>
-  );
-}
-
-function IconAlert() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7.5v5.5M12 16.4v.1" />
-    </svg>
-  );
-}
-
-function Notice({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
-  return (
-    <div className="flex items-start gap-4 text-start">
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-page text-terracota-700 shadow-[0_6px_16px_-10px_rgba(152,75,44,0.7)]">
-        {icon}
-      </span>
-      <div>
-        <h3 className="font-body text-100 font-bold uppercase tracking-[0.2em] text-terracota-700">{title}</h3>
-        <p className="mt-1.5 font-body text-200 leading-relaxed text-text-primary">{text}</p>
-      </div>
-    </div>
   );
 }
 
@@ -164,17 +142,10 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
               </div>
 
               {/* avisos importantes: estacionamento e acesso */}
-              <div
-                className="relative mt-10 rounded-[1.75rem] border border-terracota-200 bg-pessego-50/80 px-6 pb-6 pt-8 text-start md:px-7"
-              >
-                <span className="absolute -top-3.5 start-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-pill bg-terracota-500 px-4 py-1.5 font-body text-100 font-bold uppercase tracking-[0.2em] text-white rtl:translate-x-1/2">
-                  <IconAlert /> {t.importantLabel}
-                </span>
-                <div className="grid gap-6">
-                  <Notice icon={<IconParking />} title={t.parkingTitle} text={t.parking} />
-                  <Notice icon={<IconAccess />} title={t.accessTitle} text={t.access} />
-                </div>
-              </div>
+              <NoticeCard label={t.importantLabel} className="mt-10">
+                <Notice icon={<IconParking />} title={t.parkingTitle} text={t.parking} />
+                <Notice icon={<IconAccess />} title={t.accessTitle} text={t.access} />
+              </NoticeCard>
             </PaintReveal>
           </div>
 

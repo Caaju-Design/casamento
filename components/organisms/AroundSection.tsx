@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { AroundMap } from "@/components/molecules/AroundMap";
+import { Notice, NoticeCard } from "@/components/molecules/Notice";
 import { PlaceIcon } from "@/components/molecules/PlaceIcon";
 import { PlaceThumb } from "@/components/molecules/PlaceThumb";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
@@ -21,6 +22,26 @@ import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
 
 // sem "Todos": a seção já abre filtrada em hotéis (pedido do Manu)
 type Filter = PlaceCategory;
+
+/** "i" do rótulo Bom saber. */
+function IconInfo() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5.5M12 7.6v.1" />
+    </svg>
+  );
+}
+
+/** Símbolo do Airbnb (o "Bélo") em traço, na cor dos outros ícones. */
+function IconAirbnb() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3c-1.2 0-1.9.8-2.7 2.4L4.6 15.2c-1.2 2.6.4 5.4 3 5.4 1.6 0 3-1 4.4-2.6 1.4 1.6 2.8 2.6 4.4 2.6 2.6 0 4.2-2.8 3-5.4l-4.7-9.8C13.9 3.8 13.2 3 12 3z" />
+      <path d="M12 18c-1.8-2.2-2.8-4-2.8-5.4 0-1.4 1.2-2.3 2.8-2.3s2.8.9 2.8 2.3c0 1.4-1 3.2-2.8 5.4z" />
+    </svg>
+  );
+}
 const FILTERS: Filter[] = ["hotel", "cafe", "restaurante", "shopping", "beleza"];
 
 export function AroundSection({
@@ -173,16 +194,13 @@ export function AroundSection({
           </ul>
         </div>
 
-        {/* bom saber: airbnb, bairros e avisos */}
-        <PaintReveal variant="rise" className="mx-auto mt-10 max-w-3xl rounded-card border border-caramelo-100 bg-page/80 p-7 backdrop-blur-[2px]">
-          <h3 className="font-body text-100 font-bold uppercase tracking-[0.24em] text-terracota-700">{t.notesTitle}</h3>
-          <ul className="mt-4 space-y-3 font-body text-200 leading-relaxed text-text-secondary">
-            <li>
-              <strong className="text-text-primary">{stay.airbnbTitle}:</strong> {stay.airbnb}
-            </li>
-            <li>{tips.foodNote}</li>
-            <li>{tips.beautyNote}</li>
-          </ul>
+        {/* bom saber: mesmo visual do card "Importante" do Onde será */}
+        <PaintReveal variant="rise" className="mx-auto mt-14 max-w-3xl">
+          <NoticeCard label={t.notesTitle} icon={<IconInfo />}>
+            <Notice icon={<IconAirbnb />} title={stay.airbnbTitle} text={stay.airbnb} />
+            <Notice icon={<PlaceIcon kind="restaurante" className="h-6 w-6" />} title={t.noteFoodTitle} text={tips.foodNote} />
+            <Notice icon={<PlaceIcon kind="beleza" className="h-6 w-6" />} title={t.filters.beleza} text={tips.beautyNote} />
+          </NoticeCard>
         </PaintReveal>
       </div>
     </section>
