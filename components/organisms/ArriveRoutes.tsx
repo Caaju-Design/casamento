@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MetroRoute } from "@/components/molecules/MetroRoute";
+import { Notice, NoticeCard } from "@/components/molecules/Notice";
 import { ARRIVAL_IDS, type ArrivalId } from "@/lib/content/metro";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
@@ -13,6 +14,24 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
  */
 
 const body = "font-body text-200 leading-relaxed text-text-secondary";
+
+/** Ícones dos avisos "Importante" (mesmo traço dos do Onde será). */
+const ALERT_ICON = {
+  clock: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </svg>
+  ),
+  car: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 16V11.5L7 6.8A2 2 0 0 1 8.8 5.6h6.4A2 2 0 0 1 17 6.8l2 4.7V16" />
+      <path d="M3.5 16h17M4.5 11.5h15" />
+      <circle cx="7.5" cy="16.5" r="1.7" />
+      <circle cx="16.5" cy="16.5" r="1.7" />
+    </svg>
+  ),
+};
 
 function TabIcon({ kind }: { kind: ArrivalId }) {
   return (
@@ -96,7 +115,14 @@ export function ArriveRoutes({ t }: { t: Dictionary["stay"]["arrival"] }) {
             </svg>
             {r.time}
           </p>
-          <p className="mt-4 font-body text-100 leading-relaxed text-text-secondary">{r.tip}</p>
+          {r.tip && <p className="mt-4 font-body text-100 leading-relaxed text-text-secondary">{r.tip}</p>}
+          {r.alerts && r.alerts.length > 0 && (
+            <NoticeCard label={t.importantLabel} className="mt-9">
+              {r.alerts.map((a) => (
+                <Notice key={a.title} icon={ALERT_ICON[a.icon]} title={a.title} text={a.text} />
+              ))}
+            </NoticeCard>
+          )}
         </div>
         <MetroRoute key={sel} arrival={sel} t={t.metro} origin={r.origin} originSub={r.originSub} />
       </div>

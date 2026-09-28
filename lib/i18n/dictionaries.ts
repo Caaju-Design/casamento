@@ -151,8 +151,20 @@ export type Dictionary = {
       tabs: Record<"congonhas" | "guarulhos" | "tiete", string>;
       routes: Record<
         "congonhas" | "guarulhos" | "tiete",
-        { title: string; lead: string; origin: string; originSub: string; steps: string[]; time: string; tip: string }
+        {
+          title: string;
+          lead: string;
+          origin: string;
+          originSub: string;
+          steps: string[];
+          time: string;
+          /** Dica em texto miúdo (vazia quando o aviso vai no card "Importante"). */
+          tip: string;
+          /** Avisos no card "Importante" (mesmo do Onde será). */
+          alerts?: { icon: "clock" | "car"; title: string; text: string }[];
+        }
       >;
+      importantLabel: string;
       /** Rótulos do mapa. "{origin}", "{line}" e "{n}" são trocados. */
       metro: {
         mapLabel: string;
@@ -358,6 +370,7 @@ const pt: Dictionary = {
     arriveTitle: "Chegando em São Paulo",
     arrival: {
       question: "Como você vai chegar?",
+      importantLabel: "Importante",
       lead: "Escolha por onde você chega em São Paulo e veja o caminho de metrô até pertinho do casamento. Se puder escolher o voo, prefira Congonhas: é o aeroporto mais perto de nós.",
       tabs: { congonhas: "Aeroporto de Congonhas", guarulhos: "Aeroporto de Guarulhos", tiete: "Rodoviária do Tietê" },
       routes: {
@@ -374,7 +387,15 @@ const pt: Dictionary = {
             "De lá, pegue um Uber ou 99 até sua hospedagem.",
           ],
           time: "Cerca de 30 min de metrô",
-          tip: "A Linha 17-Ouro é nova (abriu em 2026) e começou com horário reduzido: confira o funcionamento antes de viajar. De Uber ou 99, direto do aeroporto, são uns 20 a 30 minutos.",
+          tip: "",
+          alerts: [
+            {
+              icon: "clock",
+              title: "Horário da Linha 17-Ouro",
+              text: "A linha é nova (abriu em 2026) e começou funcionando só das 10h às 15h. Confira o horário antes de viajar: se o seu voo chegar fora dele, venha de carro.",
+            },
+            { icon: "car", title: "De Uber ou 99", text: "Direto do aeroporto até a região do casamento são uns 20 a 30 minutos." },
+          ],
         },
         guarulhos: {
           title: "De avião, por Guarulhos",
@@ -668,6 +689,7 @@ const en: Dictionary = {
     arriveTitle: "Arriving in São Paulo",
     arrival: {
       question: "How are you arriving?",
+      importantLabel: "Important",
       lead: "Pick where you arrive in São Paulo and see the subway route to right near the wedding. If you can choose your flight, go for Congonhas: it's the airport closest to us.",
       tabs: { congonhas: "Congonhas Airport", guarulhos: "Guarulhos Airport", tiete: "Tietê Bus Terminal" },
       routes: {
@@ -684,7 +706,15 @@ const en: Dictionary = {
             "From there, take an Uber or 99 to where you're staying.",
           ],
           time: "About 30 min by subway",
-          tip: "Line 17-Gold is new (opened in 2026) and started with reduced hours: check its schedule before you travel. By Uber or 99, straight from the airport, it's about 20 to 30 minutes.",
+          tip: "",
+          alerts: [
+            {
+              icon: "clock",
+              title: "Line 17-Gold hours",
+              text: "The line is new (opened in 2026) and started running only from 10am to 3pm. Check its hours before you travel: if your flight lands outside them, come by car.",
+            },
+            { icon: "car", title: "By Uber or 99", text: "Straight from the airport to the wedding area takes about 20 to 30 minutes." },
+          ],
         },
         guarulhos: {
           title: "By plane, via Guarulhos",
@@ -975,6 +1005,7 @@ const ar: Dictionary = {
     arriveTitle: "الوصول إلى ساو باولو",
     arrival: {
       question: "كيف ستصلون؟",
+      importantLabel: "مهم",
       lead: "اختاروا مكان وصولكم إلى ساو باولو وشاهدوا طريق المترو حتى مكان قريب من الزفاف. وإن استطعتم اختيار الرحلة، ففضّلوا مطار كونغونياس: فهو الأقرب إلينا.",
       tabs: { congonhas: "مطار كونغونياس", guarulhos: "مطار غواروليوس", tiete: "محطة حافلات Tietê" },
       routes: {
@@ -991,7 +1022,15 @@ const ar: Dictionary = {
             "ومن هناك خذوا Uber أو 99 إلى مكان إقامتكم.",
           ],
           time: "نحو 30 دقيقة بالمترو",
-          tip: "الخط 17 (الذهبي) جديد (افتُتح في 2026) وبدأ بساعات عمل محدودة: تحقّقوا من مواعيده قبل السفر. أمّا بـ Uber أو 99 مباشرةً من المطار فتستغرق الرحلة نحو 20 إلى 30 دقيقة.",
+          tip: "",
+          alerts: [
+            {
+              icon: "clock",
+              title: "مواعيد الخط 17 (الذهبي)",
+              text: "الخط جديد (افتُتح في 2026) وبدأ العمل من 10 صباحًا إلى 3 عصرًا فقط. تحقّقوا من مواعيده قبل السفر: إن وصلت رحلتكم خارجها، فتعالوا بالسيارة.",
+            },
+            { icon: "car", title: "بـ Uber أو 99", text: "من المطار مباشرةً إلى منطقة الزفاف نحو 20 إلى 30 دقيقة." },
+          ],
         },
         guarulhos: {
           title: "بالطائرة عبر غواروليوس",
