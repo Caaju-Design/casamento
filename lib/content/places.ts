@@ -41,9 +41,9 @@ export const PLACES: Place[] = [
   { id: "ibis", name: "ibis budget São Paulo Morumbi", category: "hotel", lat: -23.6219, lng: -46.6975, query: "ibis budget São Paulo Morumbi", approx: true },
   // cafés e padarias
   { id: "flor", name: "Padaria Flor das Américas", category: "cafe", lat: -23.6292, lng: -46.7043, query: "Padaria Flor das Américas, São Paulo", approx: true },
-  { id: "giga", name: "Giga", category: "cafe", lat: -23.6318, lng: -46.7031, query: "Giga, Chácara Santo Antônio, São Paulo", approx: true },
+  { id: "giga", name: "Giga", category: "cafe", lat: -23.6318, lng: -46.7031, query: "Giga, Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/giga.webp" },
   // restaurantes e botecos
-  { id: "casarao", name: "Casarão de Minas", category: "restaurante", lat: -23.6347, lng: -46.7071, query: "Casarão de Minas, São Paulo", approx: true },
+  { id: "casarao", name: "Casarão de Minas", category: "restaurante", lat: -23.6347, lng: -46.7071, query: "Casarão de Minas, São Paulo", approx: true, photo: "/lugares/casarao.webp" },
   { id: "parrilaria", name: "Parrilaria Granja Julieta", category: "restaurante", lat: -23.6372, lng: -46.7083, query: "Parrilaria Granja Julieta, São Paulo", approx: true },
   { id: "boteco-vc", name: "Boteco Vila Cruzeiro", category: "restaurante", lat: -23.6398, lng: -46.7147, query: "Boteco Vila Cruzeiro, São Paulo", approx: true },
   { id: "boteco-sp", name: "Boteco São Paulo — Vila Cruzeiro", category: "restaurante", lat: -23.6412, lng: -46.7128, query: "Boteco São Paulo, Vila Cruzeiro, São Paulo", approx: true },
@@ -54,9 +54,9 @@ export const PLACES: Place[] = [
   // salões e barbearias
   { id: "ritualle", name: "Ritualle Bem Estar", category: "beleza", lat: -23.6405, lng: -46.7162, query: "Ritualle Bem Estar, Vila Cruzeiro, São Paulo", approx: true },
   { id: "geff", name: "Geff Lima", category: "beleza", lat: -23.6361, lng: -46.7092, query: "Geff Lima, Rua Booker Pittman, 57, São Paulo", approx: true },
-  { id: "jacques", name: "Jacques Janine", category: "beleza", lat: -23.6356, lng: -46.7058, query: "Jacques Janine Granja Julieta, São Paulo", approx: true },
+  { id: "jacques", name: "Jacques Janine", category: "beleza", lat: -23.6356, lng: -46.7058, query: "Jacques Janine Granja Julieta, São Paulo", approx: true, photo: "/lugares/jacques.webp" },
   { id: "dharma", name: "Espaço Dharma", category: "beleza", lat: -23.6389, lng: -46.7171, query: "Espaço Dharma, Vila Cruzeiro, São Paulo", approx: true },
-  { id: "tarantino", name: "Tarantino", category: "beleza", lat: -23.6309, lng: -46.7049, query: "Barbearia Tarantino, Chácara Santo Antônio, São Paulo", approx: true },
+  { id: "tarantino", name: "Tarantino", category: "beleza", lat: -23.6309, lng: -46.7049, query: "Barbearia Tarantino, Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/tarantino.webp" },
   { id: "corleone", name: "Corleone", category: "beleza", lat: -23.6228, lng: -46.6994, query: "Barbearia Corleone, MorumbiShopping, São Paulo", approx: true },
 ];
 
