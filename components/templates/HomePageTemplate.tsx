@@ -1,6 +1,7 @@
 import { Painting } from "@/components/atoms/Painting";
 import { AnchorNav } from "@/components/molecules/AnchorNav";
 import { DressCodeSection } from "@/components/organisms/DressCodeSection";
+import { RsvpButton, RsvpSection } from "@/components/organisms/RsvpSection";
 import { EventSection } from "@/components/organisms/EventSection";
 import { GiftSection } from "@/components/organisms/GiftSection";
 import { PreWeddingSection } from "@/components/organisms/PreWeddingSection";
@@ -28,6 +29,7 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
 
       <StorySection t={t.story} />
       <EventSection t={t.event} locale={locale} />
+      <RsvpSection t={t.rsvp} locale={locale} />
       <DressCodeSection t={t.dress} />
       <GiftSection t={t.gift} locale={locale} />
       <PreWeddingSection t={t.prewedding} />
@@ -39,7 +41,9 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
         <p className="font-display leading-snug text-text-primary" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)" }}>
           {t.footer.title}
         </p>
-        <p className="mt-3 font-body text-100 uppercase tracking-[0.24em] text-text-secondary">{t.footer.signature}</p>
+        {/* o botão de confirmar presença de novo, pra quem chegou até o fim */}
+        <RsvpButton t={t.rsvp} locale={locale} className="mt-7" />
+        <p className="mt-7 font-body text-100 uppercase tracking-[0.24em] text-text-secondary">{t.footer.signature}</p>
       </footer>
     </div>
   );

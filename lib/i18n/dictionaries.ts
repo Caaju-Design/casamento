@@ -101,6 +101,16 @@ export type Dictionary = {
     fallback: string;
     iframeTitle: string;
   };
+  /** Chamada "Confirmar presença" (antes do Dress code e no rodapé) e a página /confirmacao-de-presenca. */
+  rsvp: {
+    title: string;
+    lead: string;
+    cta: string;
+    pageTitle: string;
+    newTabLabel: string;
+    fallback: string;
+    iframeTitle: string;
+  };
   /** Card "Em breve: fotos do pré-wedding" (sem botão). */
   prewedding: { title: string; sub: string; lead: string };
   /** Mapa "Onde ficar e aproveitar" (#hospedagem): filtros, cards e controles. */
@@ -275,6 +285,15 @@ const pt: Dictionary = {
     newTabLabel: "Abrir a lista em outra aba",
     fallback: "Se a lista não aparecer, use “Abrir em outra aba” lá em cima.",
     iframeTitle: "Lista de presentes de Gabriela & Emanuel",
+  },
+  rsvp: {
+    title: "Você vem viver esse dia com a gente?",
+    lead: "Estamos preparando tudo com muito carinho e queremos saber se podemos contar com você.",
+    cta: "Confirmar presença",
+    pageTitle: "Confirmação de presença",
+    newTabLabel: "Abrir a confirmação em outra aba",
+    fallback: "Se o formulário não aparecer, use “Abrir em outra aba” lá em cima.",
+    iframeTitle: "Confirmação de presença no casamento de Gabriela & Emanuel",
   },
   around: {
     eyebrow: "Hospedagem e dicas",
@@ -521,6 +540,15 @@ const en: Dictionary = {
     fallback: "If the registry doesn't show up, use “Open in a new tab” above.",
     iframeTitle: "Gabriela & Emanuel's gift registry",
   },
+  rsvp: {
+    title: "Will you share this day with us?",
+    lead: "We're preparing everything with lots of love and would love to know if we can count on you.",
+    cta: "RSVP",
+    pageTitle: "RSVP",
+    newTabLabel: "Open the RSVP form in a new tab",
+    fallback: "If the form doesn't show up, use “Open in a new tab” above.",
+    iframeTitle: "RSVP for Gabriela & Emanuel's wedding",
+  },
   around: {
     eyebrow: "Stay & local tips",
     title: "Where to stay and enjoy",
@@ -762,6 +790,15 @@ const ar: Dictionary = {
     newTabLabel: "فتح القائمة في علامة تبويب جديدة",
     fallback: "إن لم تظهر القائمة، استخدموا «فتح في علامة تبويب جديدة» في الأعلى.",
     iframeTitle: "قائمة هدايا غابرييلا وإيمانويل",
+  },
+  rsvp: {
+    title: "هل ستعيش هذا اليوم معنا؟",
+    lead: "نُعِدّ كل شيء بكثير من الحب، ونودّ أن نعرف إن كان بإمكاننا الاعتماد على حضورك.",
+    cta: "تأكيد الحضور",
+    pageTitle: "تأكيد الحضور",
+    newTabLabel: "فتح نموذج تأكيد الحضور في علامة تبويب جديدة",
+    fallback: "إن لم يظهر النموذج، استخدموا «فتح في علامة تبويب جديدة» في الأعلى.",
+    iframeTitle: "تأكيد الحضور في حفل زفاف غابرييلا وإيمانويل",
   },
   around: {
     eyebrow: "الإقامة ونصائح المنطقة",

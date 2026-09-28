@@ -214,21 +214,22 @@ export function HeroSection({
 
         {/*
           Dica de rolagem (pedido do Manu: o pessoal ficava parado no hero sem
-          saber o que fazer). Só o texto "Role para baixo" (sem fundo) no pé da tela — branco no
-          desktop (sobre a aquarela), escuro com brilho claro no celular (sobre o papel) + seta, flutuando devagar pra cima e pra baixo; some junto com a logo quando a rolagem
+          saber o que fazer). Só o texto "Role para baixo" (sem fundo) no pé da tela — branco (sobre
+          a aquarela); no celular fica logo abaixo da logo (a pintura desce ~0,5× a largura
+          da tela a partir do centro), pra não cair no papel branco + seta, flutuando devagar pra cima e pra baixo; some junto com a logo quando a rolagem
           começa. Clicar rola um pouco, pra pintura começar a andar.
         */}
         <div
-          className="absolute inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-30 flex justify-center"
+          className="absolute inset-x-0 top-[calc(50svh+34vw)] z-30 md:bottom-[max(1.5rem,env(safe-area-inset-bottom))] md:top-auto flex justify-center"
           style={{ opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)` }}
         >
           <button
             type="button"
             onClick={() => window.scrollBy({ top: window.innerHeight * 0.9, behavior: "smooth" })}
-            className="hero-hint-float group flex flex-col items-center gap-1.5 rounded-pill px-5 pb-2.5 pt-2 font-body text-100 font-bold uppercase tracking-[0.24em] text-text-primary [text-shadow:0_0_6px_rgba(245,242,237,1),0_0_14px_rgba(245,242,237,0.95),0_0_24px_rgba(245,242,237,0.8)] transition-colors hover:text-terracota-700 md:text-white md:[text-shadow:0_1px_8px_rgba(45,43,35,0.55)] md:hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus"
+            className="hero-hint-float group flex flex-col items-center gap-1.5 rounded-pill px-5 pb-2.5 pt-2 font-body text-100 font-bold uppercase tracking-[0.24em] text-white [text-shadow:0_1px_8px_rgba(45,43,35,0.55)] transition-colors hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus"
           >
             {labels.scroll}
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6 text-terracota-700 drop-shadow-[0_0_6px_rgba(245,242,237,1)] md:text-white md:drop-shadow-[0_1px_6px_rgba(45,43,35,0.55)]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6 text-white drop-shadow-[0_1px_6px_rgba(45,43,35,0.55)]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 9l6 6 6-6" />
             </svg>
           </button>
