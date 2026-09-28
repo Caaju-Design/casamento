@@ -45,8 +45,6 @@ export interface PhotoCollageMomentProps {
   photos: CollageItem[];
   /** Lado das fotos no desktop. O texto fica do outro lado. */
   photosSide: "left" | "right";
-  /** Altura do trilho de rolagem (mais fotos → trilho mais longo). */
-  trackVh?: number;
   /** Ornamentos (nuvens) presos na tela, atrás do conteúdo. */
   decor?: ReactNode;
 }
@@ -65,15 +63,15 @@ const OVERLAP = 0.35;
  * de baixo continuam aparecendo em volta. No celular: fotos em cima e texto
  * embaixo, numa tela só.
  */
-export function PhotoCollageMoment({ text, photos, photosSide, trackVh = 160, decor, quoteTone = "azul" }: PhotoCollageMomentProps) {
+export function PhotoCollageMoment({ text, photos, photosSide, decor, quoteTone = "azul" }: PhotoCollageMomentProps) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const progressRef = useTrackProgress(trackRef, 5200);
+  const progressRef = useTrackProgress(trackRef, 3600);
   const right = photosSide === "right";
   const slot = PAINT_SPAN / Math.max(1, photos.length);
 
   return (
-    <div ref={trackRef} className="relative" style={{ height: `${trackVh}vh` }}>
-      <div className={["sticky top-0 flex h-[100svh] pt-[72px] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
+    <div ref={trackRef} className="relative">
+      <div className={["flex h-[100svh] pt-[72px] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
         {decor}
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
           <div className="max-w-xl">

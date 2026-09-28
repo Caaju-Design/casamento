@@ -54,7 +54,6 @@ export function TravelMoment({ text }: { text: string }) {
       text={text}
       photos={PHOTOS}
       photosSide="right"
-      trackVh={160}
       decor={
         <>
           <Cloud id={2} className="left-0 top-[72px] w-[42vw] md:w-[26vw]" />

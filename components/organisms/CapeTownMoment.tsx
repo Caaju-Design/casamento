@@ -18,9 +18,6 @@ const WatercolorScene = dynamic(
 /** Manchas centradas (o quadro é quase quadrado): espalhamento parecido nos dois eixos. */
 const STAINS: StainPreset = { focusX: 0.5, focusY: 0.5, spreadX: 0.55, spreadY: 0.85, radius: 0.8 };
 
-/** Altura do trilho: a tela fica presa enquanto o voo sobre a cidade acontece. */
-const TRACK_VH = 140;
-
 /**
  * Momento 1 da "Nossa história" — Cape Town. Uma tela inteira: à esquerda
  * (50%) o voo de helicóptero sobre a Cidade do Cabo sendo pintado em
@@ -34,8 +31,8 @@ export function CapeTownMoment({ text }: { text: string }) {
   const progressRef = useTrackProgress(trackRef);
 
   return (
-    <div ref={trackRef} className="relative" style={{ height: `${TRACK_VH}vh` }}>
-      <div className="sticky top-0 flex h-[100svh] pt-[72px] flex-col md:flex-row">
+    <div ref={trackRef} className="relative">
+      <div className="flex h-[100svh] pt-[72px] flex-col md:flex-row">
         <Cloud id={7} className="right-[3%] top-[16%] w-[52vw] md:w-[30vw]" opacity={0.8} />
         <Cloud id={1} className="bottom-[4%] right-0 w-[28vw] md:w-[15vw]" />
         <WatercolorScene

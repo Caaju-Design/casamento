@@ -7,14 +7,18 @@ import { useLayoutEffect, useRef, type RefObject } from "react";
  *
  * Pedido da Gabi: as fotos surgem SOZINHAS quando a pessoa chega na tela,
  * sem depender de continuar rolando. Então o progresso agora é por TEMPO:
- * quando o topo do trilho chega perto do topo da tela, dispara uma animação
+ * quando o capítulo entra na tela, dispara uma animação
  * de `durationMs` que leva o progresso de 0 a 1 (com suavização) e fica em
  * 1 dali em diante. Quem desenha continua lendo a ref a cada quadro, então
  * as colagens com várias fotos continuam aparecendo uma depois da outra.
  *
  * Com "reduzir movimento", vai direto pro fim.
+ *
+ * Os capítulos NÃO ficam mais presos na tela (sem `sticky`, pedido do Manu:
+ * a rolagem "travava"); cada um tem a altura da tela e rola normal, e a
+ * pintura dispara quando o capítulo entra em 3/4 da tela.
  */
-export function useTrackProgress(trackRef: RefObject<HTMLElement | null>, durationMs = 4200) {
+export function useTrackProgress(trackRef: RefObject<HTMLElement | null>, durationMs = 3000) {
   const progressRef = useRef(0);
   useLayoutEffect(() => {
     const track = trackRef.current;
@@ -48,7 +52,7 @@ export function useTrackProgress(trackRef: RefObject<HTMLElement | null>, durati
         }
       },
       // dispara quando a tela do capítulo já ocupa boa parte da janela
-      { rootMargin: "0px 0px -35% 0px" },
+      { rootMargin: "0px 0px -25% 0px" },
     );
     io.observe(track);
     return () => {

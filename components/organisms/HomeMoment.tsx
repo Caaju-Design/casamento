@@ -30,7 +30,6 @@ const SOFA: VideoSources = {
 const CARRO_STAINS: StainPreset = { focusX: 0.42, focusY: 0.52, spreadX: 0.8, spreadY: 1.15, radius: 1.05 };
 const SOFA_STAINS: StainPreset = { focusX: 0.5, focusY: 0.5, spreadX: 0.8, spreadY: 1.15, radius: 1.05 };
 
-const TRACK_VH = 150;
 const TEXT_STYLE = { fontSize: "clamp(1.15rem, 1.7vw, 1.6rem)" } as const;
 /** Diferença (s) a partir da qual o segundo vídeo é realinhado ao primeiro. */
 const MAX_DRIFT = 0.25;
@@ -68,8 +67,8 @@ export function HomeMoment({ text }: { text: string }) {
   }, []);
 
   return (
-    <div ref={trackRef} className="relative" style={{ height: `${TRACK_VH}vh` }}>
-      <div className="sticky top-0 flex h-[100svh] pt-[72px] flex-col-reverse md:flex-row-reverse">
+    <div ref={trackRef} className="relative">
+      <div className="flex h-[100svh] pt-[72px] flex-col-reverse md:flex-row-reverse">
         <Cloud id={3} className="right-0 top-[72px] w-[38vw] md:w-[19vw]" />
         <Cloud id={7} className="bottom-[5%] right-[3%] w-[62vw] md:w-[32vw]" opacity={0.8} />
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-4 md:w-1/2 md:items-center md:px-16 md:py-0">
