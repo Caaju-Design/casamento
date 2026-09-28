@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { Icon } from "@/components/atoms/Icon";
 import { LanguageSwitcher } from "@/components/molecules/LanguageSwitcher";
 import type { Locale } from "@/lib/i18n/dictionaries";
 
@@ -114,14 +113,20 @@ export function AnchorNav({ items, startHiddenForHero = false, locale, labels = 
             aria-expanded={isOpen}
             aria-label={labels.openMenu}
           >
-            <Icon name="menu" />
+            {/* hambúrguer → X: as 3 barras se animam (a do meio some, as outras giram e cruzam) */}
+            <span aria-hidden="true" className="relative block h-4 w-6">
+              <span className={["absolute left-0 top-0 h-[1.5px] w-6 rounded-full bg-current transition-transform duration-300 ease-out", isOpen ? "translate-y-[7px] rotate-45" : ""].join(" ")} />
+              <span className={["absolute left-0 top-[7px] h-[1.5px] w-6 rounded-full bg-current transition-[opacity,transform] duration-200 ease-out", isOpen ? "scale-x-0 opacity-0" : ""].join(" ")} />
+              <span className={["absolute left-0 top-[14px] h-[1.5px] w-6 rounded-full bg-current transition-transform duration-300 ease-out", isOpen ? "-translate-y-[7px] -rotate-45" : ""].join(" ")} />
+            </span>
           </button>
           <ul
             className={[
               "font-body text-100",
-              isOpen
-                ? "absolute inset-x-0 top-full flex flex-col items-center border-b border-white/40 bg-page/70 px-6 py-3 backdrop-blur-xl backdrop-saturate-150 text-center shadow-[0_12px_30px_-20px_rgba(45,43,35,0.5)] md:flex-row md:flex-wrap md:justify-center md:gap-x-8 md:py-2"
-                : "hidden",
+              "absolute inset-x-0 top-full flex origin-top flex-col items-center border-b border-white/40 bg-page/70 px-6 py-3 text-center shadow-[0_12px_30px_-20px_rgba(45,43,35,0.5)] backdrop-blur-xl backdrop-saturate-150 md:flex-row md:flex-wrap md:justify-center md:gap-x-8 md:py-2",
+              // abre/fecha sempre com animação suave (desce e aparece / sobe e some)
+              "transition-[opacity,transform,visibility] duration-300 ease-out motion-reduce:transition-none",
+              isOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0",
             ].join(" ")}
           >
             {items.map((item) => (

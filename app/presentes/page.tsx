@@ -39,9 +39,9 @@ export default async function GiftListPage({ searchParams }: Props) {
       <header className="relative z-10 grid h-[72px] shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 bg-white px-4 shadow-[0_10px_30px_-24px_rgba(45,43,35,0.45)] md:px-6">
         <Link
           href={`${info.href}#presentes`}
-          className="inline-flex min-h-[44px] items-center gap-2 justify-self-start font-body text-100 uppercase tracking-[0.18em] text-text-primary hover:text-terracota-700"
+          className="inline-flex min-h-[44px] min-w-[44px] items-center gap-2 justify-self-start font-body text-100 uppercase tracking-[0.18em] text-text-primary hover:text-terracota-700"
         >
-          <span aria-hidden="true" className="rtl:-scale-x-100">←</span> {t.back}
+          <span aria-hidden="true" className="text-200 rtl:-scale-x-100">←</span> <span className="sr-only sm:not-sr-only">{t.back}</span>
         </Link>
         {/* no centro, só a logo do casal (igual ao menu do site); o título fica pra leitor de tela */}
         <h1 className="justify-self-center">
