@@ -15,14 +15,9 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
  */
 
 
-function Card({ title, children, delay, art, artAlt }: { title: string; children: React.ReactNode; delay: number; art: string; artAlt: string }) {
+function Card({ title, children, delay }: { title: string; children: React.ReactNode; delay: number }) {
   return (
     <PaintReveal variant="rise" delay={delay} className="rounded-card border border-caramelo-100 bg-page/80 p-7 backdrop-blur-[2px] md:p-8">
-      {/* ilustração em aquarela dos calçados, em perspectiva (public/dresscode) */}
-      <div className="-mt-2 mb-5 flex h-32 items-end justify-center sm:h-36">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={art} alt={artAlt} width={600} height={300} loading="lazy" decoding="async" className="h-full w-auto max-w-full object-contain mix-blend-multiply" />
-      </div>
       <h3 className="font-body font-bold leading-tight text-text-primary" style={{ fontSize: "clamp(1.35rem, 2.2vw, 1.65rem)" }}>
         {title}
       </h3>
@@ -49,11 +44,11 @@ export function DressCodeSection({ t }: { t: Dictionary["dress"] }) {
         />
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <Card title={t.herTitle} delay={100} art="/dresscode/elas.webp" artAlt={t.herArt}>
+          <Card title={t.herTitle} delay={100}>
             <p>{t.her[0]}</p>
             <p>{t.her[1]}</p>
           </Card>
-          <Card title={t.himTitle} delay={250} art="/dresscode/eles.webp" artAlt={t.himArt}>
+          <Card title={t.himTitle} delay={250}>
             <p>{t.him[0]}</p>
             <p>{t.him[1]}</p>
           </Card>

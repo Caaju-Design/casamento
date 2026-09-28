@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 660" width="2000" height="1320">
+<defs>
+  <linearGradient id="skin" x1="0" y1="0" x2="0.3" y2="1">
+    <stop offset="0" stop-color="#f6c9ae"/><stop offset=".45" stop-color="#eda283"/><stop offset="1" stop-color="#c9674a"/>
+  </linearGradient>
+  <radialGradient id="toeGlow" cx="0.82" cy="0.78" r="0.35">
+    <stop offset="0" stop-color="#fff4ea" stop-opacity=".75"/><stop offset="1" stop-color="#fff4ea" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="lining" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fbeee2"/><stop offset="1" stop-color="#efd3bd"/>
+  </linearGradient>
+  <linearGradient id="insole" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#c98b67"/><stop offset="1" stop-color="#e2b394"/>
+  </linearGradient>
+  <linearGradient id="heelG" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#e59d7c"/><stop offset=".6" stop-color="#c97556"/><stop offset="1" stop-color="#9a4f36"/>
+  </linearGradient>
+  <linearGradient id="strapG" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f1b394"/><stop offset="1" stop-color="#cf7658"/>
+  </linearGradient>
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="4"/>
+  </filter>
+  <g id="shoe">
+    <!-- corpo -->
+    <path d="M282,222 C262,252 268,302 310,332 C430,362 590,470 720,500 C812,522 876,500 862,458 C846,420 760,392 668,380 C540,352 400,262 322,228 C306,220 292,218 282,222 Z" fill="url(#skin)"/>
+    <path d="M282,222 C262,252 268,302 310,332 C430,362 590,470 720,500 C812,522 876,500 862,458 C846,420 760,392 668,380 C540,352 400,262 322,228 C306,220 292,218 282,222 Z" fill="url(#toeGlow)"/>
+    <!-- sombra lateral (volume) -->
+    <path d="M310,332 C430,362 590,470 720,500 C812,522 876,500 862,458 C858,486 800,500 730,486 C610,460 470,380 330,340 Z" fill="#a8523a" opacity=".35"/>
+    <!-- sola -->
+    <path d="M370,356 C490,400 610,478 720,500 C812,522 876,500 862,458 L870,470 C882,512 812,536 718,512 C600,490 480,410 368,366 Z" fill="#7a4632"/>
+    <path d="M372,362 C492,406 610,484 720,506 C810,526 870,506 866,468" fill="none" stroke="#e8c49a" stroke-width="1.6" stroke-dasharray="5 5" opacity=".8"/>
+    <!-- abertura: forro e palmilha -->
+    <path d="M286,230 C332,300 500,382 660,386 C540,338 400,250 286,230 Z" fill="url(#lining)"/>
+    <path d="M298,242 C348,296 450,346 548,362 C455,326 372,272 298,242 Z" fill="url(#insole)"/>
+    <text x="0" y="0" font-family="Italianno, cursive" font-size="22" fill="#8a4f35" opacity=".7" transform="translate(372 300) rotate(27)">G&amp;E</text>
+    <!-- borda dourada da abertura com festonê -->
+    <path d="M286,230 C332,300 500,382 660,386" fill="none" stroke="#c49a55" stroke-width="5" stroke-linecap="round"/>
+    <path d="M292,244 C338,312 502,394 656,398" fill="none" stroke="#c49a55" stroke-width="7" stroke-dasharray="0.1 13" stroke-linecap="round" opacity=".9"/>
+    <path d="M660,386 C540,338 400,250 286,230" fill="none" stroke="#c49a55" stroke-width="3" opacity=".75"/>
+    <!-- picotes acompanhando a borda -->
+    <path d="M300,262 C350,328 510,410 690,414" fill="none" stroke="#8f4630" stroke-width="3.2" stroke-dasharray="0.1 9" stroke-linecap="round" opacity=".75"/>
+    <!-- coração vazado no bico -->
+    <path d="M760,452 C744,432 716,440 722,462 C728,480 752,488 772,500 C784,480 800,466 792,448 C786,432 766,436 760,452 Z" fill="#c9674a" opacity=".55"/>
+    <path d="M760,452 C744,432 716,440 722,462 C728,480 752,488 772,500 C784,480 800,466 792,448 C786,432 766,436 760,452 Z" fill="none" stroke="#8f4630" stroke-width="3" stroke-dasharray="0.1 8" stroke-linecap="round"/>
+    <!-- tira Mary Jane atravessando o peito do pé, com fivela dourada -->
+    <path d="M468,294 C446,318 462,350 506,372" fill="none" stroke="#b9674b" stroke-width="20" stroke-linecap="round" opacity=".5"/>
+    <path d="M468,294 C446,318 462,350 506,372" fill="none" stroke="url(#strapG)" stroke-width="16" stroke-linecap="round"/>
+    <path d="M468,294 C446,318 462,350 506,372" fill="none" stroke="#c49a55" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <path d="M506,372 C514,386 518,398 516,410" fill="none" stroke="url(#strapG)" stroke-width="15" stroke-linecap="round"/>
+    <rect x="500" y="378" width="24" height="20" rx="4" fill="none" stroke="#b8893e" stroke-width="4.5" transform="rotate(18 512 388)"/>
+    <line x1="512" y1="378" x2="512" y2="398" stroke="#b8893e" stroke-width="2.5" transform="rotate(18 512 388)"/>
+    <circle cx="518" cy="408" r="2.4" fill="#5a3322"/>
+    <!-- salto bloco -->
+    <path d="M298,326 L362,350 C354,400 346,440 342,474 L306,466 C306,420 302,370 298,326 Z" fill="url(#heelG)"/>
+    <path d="M362,350 L376,352 C368,400 360,440 354,474 L342,474 C346,440 354,400 362,350 Z" fill="#7d3f2a"/>
+    <path d="M306,462 L342,470 L354,470 L352,480 L304,474 Z" fill="#3d2418"/>
+    <path d="M300,334 L360,356" stroke="#c49a55" stroke-width="3"/>
+    <!-- brilhos -->
+    <path d="M740,468 C780,460 822,468 846,486" fill="none" stroke="#fffaf3" stroke-width="7" stroke-linecap="round" opacity=".75"/>
+    <path d="M560,430 C600,446 640,462 670,470" fill="none" stroke="#fffaf3" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+    <path d="M312,370 C316,400 316,430 318,452" fill="none" stroke="#fffaf3" stroke-width="3.5" stroke-linecap="round" opacity=".55"/>
+    <path d="M286,250 C282,278 290,302 306,318" fill="none" stroke="#fffaf3" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+    <!-- contorno sépia -->
+    <path d="M282,222 C262,252 268,302 310,332 C430,362 590,470 720,500 C812,522 876,500 862,458 C846,420 760,392 668,380 C540,352 400,262 322,228 C306,220 292,218 282,222 Z" fill="none" stroke="#5a3322" stroke-width="2.2" opacity=".75"/>
+    <path d="M298,326 L362,350 L376,352 C368,400 360,440 354,474 L306,466 C306,420 302,370 298,326 Z" fill="none" stroke="#5a3322" stroke-width="1.8" opacity=".7"/>
+  </g>
+</defs>
+<!-- sombra no chão -->
+<ellipse cx="560" cy="512" rx="360" ry="26" fill="#8a7d74" opacity=".22" filter="url(#rough)"/>
+<g filter="url(#rough)">
+  <use xlink:href="#shoe" transform="translate(-150 -70) scale(0.92)"/>
+  <use xlink:href="#shoe" transform="translate(40 30)"/>
+</g>
+</svg>
