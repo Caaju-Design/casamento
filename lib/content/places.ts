@@ -49,15 +49,15 @@ export const PLACES: Place[] = [
   { id: "boteco-sp", name: "Boteco São Paulo — Vila Cruzeiro", category: "restaurante", lat: -23.6412, lng: -46.7128, query: "Boteco São Paulo, Vila Cruzeiro, São Paulo", approx: true, photo: "/lugares/boteco-sp.webp" },
   // shoppings
   { id: "parque-cidade", name: "Shopping Parque da Cidade", category: "shopping", lat: -23.6262, lng: -46.7011, query: "Shopping Parque da Cidade, São Paulo", approx: true, photo: "/lugares/parque-cidade.webp" },
-  { id: "morumbi", name: "MorumbiShopping", category: "shopping", lat: -23.6231, lng: -46.6989, query: "MorumbiShopping, São Paulo", approx: true },
+  { id: "morumbi", name: "MorumbiShopping", category: "shopping", lat: -23.6231, lng: -46.6989, query: "MorumbiShopping, São Paulo", approx: true, photo: "/lugares/morumbi.webp" },
   { id: "market-place", name: "Shopping Market Place", category: "shopping", lat: -23.6177, lng: -46.6969, query: "Shopping Market Place, São Paulo", approx: true },
   // salões e barbearias
-  { id: "ritualle", name: "Ritualle Bem Estar", category: "beleza", lat: -23.6405, lng: -46.7162, query: "Ritualle Bem Estar, Vila Cruzeiro, São Paulo", approx: true },
+  { id: "ritualle", name: "Ritualle Bem Estar", category: "beleza", lat: -23.6405, lng: -46.7162, query: "Ritualle Bem Estar, Vila Cruzeiro, São Paulo", approx: true, photo: "/lugares/ritualle.webp" },
   { id: "geff", name: "Geff Lima", category: "beleza", lat: -23.6361, lng: -46.7092, query: "Geff Lima, Rua Booker Pittman, 57, São Paulo", approx: true, photo: "/lugares/geff.webp" },
   { id: "jacques", name: "Jacques Janine", category: "beleza", lat: -23.6356, lng: -46.7058, query: "Jacques Janine Granja Julieta, São Paulo", approx: true, photo: "/lugares/jacques.webp" },
-  { id: "dharma", name: "Espaço Dharma", category: "beleza", lat: -23.6389, lng: -46.7171, query: "Espaço Dharma, Vila Cruzeiro, São Paulo", approx: true },
+  { id: "dharma", name: "Espaço Dharma", category: "beleza", lat: -23.6389, lng: -46.7171, query: "Espaço Dharma, Vila Cruzeiro, São Paulo", approx: true, photo: "/lugares/dharma.webp" },
   { id: "tarantino", name: "Tarantino", category: "beleza", lat: -23.6309, lng: -46.7049, query: "Barbearia Tarantino, Chácara Santo Antônio, São Paulo", approx: true, photo: "/lugares/tarantino.webp" },
-  { id: "corleone", name: "Corleone", category: "beleza", lat: -23.6228, lng: -46.6994, query: "Barbearia Corleone, MorumbiShopping, São Paulo", approx: true },
+  { id: "corleone", name: "Corleone", category: "beleza", lat: -23.6228, lng: -46.6994, query: "Barbearia Corleone, MorumbiShopping, São Paulo", approx: true, photo: "/lugares/corleone.webp" },
 ];
 
 /** Distância em linha reta (km), fórmula de haversine. */
