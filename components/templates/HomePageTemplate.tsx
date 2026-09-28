@@ -49,13 +49,13 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
         <p className="mt-7 font-body text-100 uppercase tracking-[0.24em] text-text-secondary">{t.footer.signature}</p>
       </footer>
       {/* rodapé fininho: crédito da Caáju */}
-      <div className="border-t border-caramelo-100 px-6 py-4 text-center font-body text-[0.72rem] tracking-[0.06em] text-text-secondary">
+      <div className="px-6 py-2 text-center font-body text-[0.72rem] tracking-[0.06em] text-text-secondary">
         {t.footer.credit}{" "}
         <a
           href="https://www.caaju.com.br"
           target="_blank"
           rel="noopener"
-          className="font-bold text-text-primary underline decoration-caramelo-200 underline-offset-4 transition-colors hover:text-terracota-700 hover:decoration-terracota-500"
+          className="font-bold text-text-primary transition-colors hover:text-terracota-700"
         >
           Caáju Design Ltda.
         </a>
