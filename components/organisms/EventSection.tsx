@@ -190,7 +190,7 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
                     aria-hidden="true"
                     className="absolute -start-[2.4rem] top-1.5 block h-3.5 w-3.5 rounded-full border-2 border-page bg-salvia-500"
                   />
-                  <p className="font-body text-100 font-bold tracking-[0.12em] text-terracota-700">{step.time}</p>
+                  <p className="font-body text-100 font-bold tracking-[0.12em] text-salvia-800">{step.time}</p>
                   <p className="mt-0.5 font-body font-bold leading-snug text-text-primary" style={{ fontSize: "clamp(1.3rem, 2.2vw, 1.6rem)" }}>
                     {step.title}
                   </p>
