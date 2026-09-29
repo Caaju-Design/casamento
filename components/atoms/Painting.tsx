@@ -20,6 +20,8 @@ type PaintingInfo = { w: number; h: number; edge?: string };
 
 export const PAINTINGS = {
   "baia-ilhas": { w: 753, h: 370 },
+  /** baia-ilhas sem o primeiro plano (mato, pedra e montanhas do canto de baixo à esquerda) */
+  "baia-ilhas-mar": { w: 753, h: 305 },
   "baia-veleiro": { w: 325, h: 305 },
   /** só a cena de cima da baia-veleiro (baía com veleiros), ampliada 2× e com bordas mastigadas */
   "baia-veleiro-topo": { w: 650, h: 364 },

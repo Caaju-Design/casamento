@@ -15,10 +15,11 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 export function ArriveSection({ t }: { t: Dictionary["stay"] }) {
   return (
-    <section id="como-chegar" aria-labelledby="como-chegar-titulo" className="relative isolate pb-[min(34vw,17rem)] pt-8">
+    <section id="como-chegar" aria-labelledby="como-chegar-titulo" className="relative isolate pb-[26vw] pt-8">
       <Cloud id={4} className="left-0 top-[10%] w-[60vw] md:w-[28vw]" opacity={0.8} />
-      <Painting name="faixa-mesa" className="absolute bottom-0 left-1/2 w-[min(100%,780px)] -translate-x-1/2" />
-      <Painting name="arbustos-pedras" className="absolute bottom-0 right-0 w-[40vw] max-w-[250px]" />
+      <Painting name="faixa-mesa" className="absolute bottom-0 left-1/2 w-[90vw] -translate-x-1/2" />
+      {/* a árvore do ipê (veio do "O grande dia"), maior, no canto esquerdo */}
+      <Painting name="arvore" className="absolute bottom-0 left-0 w-[46vw] max-w-[360px]" />
 
       <div className="mx-auto max-w-5xl px-6">
         <SectionHeading id="como-chegar-titulo" eyebrow={t.arriveEyebrow} title={t.arriveTitle} highlight />

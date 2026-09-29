@@ -1,3 +1,4 @@
+import { Painting } from "@/components/atoms/Painting";
 import { AnchorNav } from "@/components/molecules/AnchorNav";
 import { DressCodeSection } from "@/components/organisms/DressCodeSection";
 import { RsvpButton, RsvpSection } from "@/components/organisms/RsvpSection";
@@ -42,7 +43,10 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <PreWeddingSection t={t.prewedding} />
 
       {/* rodapé: a aquarela da baía saiu; aqui vai entrar uma foto do pré-wedding (pedido do Manu) */}
-      <footer className="relative isolate px-6 pb-section-gap pt-section-gap text-center">
+      <footer className="relative isolate px-6 pb-[max(10rem,20vw)] pt-section-gap text-center">
+        {/* pedras nos cantos de baixo: a do ipê à esquerda, a das agaves (espelhada) à direita */}
+        <Painting name="arbusto-pedra-canto" className="absolute bottom-0 left-0 w-[40vw] max-w-[300px]" />
+        <Painting name="arbustos-pedras" flip className="absolute bottom-0 right-0 w-[40vw] max-w-[300px]" />
         <p className="font-display leading-snug text-text-title" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)" }}>
           {t.footer.title}
         </p>

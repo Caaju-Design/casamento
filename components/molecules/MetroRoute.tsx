@@ -60,43 +60,10 @@ function strokePath(x: number, y0: number, y1: number, seed: number, amp: number
   return d;
 }
 
-/**
- * Uma "linha de metrô" pintada: mancha clara que vaza (borrada), passada
- * principal e duas passadas finas deslocadas — mesma receita do círculo do
- * calendário (`brush-rough`): contorno ondulado + falhas de tinta seca.
- */
-function InkLine({ x, y0, y1, color, seed, f }: { x: number; y0: number; y1: number; color: string; seed: number; f: string }) {
-  if (y1 - y0 < 4) return null;
-  return (
-    <g stroke={color} fill="none" strokeLinecap="round">
-      {/* água que vaza em volta */}
-      <path d={strokePath(x, y0 - 4, y1 + 4, seed, 3)} strokeWidth={26} strokeOpacity={0.13} filter={`url(#${f}-bleed)`} />
-      {/* corpo da pincelada: tinta rala, granulada e arrastada */}
-      <path d={strokePath(x, y0, y1, seed + 1, 2)} strokeWidth={13} strokeOpacity={0.5} filter={`url(#${f}-wash)`} />
-      <path d={strokePath(x + 1.5, y0 + 8, y1 - 6, seed + 2, 2.6)} strokeWidth={6} strokeOpacity={0.35} filter={`url(#${f}-wash)`} />
-      {/* bordas mais escuras, onde o pigmento acumula quando a água seca */}
-      <g filter={`url(#${f}-brush)`}>
-        <path d={strokePath(x - 5.5, y0 + 3, y1 - 3, seed + 1, 2)} strokeWidth={1.7} strokeOpacity={0.6} />
-        <path d={strokePath(x + 5.5, y0 + 5, y1 - 2, seed + 1, 2)} strokeWidth={1.4} strokeOpacity={0.5} />
-      </g>
-    </g>
-  );
-}
 
 /** Papel (miolo branco das bolinhas), com a borda levemente irregular. */
 const PAPER = "#fbfaf6";
 
-/** Anel pintado: miolo de papel + aro de tinta rala com a borda mais escura. */
-function PaintRing({ cx, cy, r, width, color, f }: { cx: number; cy: number; r: number; width: number; color: string; f: string }) {
-  return (
-    <g>
-      <circle cx={cx} cy={cy} r={r + width / 2} fill={color} fillOpacity={0.12} filter={`url(#${f}-bleed)`} />
-      <circle cx={cx} cy={cy} r={r + width / 2} fill={PAPER} filter={`url(#${f}-paper)`} />
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={width} strokeOpacity={0.72} filter={`url(#${f}-dab)`} />
-      <circle cx={cx} cy={cy} r={r + width / 2 - 0.6} fill="none" stroke={color} strokeWidth={1.1} strokeOpacity={0.55} filter={`url(#${f}-dab)`} />
-    </g>
-  );
-}
 
 type MNode = { kind: NodeKind; y: number; c1?: string; c2?: string };
 type Geo = { w: number; h: number; x: number; nodes: MNode[] };
@@ -145,11 +112,17 @@ function Ink({ geo, f }: { geo: Geo; f: string }) {
     if (last && last.color === c && last.b === nodes[i]) last.b = nodes[i + 1]!;
     else runs.push({ color: c, a: nodes[i]!, b: nodes[i + 1]! });
   }
+  const lines = runs.filter((r) => r.color !== "dash" && r.b.y - r.a.y >= 4).map((r, i) => ({ ...r, seed: 11 + i * 26 }));
+  const dashes = runs.filter((r) => r.color === "dash");
+  const rings = nodes
+    .filter((n) => n.kind === "dot" || n.kind === "ring" || n.kind === "end")
+    .map((n) => ({ y: n.y, c: n.c1!, r: n.kind === "dot" ? 5.2 : 13.5, sw: n.kind === "dot" ? 3 : 6, end: n.kind === "end" }));
+  const transfers = nodes.filter((n) => n.kind === "transfer");
   return (
     <svg aria-hidden="true" width={w} height={h} className="pointer-events-none absolute inset-0 overflow-visible">
         <defs>
           {/* contorno ondulado (ruído grosso) + tinta seca arrastada no sentido da pincelada (ruído fino esticado na vertical) */}
-          <filter id={`${f}-brush`} filterUnits="userSpaceOnUse" x={-20} y={-20} width={w + 40} height={h + 40}>
+          <filter id={`${f}-brush`} filterUnits="userSpaceOnUse" x={x - 48} y={-30} width={96} height={h + 60}>
             <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="4" result="wob" />
             <feDisplacementMap in="SourceGraphic" in2="wob" scale="5" result="shape" />
             <feTurbulence type="fractalNoise" baseFrequency="0.7 0.05" numOctaves="2" seed="9" result="grain" />
@@ -157,7 +130,7 @@ function Ink({ geo, f }: { geo: Geo; f: string }) {
             <feComposite in="shape" in2="dry" operator="in" />
           </filter>
           {/* corpo: ondulado + pigmento granulado em faixas verticais (a tinta falha e acumula no sentido do pincel) */}
-          <filter id={`${f}-wash`} filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
+          <filter id={`${f}-wash`} filterUnits="userSpaceOnUse" x={x - 48} y={-30} width={96} height={h + 60}>
             <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4" result="wob" />
             <feDisplacementMap in="SourceGraphic" in2="wob" scale="7" result="shape" />
             <feTurbulence type="fractalNoise" baseFrequency="0.3 0.035" numOctaves="3" seed="21" result="grain" />
@@ -165,7 +138,7 @@ function Ink({ geo, f }: { geo: Geo; f: string }) {
             <feComposite in="shape" in2="pig" operator="in" />
           </filter>
           {/* bolinhas: ondulado bem leve (círculo pequeno deforma fácil) + granulado suave */}
-          <filter id={`${f}-dab`} filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
+          <filter id={`${f}-dab`} filterUnits="userSpaceOnUse" x={x - 48} y={-30} width={96} height={h + 60}>
             <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="6" result="wob" />
             <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.6" result="shape" />
             <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="2" seed="13" result="grain" />
@@ -173,55 +146,81 @@ function Ink({ geo, f }: { geo: Geo; f: string }) {
             <feComposite in="shape" in2="pig" operator="in" />
           </filter>
           {/* papel: só o contorno levemente irregular, sem granulado (tampa a linha por baixo) */}
-          <filter id={`${f}-paper`} filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
+          <filter id={`${f}-paper`} filterUnits="userSpaceOnUse" x={x - 48} y={-30} width={96} height={h + 60}>
             <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="6" result="wob" />
             <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.6" />
           </filter>
           {/* água que vaza em volta da pincelada */}
-          <filter id={`${f}-bleed`} filterUnits="userSpaceOnUse" x={-30} y={-30} width={w + 60} height={h + 60}>
+          <filter id={`${f}-bleed`} filterUnits="userSpaceOnUse" x={x - 48} y={-30} width={96} height={h + 60}>
             <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="2" result="wob" />
             <feDisplacementMap in="SourceGraphic" in2="wob" scale="14" result="d" />
             <feGaussianBlur in="d" stdDeviation="3" />
           </filter>
         </defs>
-      {runs.map((r, i) =>
-        r.color === "dash" ? (
-          <path
-            key={i}
-            d={`M${x} ${r.a.y + RADIUS[r.a.kind] + 6} L${x} ${r.b.y - RADIUS[r.b.kind] - 6}`}
-            stroke={RIDE}
-            strokeWidth={4}
-            strokeLinecap="round"
-            strokeDasharray="0.1 9"
-            filter={`url(#${f}-brush)`}
-          />
-        ) : (
-          <InkLine key={i} x={x} y0={r.a.y} y1={r.b.y} color={r.color} seed={11 + i * 26} f={f} />
-        ),
-      )}
-      {nodes.map((n, i) => {
-        if (n.kind === "dot") return <PaintRing key={i} cx={x} cy={n.y} r={5.2} width={3} color={n.c1!} f={f} />;
-        if (n.kind === "ring" || n.kind === "end")
-          return (
-            <g key={i}>
-              <PaintRing cx={x} cy={n.y} r={13.5} width={6} color={n.c1!} f={f} />
-              {n.kind === "end" && <circle cx={x} cy={n.y} r={5} fill={n.c1} fillOpacity={0.8} filter={`url(#${f}-dab)`} />}
-            </g>
-          );
-        if (n.kind === "transfer")
-          return (
-            <g key={i}>
-              <circle cx={x} cy={n.y} r={21} fill="none" stroke={n.c2} strokeOpacity={0.1} strokeWidth={6} filter={`url(#${f}-bleed)`} />
-              <circle cx={x} cy={n.y} r={19} fill={PAPER} filter={`url(#${f}-paper)`} />
-              <g filter={`url(#${f}-dab)`}>
-                <path d={`M${x - 19} ${n.y} A19 19 0 0 1 ${x + 19} ${n.y} Z`} fill={n.c1} fillOpacity={0.78} />
-                <path d={`M${x + 19} ${n.y} A19 19 0 0 1 ${x - 19} ${n.y} Z`} fill={n.c2} fillOpacity={0.78} />
-              </g>
-              <circle cx={x} cy={n.y} r={11.5} fill={PAPER} filter={`url(#${f}-paper)`} />
-            </g>
-          );
-        return null;
-      })}
+      {/*
+        Desempenho (celular): cada filtro de aquarela roda UMA vez por camada
+        (tudo que usa o mesmo filtro vai num grupo só) e só na faixa do
+        trilho (±48px), não no quadro inteiro. Antes eram ~70 filtros, cada um
+        sobre a figura toda: o celular pintava aos pedaços e parecia cortado.
+      */}
+      <g filter={`url(#${f}-bleed)`}>
+        {lines.map((r, i) => (
+          <path key={i} d={strokePath(x, r.a.y - 4, r.b.y + 4, r.seed, 3)} stroke={r.color} fill="none" strokeLinecap="round" strokeWidth={26} strokeOpacity={0.13} />
+        ))}
+        {rings.map((n, i) => (
+          <circle key={i} cx={x} cy={n.y} r={n.r + n.sw / 2} fill={n.c} fillOpacity={0.12} />
+        ))}
+        {transfers.map((n, i) => (
+          <circle key={i} cx={x} cy={n.y} r={21} fill="none" stroke={n.c2} strokeOpacity={0.1} strokeWidth={6} />
+        ))}
+      </g>
+      <g filter={`url(#${f}-wash)`} fill="none" strokeLinecap="round">
+        {lines.map((r, i) => (
+          <g key={i} stroke={r.color}>
+            <path d={strokePath(x, r.a.y, r.b.y, r.seed + 1, 2)} strokeWidth={13} strokeOpacity={0.5} />
+            <path d={strokePath(x + 1.5, r.a.y + 8, r.b.y - 6, r.seed + 2, 2.6)} strokeWidth={6} strokeOpacity={0.35} />
+          </g>
+        ))}
+      </g>
+      <g filter={`url(#${f}-brush)`} fill="none" strokeLinecap="round">
+        {lines.map((r, i) => (
+          <g key={i} stroke={r.color}>
+            <path d={strokePath(x - 5.5, r.a.y + 3, r.b.y - 3, r.seed + 1, 2)} strokeWidth={1.7} strokeOpacity={0.6} />
+            <path d={strokePath(x + 5.5, r.a.y + 5, r.b.y - 2, r.seed + 1, 2)} strokeWidth={1.4} strokeOpacity={0.5} />
+          </g>
+        ))}
+        {dashes.map((r, i) => (
+          <path key={i} d={`M${x} ${r.a.y + RADIUS[r.a.kind] + 6} L${x} ${r.b.y - RADIUS[r.b.kind] - 6}`} stroke={RIDE} strokeWidth={4} strokeDasharray="0.1 9" />
+        ))}
+      </g>
+      <g filter={`url(#${f}-paper)`} fill={PAPER}>
+        {rings.map((n, i) => (
+          <circle key={i} cx={x} cy={n.y} r={n.r + n.sw / 2} />
+        ))}
+        {transfers.map((n, i) => (
+          <circle key={i} cx={x} cy={n.y} r={19} />
+        ))}
+      </g>
+      <g filter={`url(#${f}-dab)`}>
+        {rings.map((n, i) => (
+          <g key={i} fill="none" stroke={n.c}>
+            <circle cx={x} cy={n.y} r={n.r} strokeWidth={n.sw} strokeOpacity={0.72} />
+            <circle cx={x} cy={n.y} r={n.r + n.sw / 2 - 0.6} strokeWidth={1.1} strokeOpacity={0.55} />
+            {n.end && <circle cx={x} cy={n.y} r={5} fill={n.c} fillOpacity={0.8} stroke="none" />}
+          </g>
+        ))}
+        {transfers.map((n, i) => (
+          <g key={i}>
+            <path d={`M${x - 19} ${n.y} A19 19 0 0 1 ${x + 19} ${n.y} Z`} fill={n.c1} fillOpacity={0.78} />
+            <path d={`M${x + 19} ${n.y} A19 19 0 0 1 ${x - 19} ${n.y} Z`} fill={n.c2} fillOpacity={0.78} />
+          </g>
+        ))}
+      </g>
+      <g filter={`url(#${f}-paper)`} fill={PAPER}>
+        {transfers.map((n, i) => (
+          <circle key={i} cx={x} cy={n.y} r={11.5} />
+        ))}
+      </g>
     </svg>
   );
 }

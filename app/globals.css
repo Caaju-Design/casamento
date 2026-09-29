@@ -22,6 +22,16 @@ html {
 
 body {
   background-color: theme("colors.page");
+  /*
+   * Papel de aquarela (cold press) no site inteiro: um ladrilho de 512px
+   * (13 kB, gerado por código, sem emenda) repetido. Sem
+   * `background-attachment: fixed` de propósito — no celular isso obriga a
+   * repintar a tela toda a cada rolagem; assim o papel rola junto e custa
+   * o mesmo que uma cor lisa. O relevo é bem sutil (±3% de luz) pra não
+   * brigar com as aquarelas, que continuam pintadas no creme liso.
+   */
+  background-image: url("/decor/papel.webp");
+  background-size: 512px 512px;
   overscroll-behavior-y: none;
 }
 

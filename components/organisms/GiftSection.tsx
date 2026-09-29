@@ -26,8 +26,7 @@ export function GiftSection({ t, locale }: { t: Dictionary["gift"]; locale: Loca
             {t.title}
           </h2>
           <span aria-hidden="true" className="mt-4 block h-px w-10 bg-salvia-700" />
-          <p className="mt-5 font-body text-100 uppercase tracking-[0.24em] text-salvia-800">{t.sub}</p>
-          <p className="mt-3 max-w-md font-body text-200 italic leading-relaxed text-text-secondary">
+          <p className="mt-5 max-w-md font-body text-200 italic leading-relaxed text-text-secondary">
             {t.lead}
           </p>
           <Link

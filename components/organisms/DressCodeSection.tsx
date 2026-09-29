@@ -31,7 +31,6 @@ export function DressCodeSection({ t }: { t: Dictionary["dress"] }) {
     <section id="dresscode" aria-labelledby="dresscode-titulo" className="relative isolate py-section-gap">
       <Painting name="ramo-pendente" flip className="absolute left-0 top-0 w-[38vw] max-w-[230px]" />
       <Painting name="arvore-grande" flip className="absolute bottom-[6%] right-0 hidden w-[15rem] md:block" />
-      <Painting name="arbusto-pedra-canto" className="absolute bottom-0 left-0 w-[46vw] max-w-[300px]" />
       <Cloud id={3} className="right-0 top-0 w-[44vw] md:w-[22vw]" />
       <Cloud id={7} className="bottom-[30%] left-[4%] w-[60vw] md:w-[30vw]" opacity={0.7} />
 
