@@ -41,6 +41,7 @@ export function DressCodeSection({ t }: { t: Dictionary["dress"] }) {
           eyebrow={t.eyebrow}
           title={t.title}
           lead={t.lead}
+          highlight
         />
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">

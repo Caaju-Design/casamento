@@ -4,6 +4,7 @@ import { RsvpButton, RsvpSection } from "@/components/organisms/RsvpSection";
 import { EventSection } from "@/components/organisms/EventSection";
 import { GiftSection } from "@/components/organisms/GiftSection";
 import { LiveSection } from "@/components/organisms/LiveSection";
+import { PlacesSection } from "@/components/organisms/PlacesSection";
 import { PreWeddingSection } from "@/components/organisms/PreWeddingSection";
 import { HeroSection } from "@/components/organisms/HeroSection";
 import { StorySection } from "@/components/organisms/StorySection";
@@ -44,10 +45,12 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <PreWeddingSection t={t.prewedding} />
       {/* pra quem não vai conseguir vir: transmissão ao vivo (em breve) */}
       <LiveSection t={t.live} />
+      {/* fecho: "Lugares que nos formaram" (arte do manual dos padrinhos) */}
+      <PlacesSection t={t.formed} />
 
       {/* rodapé: a aquarela da baía saiu; aqui vai entrar uma foto do pré-wedding (pedido do Manu) */}
       <footer className="relative isolate px-6 pb-section-gap pt-section-gap text-center">
-        <p className="font-display leading-snug text-text-primary" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)" }}>
+        <p className="font-display leading-snug text-text-title" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)" }}>
           {t.footer.title}
         </p>
         {/* o botão de confirmar presença de novo, pra quem chegou até o fim */}

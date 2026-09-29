@@ -174,7 +174,7 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
         </div>
 
         <PaintReveal variant="rise" delay={200} className="mx-auto mt-20 max-w-2xl text-center">
-          <p className="font-display leading-snug text-text-primary" style={{ fontSize: "clamp(1.7rem, 3.2vw, 2.4rem)" }}>
+          <p className="font-display leading-snug text-text-title" style={{ fontSize: "clamp(1.7rem, 3.2vw, 2.4rem)" }}>
             {t.quoteTitle}
           </p>
           <p className="mt-3 font-body text-200 leading-relaxed text-text-secondary">

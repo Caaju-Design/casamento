@@ -21,7 +21,7 @@ export function ArriveSection({ t }: { t: Dictionary["stay"] }) {
       <Painting name="arbustos-pedras" className="absolute bottom-0 right-0 w-[40vw] max-w-[250px]" />
 
       <div className="mx-auto max-w-5xl px-6">
-        <SectionHeading id="como-chegar-titulo" eyebrow={t.arriveEyebrow} title={t.arriveTitle} />
+        <SectionHeading id="como-chegar-titulo" eyebrow={t.arriveEyebrow} title={t.arriveTitle} highlight />
         <PaintReveal variant="rise" delay={100} className="mt-10">
           <ArriveRoutes t={t.arrival} />
         </PaintReveal>
