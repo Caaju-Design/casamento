@@ -226,10 +226,10 @@ export function WatercolorScene({
         <img
           src={frameUrl(frames.desktop, frames.desktop.count - 1)}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover mix-blend-multiply"
         />
       ) : (
-        <canvas key={generation} ref={canvasRef} className="absolute inset-0 block h-full w-full" />
+        <canvas key={generation} ref={canvasRef} className="absolute inset-0 block h-full w-full mix-blend-multiply" />
       )}
     </div>
   );

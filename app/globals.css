@@ -34,6 +34,12 @@ body {
   background-size: 512px 512px;
   overscroll-behavior-y: none;
 }
+/* mesmo papel pra camadas que precisam de fundo próprio (ex.: o quadro fixo do hero, onde a pintura mescla em multiply) */
+.bg-paper {
+  background-color: theme("colors.page");
+  background-image: url("/decor/papel.webp");
+  background-size: 512px 512px;
+}
 
 /*
  * Revelação das ilustrações da "Nossa história" (components/molecules/PaintReveal.tsx):

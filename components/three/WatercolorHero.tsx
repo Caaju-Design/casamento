@@ -214,7 +214,7 @@ export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallbac
 
   return (
     <div ref={containerRef} className="absolute inset-0" aria-hidden="true">
-      <canvas ref={canvasRef} className="block h-full w-full" />
+      <canvas ref={canvasRef} className="block h-full w-full mix-blend-multiply" />
     </div>
   );
 }

@@ -201,9 +201,9 @@ export function WatercolorVideo({
         loop
         playsInline
         preload="auto"
-        className={["absolute inset-0 h-full w-full object-cover", failed ? "" : "opacity-0"].join(" ")}
+        className={["absolute inset-0 h-full w-full object-cover mix-blend-multiply", failed ? "" : "opacity-0"].join(" ")}
       />
-      {!failed && <canvas key={generation} ref={canvasRef} className="absolute inset-0 block h-full w-full" />}
+      {!failed && <canvas key={generation} ref={canvasRef} className="absolute inset-0 block h-full w-full mix-blend-multiply" />}
     </div>
   );
 }

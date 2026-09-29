@@ -170,7 +170,7 @@ export function HeroSection({
           `pointer-events: none`: puramente decorativa.
         */}
         <div
-          className="pointer-events-none absolute inset-0 -z-20 bg-page"
+          className="bg-paper pointer-events-none absolute inset-0 -z-20"
           aria-hidden="true"
         >
           {phase === "fallback" ? (
@@ -178,7 +178,7 @@ export function HeroSection({
             <img
               src="/hero/aquarela/fallback.webp"
               alt=""
-              className="absolute inset-0 h-full w-full object-contain sm:object-cover"
+              className="absolute inset-0 h-full w-full object-contain mix-blend-multiply sm:object-cover"
             />
           ) : (
             <WatercolorHero
