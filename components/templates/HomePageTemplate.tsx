@@ -3,7 +3,6 @@ import { DressCodeSection } from "@/components/organisms/DressCodeSection";
 import { RsvpButton, RsvpSection } from "@/components/organisms/RsvpSection";
 import { EventSection } from "@/components/organisms/EventSection";
 import { GiftSection } from "@/components/organisms/GiftSection";
-import { PlacesSection } from "@/components/organisms/PlacesSection";
 import { PreWeddingSection } from "@/components/organisms/PreWeddingSection";
 import { HeroSection } from "@/components/organisms/HeroSection";
 import { StorySection } from "@/components/organisms/StorySection";
@@ -41,8 +40,6 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <ArriveSection t={t.stay} />
       <GiftSection t={t.gift} locale={locale} />
       <PreWeddingSection t={t.prewedding} />
-      {/* fecho: "Lugares que nos formaram" (arte do manual dos padrinhos) */}
-      <PlacesSection t={t.formed} />
 
       {/* rodapé: a aquarela da baía saiu; aqui vai entrar uma foto do pré-wedding (pedido do Manu) */}
       <footer className="relative isolate px-6 pb-section-gap pt-section-gap text-center">

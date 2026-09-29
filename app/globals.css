@@ -208,11 +208,3 @@ body {
 
 /* Âncoras do menu: a seção para logo abaixo do cabeçalho fixo (72px), sem ficar escondida atrás dele */
 section[id]:not(#topo):not(#historia) { scroll-margin-top: 72px; }
-
-/* PlacesSection: bordas da aquarela somem no creme da página (nos 4 lados, sem virar círculo) */
-.places-fade {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
-  mask-composite: intersect;
-}

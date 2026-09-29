@@ -183,15 +183,6 @@ export type Dictionary = {
       };
     };
   };
-  /** "Lugares que nos formaram" (fecho, antes do rodapé): [nome, palavra] de cada lugar. */
-  formed: {
-    title: [string, string];
-    cape: [string, string];
-    angra: [string, string];
-    brasilia: [string, string];
-    caption: string;
-    alt: string;
-  };
   tips: {
     eyebrow: string;
     title: string;
@@ -520,14 +511,6 @@ const pt: Dictionary = {
     beautyNote:
       "Agende com antecedência e confirme os serviços, valores e tempo de atendimento. Nosso encontro começa às 16h, então reserve uma folguinha para se vestir e chegar com calma! 🤍",
   },
-  formed: {
-    title: ["Lugares", "que nos formaram"],
-    cape: ["Cidade do Cabo", "Encontros"],
-    angra: ["Angra", "Mar e liberdade"],
-    brasilia: ["Brasília", "Raízes"],
-    caption: "Diferentes lugares. A mesma essência.",
-    alt: "Aquarela com a montanha da Mesa da Cidade do Cabo, as ilhas de Angra dos Reis com um veleiro e o cerrado de Brasília com um ipê amarelo.",
-  },
   footer: { title: "Esperamos vocês para celebrar com a gente!", signature: "Com amor, Gabriela & Emanuel", credit: "Site desenvolvido por" },
 };
 
@@ -842,14 +825,6 @@ const en: Dictionary = {
     beautyNote:
       "Book in advance and confirm services, prices and how long it takes. Our celebration starts at 4 pm, so leave yourself some time to get dressed and arrive calmly! 🤍",
   },
-  formed: {
-    title: ["Places", "that shaped us"],
-    cape: ["Cape Town", "Encounters"],
-    angra: ["Angra", "Sea and freedom"],
-    brasilia: ["Brasília", "Roots"],
-    caption: "Different places. The same essence.",
-    alt: "Watercolor with Cape Town's Table Mountain, the islands of Angra dos Reis with a sailboat, and Brasília's cerrado with a yellow ipê tree.",
-  },
   footer: { title: "We can't wait to celebrate with you!", signature: "With love, Gabriela & Emanuel", credit: "Website developed by" },
 };
 
@@ -1154,14 +1129,6 @@ const ar: Dictionary = {
       },
     ],
     beautyNote: "احجزوا مسبقًا وتأكّدوا من الخدمات والأسعار ومدّة الموعد. يبدأ لقاؤنا في الرابعة عصرًا، فخصّصوا وقتًا كافيًا لتتجهّزوا وتصلوا بهدوء! 🤍",
-  },
-  formed: {
-    title: ["أماكن", "صنعتنا"],
-    cape: ["Cape Town", "لقاءات"],
-    angra: ["Angra", "البحر والحرية"],
-    brasilia: ["Brasília", "الجذور"],
-    caption: "أماكن مختلفة. والجوهر واحد.",
-    alt: "لوحة مائية لجبل الطاولة في Cape Town، وجزر Angra dos Reis مع قارب شراعي، وسهول Brasília مع شجرة إيبي صفراء.",
   },
   footer: { title: "ننتظركم لنحتفل معًا!", signature: "مع الحب، Gabriela & Emanuel", credit: "تصميم وتطوير الموقع:" },
 };
