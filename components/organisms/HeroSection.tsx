@@ -66,19 +66,33 @@ function useHeroScrollProgress(trackRef: RefObject<HTMLDivElement | null>, progr
     const root = document.documentElement;
     if (!track) return;
     let rafId: number | null = null;
+    // últimos valores escritos: só mexe nas variáveis do :root quando mudam
+    // (escrever no :root a cada rolagem força recalcular o estilo da página
+    // inteira — no celular isso vira engasgo mesmo lá embaixo do site)
+    let last = { progress: -1, reveal: -1, pe: "" };
 
     const update = () => {
       rafId = null;
       const rect = track.getBoundingClientRect();
-      const scrollable = rect.height - window.innerHeight;
+      // Altura da "tela" = a do quadro fixo do hero (100vh, que no celular é
+      // a tela SEM a barra do navegador e não muda). Antes usava
+      // window.innerHeight, que muda toda vez que a barra de endereço some ou
+      // volta (é exatamente quando a pessoa inverte o sentido da rolagem) —
+      // e isso fazia a pintura e a logo darem um salto.
+      const stage = (track.firstElementChild as HTMLElement | null)?.offsetHeight || window.innerHeight;
+      const scrollable = rect.height - stage;
       const progress = scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0;
       progressRef.current = progress;
 
       const fade = progress <= HERO_FADE_START ? 1 : Math.max(0, 1 - (progress - HERO_FADE_START) / (1 - HERO_FADE_START));
       const reveal = 1 - fade;
-      root.style.setProperty("--hero-progress", progress.toString());
-      root.style.setProperty("--hero-reveal", reveal.toString());
-      root.style.setProperty("--hero-reveal-pointer-events", reveal > 0.5 ? "auto" : "none");
+      const pe = reveal > 0.5 ? "auto" : "none";
+      const p4 = Math.round(progress * 10000) / 10000;
+      const r4 = Math.round(reveal * 10000) / 10000;
+      if (p4 !== last.progress) root.style.setProperty("--hero-progress", p4.toString());
+      if (r4 !== last.reveal) root.style.setProperty("--hero-reveal", r4.toString());
+      if (pe !== last.pe) root.style.setProperty("--hero-reveal-pointer-events", pe);
+      last = { progress: p4, reveal: r4, pe };
     };
 
     const onScrollOrResize = () => {
