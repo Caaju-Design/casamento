@@ -46,7 +46,10 @@ const arefRuqaa = localFont({
   variable: "--font-aref",
   display: "swap",
   preload: false,
-  // só o alfabeto árabe: espaço, pontuação, parênteses, números e letras latinas vêm da Cardo
+  // só o alfabeto árabe: espaço, pontuação, parênteses, números e letras latinas vêm da Cardo.
+  // Sem a fonte "Fallback" automática do next/font: ela é uma Arial local SEM
+  // unicode-range, então pegava os números e nomes latinos antes da Cardo
+  adjustFontFallback: false,
   declarations: [{ prop: "unicode-range", value: "U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200F" }],
 });
 const amiri = localFont({
@@ -57,7 +60,10 @@ const amiri = localFont({
   variable: "--font-amiri",
   display: "swap",
   preload: false,
-  // só o alfabeto árabe: espaço, pontuação, parênteses, números e letras latinas vêm da Cardo
+  // só o alfabeto árabe: espaço, pontuação, parênteses, números e letras latinas vêm da Cardo.
+  // Sem a fonte "Fallback" automática do next/font: ela é uma Arial local SEM
+  // unicode-range, então pegava os números e nomes latinos antes da Cardo
+  adjustFontFallback: false,
   declarations: [{ prop: "unicode-range", value: "U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200F" }],
 });
 
