@@ -1,4 +1,3 @@
-import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { Painting } from "@/components/atoms/Painting";
 import { AnchorNav } from "@/components/molecules/AnchorNav";
 import { DressCodeSection } from "@/components/organisms/DressCodeSection";
@@ -58,11 +57,10 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
         {/* o botão de confirmar presença de novo, pra quem chegou até o fim */}
         <RsvpButton t={t.rsvp} locale={locale} className="mt-7" />
         {/*
-          assinatura "à mão" em nanquim: a caligrafia passa por um filtro de
+          assinatura "à mão" em nanquim, FIXA (sem animação): a caligrafia passa por um filtro de
           tinta (SVG) — traço levemente tremido, mais grosso onde a "caneta
           apertou" (manchas de ruído bem largas engordam o traço), bordas que
-          incham um pouco como tinta no papel e pigmento irregular. Se
-          escreve da esquerda pra direita quando aparece.
+          incham um pouco como tinta no papel e pigmento irregular.
         */}
         <svg aria-hidden="true" width="0" height="0" className="absolute">
           <filter id="nanquim" x="-5%" y="-20%" width="110%" height="140%" colorInterpolationFilters="sRGB">
@@ -93,17 +91,15 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
             <feComposite in="bled" in2="grainA" operator="in" />
           </filter>
         </svg>
-        <PaintReveal variant="rise" delay={200} className="mt-9">
-          {/* duas linhas, como numa carta: "Com amor," e embaixo os nomes, maiores */}
-          <p className="signature-write signature-ink inline-block -rotate-3 px-4 pb-3 font-signature leading-[1.35] text-[#221a15]">
-            <span className="block text-start" style={{ fontSize: "clamp(3rem, 5.6vw, 4rem)" }}>
-              {sigLead}
-            </span>
-            <span className="-mt-2 block ps-10" style={{ fontSize: "clamp(3.4rem, 7vw, 5rem)" }}>
-              {sigNames}
-            </span>
-          </p>
-        </PaintReveal>
+        {/* duas linhas, como numa carta: "Com amor," e embaixo os nomes, maiores */}
+        <p className="signature-ink mt-9 inline-block -rotate-3 px-4 pb-3 font-signature leading-[1.5] rtl:leading-[1.9] text-[#221a15]">
+          <span className="block text-start" style={{ fontSize: "clamp(3rem, 5.6vw, 4rem)" }}>
+            {sigLead}
+          </span>
+          <span className="-mt-2 block ps-10" style={{ fontSize: "clamp(3.4rem, 7vw, 5rem)" }}>
+            {sigNames}
+          </span>
+        </p>
       </footer>
       {/* rodapé fininho: crédito da Caáju */}
       <div className="px-6 py-2 text-center font-body text-[0.72rem] tracking-[0.06em] text-text-secondary">

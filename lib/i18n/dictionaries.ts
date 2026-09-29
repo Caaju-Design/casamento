@@ -825,7 +825,7 @@ const en: Dictionary = {
     beautyNote:
       "Book in advance and confirm services, prices and how long it takes. Our celebration starts at 4 pm, so leave yourself some time to get dressed and arrive calmly! 🤍",
   },
-  footer: { title: "We can't wait to celebrate with you!", signature: "With love, Gabi & Manu", credit: "Website developed by" },
+  footer: { title: "We can't wait to celebrate with you!", signature: "With love, Gabi and Manu", credit: "Website developed by" },
 };
 
 const ar: Dictionary = {
@@ -1130,7 +1130,7 @@ const ar: Dictionary = {
     ],
     beautyNote: "احجزوا مسبقًا وتأكّدوا من الخدمات والأسعار ومدّة الموعد. يبدأ لقاؤنا في الرابعة عصرًا، فخصّصوا وقتًا كافيًا لتتجهّزوا وتصلوا بهدوء! 🤍",
   },
-  footer: { title: "ننتظركم لنحتفل معًا!", signature: "مع الحب، Gabi & Manu", credit: "تصميم وتطوير الموقع:" },
+  footer: { title: "ننتظركم لنحتفل معًا!", signature: "مع الحب، Gabi و Manu", credit: "تصميم وتطوير الموقع:" },
 };
 
 export const DICTIONARIES: Record<Locale, Dictionary> = { pt, en, ar };

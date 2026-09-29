@@ -225,17 +225,6 @@ body {
 /* Âncoras do menu: a seção para logo abaixo do cabeçalho fixo (72px), sem ficar escondida atrás dele */
 section[id]:not(#topo):not(#historia) { scroll-margin-top: 72px; }
 
-/* Assinatura do rodapé: a caligrafia "se escreve" da esquerda pra direita (no árabe, da direita pra esquerda) */
-.signature-write { clip-path: inset(-20% 0 -20% 0); }
-.rise-reveal:not([data-shown]) .signature-write { clip-path: inset(-20% 100% -20% 0); }
-.rise-reveal[data-shown] .signature-write { animation: signature-write 2.4s cubic-bezier(0.45, 0.05, 0.4, 1) 0.4s both; }
-[dir="rtl"] .rise-reveal:not([data-shown]) .signature-write { clip-path: inset(-20% 0 -20% 100%); }
-[dir="rtl"] .rise-reveal[data-shown] .signature-write { animation-name: signature-write-rtl; }
-@keyframes signature-write { from { clip-path: inset(-20% 100% -20% 0); } to { clip-path: inset(-20% 0 -20% 0); } }
-@keyframes signature-write-rtl { from { clip-path: inset(-20% 0 -20% 100%); } to { clip-path: inset(-20% 0 -20% 0); } }
-@media (prefers-reduced-motion: reduce), (scripting: none) {
-  .rise-reveal .signature-write, .rise-reveal:not([data-shown]) .signature-write { clip-path: none; animation: none; }
-}
 .signature-ink { filter: url(#nanquim); }
 /* assinatura: caligrafia de assinatura; no árabe o "مع الحب،" cai na Aref Ruqaa */
 .font-signature { font-family: var(--font-signature), cursive; }
