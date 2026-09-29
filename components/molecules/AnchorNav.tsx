@@ -7,6 +7,8 @@ import type { Locale } from "@/lib/i18n/dictionaries";
 export interface AnchorNavItem {
   href: string;
   label: string;
+  /** Pula direto pra seção (sem rolagem suave), pros itens lá do fim da página. */
+  instant?: boolean;
 }
 
 export interface AnchorNavProps {
@@ -134,7 +136,15 @@ export function AnchorNav({ items, startHiddenForHero = false, locale, labels = 
                 <a
                   href={item.href}
                   className="block whitespace-nowrap py-2 text-text-secondary hover:text-action-primary"
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    if (!item.instant || !item.href.startsWith("#")) return;
+                    const target = document.getElementById(item.href.slice(1));
+                    if (!target) return;
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: "instant", block: "start" });
+                    history.replaceState(null, "", item.href);
+                  }}
                 >
                   {item.label}
                 </a>

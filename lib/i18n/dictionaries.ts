@@ -33,6 +33,10 @@ export type Dictionary = {
     presentes: string;
     hospedagem: string;
     dicas: string;
+    comoChegar: string;
+    galeria: string;
+    transmissao: string;
+    rsvp: string;
     openMenu: string;
     home: string;
     language: string;
@@ -212,10 +216,14 @@ const pt: Dictionary = {
   nav: {
     historia: "Nossa história",
     evento: "O grande dia",
-    dresscode: "Dress code",
-    presentes: "Presentes",
-    hospedagem: "Onde ficar",
+    dresscode: "Dresscode",
+    presentes: "Presenteie",
+    hospedagem: "Hospedagem e dicas",
     dicas: "Dicas da região",
+    comoChegar: "Como chegar",
+    galeria: "Galeria",
+    transmissao: "Transmissão",
+    rsvp: "RSVP",
     openMenu: "Abrir menu",
     home: "Gabriela & Emanuel — voltar ao início",
     language: "Idioma",
@@ -533,8 +541,12 @@ const en: Dictionary = {
     evento: "The big day",
     dresscode: "Dress code",
     presentes: "Gifts",
-    hospedagem: "Where to stay",
+    hospedagem: "Stay & tips",
     dicas: "Local tips",
+    comoChegar: "Getting here",
+    galeria: "Gallery",
+    transmissao: "Live stream",
+    rsvp: "RSVP",
     openMenu: "Open menu",
     home: "Gabriela & Emanuel — back to the top",
     language: "Language",
@@ -851,8 +863,12 @@ const ar: Dictionary = {
     evento: "اليوم الكبير",
     dresscode: "قواعد اللباس",
     presentes: "الهدايا",
-    hospedagem: "أين تقيمون",
+    hospedagem: "الإقامة والنصائح",
     dicas: "نصائح المنطقة",
+    comoChegar: "كيف تصلون",
+    galeria: "المعرض",
+    transmissao: "البث المباشر",
+    rsvp: "تأكيد الحضور",
     openMenu: "فتح القائمة",
     home: "غابرييلا وإيمانويل — العودة إلى البداية",
     language: "اللغة",

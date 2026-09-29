@@ -15,12 +15,18 @@ import { getDictionary, localeInfo, type Locale } from "@/lib/i18n/dictionaries"
 export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
   const t = getDictionary(locale);
   const info = localeInfo(locale);
+  // os marcados com `instant` ficam lá no fim da página: o clique leva direto
+  // pra seção, sem a rolagem suave atravessando o site inteiro
   const navItems = [
     { href: "#historia", label: t.nav.historia },
     { href: "#evento", label: t.nav.evento },
     { href: "#dresscode", label: t.nav.dresscode },
     { href: "#hospedagem", label: t.nav.hospedagem },
-    { href: "#presentes", label: t.nav.presentes },
+    { href: "#como-chegar", label: t.nav.comoChegar },
+    { href: "#presentes", label: t.nav.presentes, instant: true },
+    { href: "#pre-wedding", label: t.nav.galeria, instant: true },
+    { href: "#ao-vivo", label: t.nav.transmissao, instant: true },
+    { href: "#confirmar", label: t.nav.rsvp, instant: true },
   ];
   return (
     <div lang={info.lang} dir={info.dir} className="flex flex-col overflow-x-clip">
