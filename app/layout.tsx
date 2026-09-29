@@ -34,8 +34,8 @@ const cardo = localFont({
 
 /**
  * Versão em árabe (/ar): Aref Ruqaa (caligrafia) no lugar da Italianno e
- * Amiri no lugar da Cardo — só o subconjunto árabe; letras latinas (nomes,
- * números) caem na Italianno/Cardo. Sem preload: só baixam na página em
+ * Amiri no lugar da Cardo — só o subconjunto árabe (com `unicode-range`);
+ * letras latinas (nomes próprios), números e pontuação ficam na Cardo. Sem preload: só baixam na página em
  * árabe. As trocas ficam em app/globals.css (`[lang="ar"]`).
  */
 const arefRuqaa = localFont({
@@ -46,6 +46,8 @@ const arefRuqaa = localFont({
   variable: "--font-aref",
   display: "swap",
   preload: false,
+  // só o alfabeto árabe: espaço, pontuação, parênteses, números e letras latinas vêm da Cardo
+  declarations: [{ prop: "unicode-range", value: "U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200F" }],
 });
 const amiri = localFont({
   src: [
@@ -55,6 +57,8 @@ const amiri = localFont({
   variable: "--font-amiri",
   display: "swap",
   preload: false,
+  // só o alfabeto árabe: espaço, pontuação, parênteses, números e letras latinas vêm da Cardo
+  declarations: [{ prop: "unicode-range", value: "U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200F" }],
 });
 
 /**

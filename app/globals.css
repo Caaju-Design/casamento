@@ -115,12 +115,15 @@ body {
 
 /*
  * Versão em árabe (/ar, `lang="ar" dir="rtl"`): fontes árabes na frente
- * (Aref Ruqaa na caligrafia, Amiri no corpo), com as latinas atrás pra nomes
- * e números. Árabe é escrita cursiva: espaçamento entre letras quebra as
+ * (Aref Ruqaa na caligrafia, Amiri no corpo), com a Cardo atrás: as fontes
+ * árabes só têm o alfabeto árabe, então nomes próprios (escritos em letras
+ * latinas: Gabriela & Emanuel, Congonhas, São Paulo…) e números saem SEMPRE
+ * na Cardo, inclusive nos títulos. Árabe é escrita cursiva: espaçamento entre letras quebra as
  * ligações, então letter-spacing zera; e não existe itálico nem caixa alta.
  */
 [lang="ar"] .font-display {
-  font-family: var(--font-aref), var(--font-italianno), cursive;
+  /* letras latinas (nomes próprios) e números caem na Cardo, não na Italianno */
+  font-family: var(--font-aref), var(--font-cardo), Georgia, serif;
   font-size-adjust: none;
   line-height: 1.5;
 }

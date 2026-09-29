@@ -57,6 +57,8 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       {/* rodapé fininho: crédito da Caáju */}
       <div className="px-6 py-2 text-center font-body text-[0.72rem] tracking-[0.06em] text-text-secondary">
         {t.footer.credit}{" "}
+        {/* <bdi>: no árabe, o nome (em letras latinas) não embaralha o ponto final */}
+        <bdi>
         <a
           href="https://www.caaju.com.br"
           target="_blank"
@@ -65,6 +67,7 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
         >
           Caáju Design Ltda.
         </a>
+        </bdi>
       </div>
     </div>
   );
