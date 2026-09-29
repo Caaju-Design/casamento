@@ -35,7 +35,6 @@ export type Dictionary = {
     dicas: string;
     comoChegar: string;
     galeria: string;
-    transmissao: string;
     rsvp: string;
     openMenu: string;
     home: string;
@@ -193,8 +192,6 @@ export type Dictionary = {
     caption: string;
     alt: string;
   };
-  /** Seção final "Transmissão ao vivo" (em breve). */
-  live: { eyebrow: string; title: string; lead: string; when: string; badge: string };
   tips: {
     eyebrow: string;
     title: string;
@@ -231,7 +228,6 @@ const pt: Dictionary = {
     dicas: "Dicas da região",
     comoChegar: "Como chegar",
     galeria: "Galeria",
-    transmissao: "Transmissão",
     rsvp: "RSVP",
     openMenu: "Abrir menu",
     home: "Gabriela & Emanuel — voltar ao início",
@@ -532,13 +528,6 @@ const pt: Dictionary = {
     caption: "Diferentes lugares. A mesma essência.",
     alt: "Aquarela com a montanha da Mesa da Cidade do Cabo, as ilhas de Angra dos Reis com um veleiro e o cerrado de Brasília com um ipê amarelo.",
   },
-  live: {
-    eyebrow: "Transmissão ao vivo",
-    title: "De longe, mas com a gente",
-    lead: "Não vai conseguir estar com a gente pessoalmente? Tudo bem: queremos você perto do mesmo jeito. Em breve, aqui mesmo, você vai poder assistir à cerimônia ao vivo, de onde estiver.",
-    when: "17 de abril de 2027 · a partir das 16h (horário de Brasília)",
-    badge: "Em breve",
-  },
   footer: { title: "Esperamos vocês para celebrar com a gente!", signature: "Com amor, Gabriela & Emanuel", credit: "Site desenvolvido por" },
 };
 
@@ -562,7 +551,6 @@ const en: Dictionary = {
     dicas: "Local tips",
     comoChegar: "Getting here",
     galeria: "Gallery",
-    transmissao: "Live stream",
     rsvp: "RSVP",
     openMenu: "Open menu",
     home: "Gabriela & Emanuel — back to the top",
@@ -862,13 +850,6 @@ const en: Dictionary = {
     caption: "Different places. The same essence.",
     alt: "Watercolor with Cape Town's Table Mountain, the islands of Angra dos Reis with a sailboat, and Brasília's cerrado with a yellow ipê tree.",
   },
-  live: {
-    eyebrow: "Live stream",
-    title: "Far away, but with us",
-    lead: "Can't be with us in person? That's okay: we still want you close. Soon, right here, you'll be able to watch the ceremony live, wherever you are.",
-    when: "April 17, 2027 · from 4pm (Brasília time, UTC−3)",
-    badge: "Coming soon",
-  },
   footer: { title: "We can't wait to celebrate with you!", signature: "With love, Gabriela & Emanuel", credit: "Website developed by" },
 };
 
@@ -892,7 +873,6 @@ const ar: Dictionary = {
     dicas: "نصائح المنطقة",
     comoChegar: "كيف تصلون",
     galeria: "المعرض",
-    transmissao: "البث المباشر",
     rsvp: "تأكيد الحضور",
     openMenu: "فتح القائمة",
     home: "Gabriela & Emanuel — العودة إلى البداية",
@@ -1182,13 +1162,6 @@ const ar: Dictionary = {
     brasilia: ["Brasília", "الجذور"],
     caption: "أماكن مختلفة. والجوهر واحد.",
     alt: "لوحة مائية لجبل الطاولة في Cape Town، وجزر Angra dos Reis مع قارب شراعي، وسهول Brasília مع شجرة إيبي صفراء.",
-  },
-  live: {
-    eyebrow: "بثّ مباشر",
-    title: "بعيدون، لكن معنا",
-    lead: "لن تتمكّنوا من الحضور شخصيًا؟ لا بأس: نريدكم قريبين منّا رغم ذلك. قريبًا، هنا في هذه الصفحة، ستتمكّنون من مشاهدة المراسم مباشرةً أينما كنتم.",
-    when: "17 أبريل 2027 · ابتداءً من الرابعة عصرًا بتوقيت Brasília \u200F(UTC−3)\u200F",
-    badge: "قريبًا",
   },
   footer: { title: "ننتظركم لنحتفل معًا!", signature: "مع الحب، Gabriela & Emanuel", credit: "تصميم وتطوير الموقع:" },
 };

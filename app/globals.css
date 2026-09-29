@@ -205,10 +205,6 @@ body {
   .hero-hint-float { animation: none; }
 }
 
-/* LiveSection: bolinha "ao vivo" pulsando devagar */
-.live-dot > span:first-child { animation: live-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite; }
-@keyframes live-ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .live-dot > span:first-child { animation: none; } }
 
 /* Âncoras do menu: a seção para logo abaixo do cabeçalho fixo (72px), sem ficar escondida atrás dele */
 section[id]:not(#topo):not(#historia) { scroll-margin-top: 72px; }

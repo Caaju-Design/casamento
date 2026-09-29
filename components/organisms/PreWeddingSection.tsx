@@ -21,8 +21,11 @@ export function PreWeddingSection({ t }: { t: Dictionary["prewedding"] }) {
             {t.title}
           </h2>
           <span aria-hidden="true" className="mt-4 block h-px w-10 bg-terracota-500" />
-          <p className="mt-5 font-body text-100 uppercase tracking-[0.24em] text-terracota-700">{t.sub}</p>
-          <p className="mt-3 max-w-md font-body text-200 italic leading-relaxed text-text-secondary">{t.lead}</p>
+          <p className="mt-5 max-w-md font-body text-200 italic leading-relaxed text-text-secondary">{t.lead}</p>
+          {/* "Em breve" como pílula contornada embaixo do texto (no lugar do botão, enquanto as fotos não chegam) */}
+          <span className="mt-7 inline-flex min-h-[44px] items-center rounded-pill border border-terracota-700 px-6 font-body text-100 uppercase tracking-[0.2em] text-terracota-700">
+            {t.sub}
+          </span>
         </div>
 
         <div aria-hidden="true" className="relative flex items-center justify-center px-4 pb-8 md:py-6 md:pe-6 md:ps-0">

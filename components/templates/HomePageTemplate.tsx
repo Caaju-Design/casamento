@@ -3,7 +3,6 @@ import { DressCodeSection } from "@/components/organisms/DressCodeSection";
 import { RsvpButton, RsvpSection } from "@/components/organisms/RsvpSection";
 import { EventSection } from "@/components/organisms/EventSection";
 import { GiftSection } from "@/components/organisms/GiftSection";
-import { LiveSection } from "@/components/organisms/LiveSection";
 import { PlacesSection } from "@/components/organisms/PlacesSection";
 import { PreWeddingSection } from "@/components/organisms/PreWeddingSection";
 import { HeroSection } from "@/components/organisms/HeroSection";
@@ -26,7 +25,6 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
     { href: "#como-chegar", label: t.nav.comoChegar },
     { href: "#presentes", label: t.nav.presentes, instant: true },
     { href: "#pre-wedding", label: t.nav.galeria, instant: true },
-    { href: "#ao-vivo", label: t.nav.transmissao, instant: true },
     { href: "#confirmar", label: t.nav.rsvp, instant: true },
   ];
   return (
@@ -43,8 +41,6 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <ArriveSection t={t.stay} />
       <GiftSection t={t.gift} locale={locale} />
       <PreWeddingSection t={t.prewedding} />
-      {/* pra quem não vai conseguir vir: transmissão ao vivo (em breve) */}
-      <LiveSection t={t.live} />
       {/* fecho: "Lugares que nos formaram" (arte do manual dos padrinhos) */}
       <PlacesSection t={t.formed} />
 
