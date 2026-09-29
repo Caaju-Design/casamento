@@ -92,13 +92,13 @@ export function AroundSection({
 
   const chip = (active: boolean) =>
     [
-      "inline-flex min-h-[40px] shrink-0 items-center gap-2 rounded-pill border px-4 font-body text-100 transition-colors",
+      "inline-flex min-h-[40px] shrink-0 items-center gap-2 rounded-pill px-4 font-body text-100 transition-colors shadow-[0_6px_16px_-10px_rgba(152,75,44,0.7)]",
       "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus",
-      active ? "border-terracota-700 bg-terracota-700 text-white" : "border-caramelo-100 bg-white/80 text-text-primary hover:border-terracota-500",
+      active ? "bg-terracota-700 text-white" : "bg-page text-text-primary hover:text-terracota-700",
     ].join(" ");
 
   return (
-    <section id="hospedagem" aria-labelledby="hospedagem-titulo" className="relative isolate pb-section-gap pt-section-gap">
+    <section id="hospedagem" aria-labelledby="hospedagem-titulo" className="relative pb-section-gap pt-section-gap">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading id="hospedagem-titulo" eyebrow={t.eyebrow} title={t.title} lead={t.lead} highlight />
 
@@ -149,8 +149,8 @@ export function AroundSection({
                 >
                   <article
                     className={[
-                      "flex gap-4 rounded-card border bg-white/85 p-3 transition-[border-color,box-shadow] duration-200 sm:p-4",
-                      active ? "border-terracota-500 shadow-[0_14px_30px_-22px_rgba(152,75,44,0.8)]" : "border-caramelo-100 hover:border-terracota-200",
+                      "flex gap-4 rounded-card bg-page p-3 transition-shadow duration-200 sm:p-4",
+                      active ? "shadow-[0_16px_34px_-16px_rgba(152,75,44,0.85)]" : "shadow-[0_14px_34px_-22px_rgba(152,75,44,0.6)] hover:shadow-[0_16px_34px_-18px_rgba(152,75,44,0.7)]",
                     ].join(" ")}
                   >
                     {/* miniatura à esquerda */}
@@ -181,7 +181,7 @@ export function AroundSection({
                           href={directionsUrl(p.query)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex min-h-[36px] shrink-0 items-center rounded-pill border border-terracota-500 px-3 font-body text-[0.7rem] uppercase tracking-[0.12em] text-terracota-700 transition-colors hover:bg-terracota-500 hover:text-white"
+                          className="inline-flex min-h-[36px] shrink-0 items-center rounded-pill bg-page px-3 shadow-[0_6px_16px_-10px_rgba(152,75,44,0.7)] font-body text-[0.7rem] uppercase tracking-[0.12em] text-terracota-700 transition-colors hover:bg-terracota-700 hover:text-white"
                         >
                           {t.route}
                         </a>

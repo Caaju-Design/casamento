@@ -29,7 +29,7 @@ function googleCalendar(t: Dictionary["event"]) {
 }
 
 const linkClass =
-  "inline-flex min-h-[44px] items-center justify-center rounded-pill border border-terracota-500 px-5 font-body text-100 uppercase tracking-[0.14em] text-terracota-700 transition-colors hover:bg-terracota-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus";
+  "inline-flex min-h-[44px] items-center justify-center rounded-pill bg-page px-5 font-body text-100 uppercase tracking-[0.14em] text-terracota-700 shadow-[0_6px_16px_-10px_rgba(152,75,44,0.7)] transition-colors hover:bg-terracota-700 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus";
 
 const primaryClass =
   "inline-flex min-h-[48px] items-center justify-center gap-2 rounded-pill bg-terracota-500 px-7 font-body text-100 uppercase tracking-[0.16em] text-white shadow-[0_10px_24px_-16px_rgba(152,75,44,0.9)] transition-colors hover:bg-terracota-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus";
@@ -56,7 +56,7 @@ function IconAccess() {
 
 export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Locale }) {
   return (
-    <section id="evento" aria-labelledby="evento-titulo" className="relative isolate pb-[calc(44vw+1rem)] pt-section-gap">
+    <section id="evento" aria-labelledby="evento-titulo" className="relative pb-[calc(44vw+1rem)] pt-section-gap">
       {/* aquarelas: ramo no canto de cima, árvore à esquerda, a baía embaixo */}
       <Painting name="ramo-canto-dir-cima" className="absolute right-0 top-0 w-[30vw] max-w-[190px]" />
       <Painting name="ramo-borda-esq" className="absolute left-0 top-[18%] hidden w-[9rem] md:block" />
@@ -107,7 +107,7 @@ export function EventSection({ t, locale }: { t: Dictionary["event"]; locale: Lo
 
           <div className="mt-10 grid items-center gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-12">
             {/* fachada do condomínio, com bordas mastigadas */}
-            <PaintReveal variant="paint" className="mx-auto w-full max-w-[22rem] md:max-w-none">
+            <PaintReveal variant="paint" className="mx-auto w-full max-w-[22rem] mix-blend-multiply md:max-w-none">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/evento/fachada.webp"

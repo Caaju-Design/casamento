@@ -9,7 +9,7 @@
  * só registra de que lado a nuvem original encostava no pattern.
  *
  * É só decoração: `aria-hidden`, sem clique, e fica ATRÁS do conteúdo
- * (`-z-10`) — o pai precisa ser um contexto de empilhamento (`isolate`,
+ * (`-z-10`) — o pai NÃO deve isolar (sem `isolate`: o multiply precisa enxergar o papel do body;
  * ou `sticky`, que já cria um). `mix-blend-multiply` faz a tinta "entrar"
  * no papel, como aquarela de verdade.
  */

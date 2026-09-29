@@ -33,6 +33,20 @@ const cardo = localFont({
 });
 
 /**
+ * Assinatura do rodapé ("Com amor, Gabi e Manu"): Herr Von Muellerhoff, uma
+ * caligrafia de assinatura rápida, monolinha (licença OFL, livre pra uso
+ * comercial — a Photograph Signature do dafont é só pra uso pessoal). Só o
+ * latino; sem preload, só baixa quando chega no fim da página.
+ */
+const signature = localFont({
+  src: [{ path: "./fonts/herr-von-muellerhoff-latin-400.woff2", weight: "400", style: "normal" }],
+  variable: "--font-signature",
+  display: "swap",
+  preload: false,
+  fallback: ["cursive"],
+});
+
+/**
  * Versão em árabe (/ar): Aref Ruqaa (caligrafia) no lugar da Italianno e
  * Amiri no lugar da Cardo — só o subconjunto árabe (com `unicode-range`);
  * letras latinas (nomes próprios), números e pontuação ficam na Cardo. Sem preload: só baixam na página em
@@ -73,7 +87,7 @@ const amiri = localFont({
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${italianno.variable} ${cardo.variable} ${arefRuqaa.variable} ${amiri.variable}`}>
+    <html lang="pt-BR" className={`${italianno.variable} ${cardo.variable} ${arefRuqaa.variable} ${amiri.variable} ${signature.variable}`}>
       <body className="min-h-screen bg-page font-body text-text-primary">{children}</body>
     </html>
   );

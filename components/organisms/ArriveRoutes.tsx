@@ -54,9 +54,9 @@ export function ArriveRoutes({ t }: { t: Dictionary["stay"]["arrival"] }) {
 
   const tab = (active: boolean) =>
     [
-      "inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-pill border px-4 font-body text-100 transition-colors",
+      "inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-pill px-4 font-body text-100 transition-colors shadow-[0_6px_16px_-10px_rgba(152,75,44,0.7)]",
       "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus",
-      active ? "border-terracota-700 bg-terracota-700 text-white" : "border-caramelo-100 bg-white/80 text-text-primary hover:border-terracota-500",
+      active ? "bg-terracota-700 text-white" : "bg-page text-text-primary hover:text-terracota-700",
     ].join(" ");
 
   return (
@@ -93,7 +93,7 @@ export function ArriveRoutes({ t }: { t: Dictionary["stay"]["arrival"] }) {
         id="chegada-painel"
         role="tabpanel"
         aria-labelledby={`chegada-tab-${sel}`}
-        className="mt-6 grid gap-8 rounded-card border border-caramelo-100 bg-page/80 p-6 backdrop-blur-[2px] sm:p-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-12 md:p-10"
+        className="mt-6 grid gap-8 rounded-card bg-page p-6 shadow-[0_14px_34px_-22px_rgba(152,75,44,0.6)] sm:p-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-12 md:p-10"
       >
         <div>
           <h4 className="font-body text-400 font-bold leading-tight text-text-primary">{r.title}</h4>

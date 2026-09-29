@@ -237,3 +237,6 @@ section[id]:not(#topo):not(#historia) { scroll-margin-top: 72px; }
   .rise-reveal .signature-write, .rise-reveal:not([data-shown]) .signature-write { clip-path: none; animation: none; }
 }
 .signature-ink { filter: url(#nanquim); }
+/* assinatura: caligrafia de assinatura; no árabe o "مع الحب،" cai na Aref Ruqaa */
+.font-signature { font-family: var(--font-signature), cursive; }
+[lang="ar"] .font-signature { font-family: var(--font-signature), var(--font-aref), cursive; }

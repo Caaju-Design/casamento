@@ -48,7 +48,7 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
       <PreWeddingSection t={t.prewedding} />
 
       {/* rodapé: a aquarela da baía saiu; aqui vai entrar uma foto do pré-wedding (pedido do Manu) */}
-      <footer className="relative isolate px-6 pb-[max(10rem,20vw)] pt-section-gap text-center">
+      <footer className="relative px-6 pb-[max(10rem,20vw)] pt-section-gap text-center">
         {/* pedras nos cantos de baixo: a do ipê à esquerda, a das agaves (espelhada) à direita */}
         <Painting name="arbusto-pedra-canto" className="absolute bottom-0 left-0 w-[40vw] max-w-[300px]" />
         <Painting name="arbustos-pedras" flip className="absolute bottom-0 right-0 w-[40vw] max-w-[300px]" />
@@ -95,11 +95,11 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
         </svg>
         <PaintReveal variant="rise" delay={200} className="mt-9">
           {/* duas linhas, como numa carta: "Com amor," e embaixo os nomes, maiores */}
-          <p className="signature-write signature-ink inline-block -rotate-2 px-3 pb-2 font-display leading-[1.25] text-[#221a15]">
-            <span className="block text-start" style={{ fontSize: "clamp(1.7rem, 3vw, 2.2rem)" }}>
+          <p className="signature-write signature-ink inline-block -rotate-3 px-4 pb-3 font-signature leading-[1.35] text-[#221a15]">
+            <span className="block text-start" style={{ fontSize: "clamp(3rem, 5.6vw, 4rem)" }}>
               {sigLead}
             </span>
-            <span className="-mt-1 block ps-8" style={{ fontSize: "clamp(2.4rem, 4.8vw, 3.4rem)" }}>
+            <span className="-mt-2 block ps-10" style={{ fontSize: "clamp(3.4rem, 7vw, 5rem)" }}>
               {sigNames}
             </span>
           </p>

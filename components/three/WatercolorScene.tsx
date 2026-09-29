@@ -34,6 +34,8 @@ export interface WatercolorSceneProps {
   intro?: boolean;
   /** Canvas transparente fora da tinta — pra pintar uma foto por cima de outra. */
   transparent?: boolean;
+  /** Mescla em multiply com o papel do site (padrão). `false` = cobre o que está por trás (ex.: uma foto por cima de outra). */
+  multiply?: boolean;
   /** Margem de papel onde a tinta termina antes da borda (em alturas do canvas). */
   edgeFade?: number;
   stains: StainPreset;
@@ -60,6 +62,7 @@ export function WatercolorScene({
   paintStart = 0,
   intro = true,
   transparent = false,
+  multiply = true,
   edgeFade = 0.07,
   stains,
   focusU = 0.5,
@@ -229,7 +232,7 @@ export function WatercolorScene({
           className="absolute inset-0 h-full w-full object-cover mix-blend-multiply"
         />
       ) : (
-        <canvas key={generation} ref={canvasRef} className="absolute inset-0 block h-full w-full mix-blend-multiply" />
+        <canvas key={generation} ref={canvasRef} className={["absolute inset-0 block h-full w-full", multiply ? "mix-blend-multiply" : ""].join(" ")} />
       )}
     </div>
   );

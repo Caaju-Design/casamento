@@ -11,10 +11,10 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
  */
 export function PreWeddingSection({ t }: { t: Dictionary["prewedding"] }) {
   return (
-    <section id="pre-wedding" aria-labelledby="pre-wedding-titulo" className="relative isolate px-6 pb-section-gap">
+    <section id="pre-wedding" aria-labelledby="pre-wedding-titulo" className="relative px-6 pb-section-gap">
       <PaintReveal
         variant="rise"
-        className="relative mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] bg-ardosia-50/45 shadow-[0_18px_50px_-30px_rgba(45,43,35,0.45)] md:grid-cols-[1.15fr_1fr]"
+        className="relative mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] bg-ardosia-50 shadow-[0_18px_50px_-30px_rgba(45,43,35,0.45)] md:grid-cols-[1.15fr_1fr]"
       >
         <div className="relative z-10 px-8 py-10 md:px-12 md:py-14">
           <h2 id="pre-wedding-titulo" className="font-body text-400 uppercase tracking-[0.2em] text-text-primary sm:tracking-[0.28em]">

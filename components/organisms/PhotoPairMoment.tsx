@@ -20,6 +20,8 @@ export type PaintedPhoto = {
   focusU?: number;
   /** Quando o painel corta em cima/embaixo, qual linha fica no centro (0 = topo; padrão 0,5). */
   focusV?: number;
+  /** `false`: não mescla em multiply (cobre a foto de trás em vez de misturar com ela). */
+  multiply?: boolean;
 };
 
 export interface PhotoPairMomentProps {
@@ -111,6 +113,7 @@ export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, s
                     right ? "right-[3%] md:right-[6%]" : "left-[3%] md:left-[6%]",
                   ].join(" ")
             }
+            multiply={second.multiply}
           />
         </div>
       </div>

@@ -17,7 +17,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 function Card({ title, children, delay }: { title: string; children: React.ReactNode; delay: number }) {
   return (
-    <PaintReveal variant="rise" delay={delay} className="rounded-card border border-caramelo-100 bg-page/80 p-7 backdrop-blur-[2px] md:p-8">
+    <PaintReveal variant="rise" delay={delay} className="rounded-card bg-page p-7 shadow-[0_14px_34px_-22px_rgba(152,75,44,0.6)] md:p-8">
       <h3 className="font-body font-bold leading-tight text-text-primary" style={{ fontSize: "clamp(1.35rem, 2.2vw, 1.65rem)" }}>
         {title}
       </h3>
@@ -28,7 +28,7 @@ function Card({ title, children, delay }: { title: string; children: React.React
 
 export function DressCodeSection({ t }: { t: Dictionary["dress"] }) {
   return (
-    <section id="dresscode" aria-labelledby="dresscode-titulo" className="relative isolate py-section-gap">
+    <section id="dresscode" aria-labelledby="dresscode-titulo" className="relative py-section-gap">
       <Painting name="ramo-pendente" flip className="absolute left-0 top-0 w-[38vw] max-w-[230px]" />
       <Painting name="arvore-grande" flip className="absolute bottom-[6%] right-0 hidden w-[15rem] md:block" />
       <Cloud id={3} className="right-0 top-0 w-[44vw] md:w-[22vw]" />

@@ -48,7 +48,7 @@ const TONES: Record<StoryQuoteTone, { quote: string; top: string; bottom: string
 export function StoryQuote({ children, tone = "azul" }: { children: ReactNode; tone?: StoryQuoteTone }) {
   const c = TONES[tone];
   return (
-    <div className="relative isolate px-2 pb-14 pt-14 md:px-4 md:pb-16 md:pt-16">
+    <div className="relative px-2 pb-14 pt-14 md:px-4 md:pb-16 md:pt-16">
       {/* aquarela bem sutil, no mesmo estilo das nuvens do site */}
       {/* eslint-disable @next/next/no-img-element */}
       <img

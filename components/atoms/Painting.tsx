@@ -13,7 +13,7 @@
  * lateral é o `overflow-x-clip` da página (HomePageTemplate).
  *
  * Só decoração: `aria-hidden`, sem clique. Quando `behind`, fica atrás do
- * conteúdo (`-z-10`; o pai precisa ser `isolate`).
+ * conteúdo (`-z-10`; sem `isolate` no pai, pra mesclar em multiply com o papel do body).
  */
 
 type PaintingInfo = { w: number; h: number; edge?: string };
@@ -79,7 +79,7 @@ export function Painting({ name, className, flip = false, behind = true, eager =
       decoding="async"
       draggable={false}
       className={[
-        "pointer-events-none h-auto select-none",
+        "pointer-events-none h-auto select-none mix-blend-multiply",
         behind ? "-z-10" : "",
         flip ? "-scale-x-100" : "",
         className,

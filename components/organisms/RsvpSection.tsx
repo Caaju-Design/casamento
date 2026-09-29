@@ -33,7 +33,7 @@ export function RsvpButton({ t, locale, className = "" }: { t: Dictionary["rsvp"
 
 export function RsvpSection({ t, locale }: { t: Dictionary["rsvp"]; locale: Locale }) {
   return (
-    <section id="confirmar" aria-labelledby="confirmar-titulo" className="relative isolate px-6 py-section-gap">
+    <section id="confirmar" aria-labelledby="confirmar-titulo" className="relative px-6 py-section-gap">
       <Cloud id={4} className="right-[4%] top-6 w-[55vw] md:w-[24vw]" opacity={0.6} />
       <Cloud id={2} className="bottom-4 left-[3%] w-[50vw] md:w-[20vw]" opacity={0.5} />
       <SectionHeading id="confirmar-titulo" title={t.title} lead={t.lead} highlight />
