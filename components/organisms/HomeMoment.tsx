@@ -86,6 +86,7 @@ export function HomeMoment({ text }: { text: string }) {
         <div className="relative h-[54%] w-full shrink-0 md:h-full md:w-1/2">
           <WatercolorVideo
             video={CARRO}
+            focusV={0} // topo travado: se a tela encurtar, o corte sai só de baixo
             progressRef={progressRef}
             stains={CARRO_STAINS}
             paintStart={0}
@@ -95,6 +96,7 @@ export function HomeMoment({ text }: { text: string }) {
           />
           <WatercolorVideo
             video={SOFA}
+            focusV={0} // topo travado: se a tela encurtar, o corte sai só de baixo
             progressRef={progressRef}
             stains={SOFA_STAINS}
             paintStart={0.3}
