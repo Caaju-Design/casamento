@@ -15,12 +15,26 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 const body = "font-body text-200 leading-relaxed text-text-secondary";
 
+/** "i" do rótulo Bom saber. */
+const INFO = (
+  <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 11v5.5M12 7.6v.1" />
+  </svg>
+);
+
 /** Ícones dos avisos "Importante" (mesmo traço dos do Onde será). */
 const ALERT_ICON = {
   clock: (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="8.5" />
       <path d="M12 7.5V12l3 2" />
+    </svg>
+  ),
+  ticket: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V14a2 2 0 0 0 0-4z" />
+      <path d="M14.5 6v12" strokeDasharray="1.5 2" />
     </svg>
   ),
   car: (
@@ -63,8 +77,8 @@ export function ArriveRoutes({ t }: { t: Dictionary["stay"]["arrival"] }) {
     <div>
       {/* seletor: por onde a pessoa chega */}
       <div className="text-center">
-        <h3 className="font-body text-400 font-bold leading-tight text-text-primary">{t.question}</h3>
-        <p className={`${body} mx-auto mt-2 max-w-2xl`}>{t.lead}</p>
+        {/* o título "Como você vai chegar?" saiu (pedido do Manu); segue como rótulo do seletor pra leitor de tela */}
+        <p className={`${body} mx-auto max-w-2xl`}>{t.lead}</p>
       </div>
       <div
         role="tablist"
@@ -108,7 +122,7 @@ export function ArriveRoutes({ t }: { t: Dictionary["stay"]["arrival"] }) {
               </li>
             ))}
           </ol>
-          <p className="mt-6 inline-flex items-center gap-2 rounded-pill bg-pessego-50 px-4 py-2 font-body text-100 font-bold text-terracota-700">
+          <p className="mt-6 inline-flex items-center gap-2 rounded-pill bg-salvia-700 px-4 py-2 font-body text-100 font-bold text-white">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="9" />
               <path d="M12 7v5l3 2" />
@@ -119,6 +133,13 @@ export function ArriveRoutes({ t }: { t: Dictionary["stay"]["arrival"] }) {
           {r.alerts && r.alerts.length > 0 && (
             <NoticeCard label={t.importantLabel} className="mt-9">
               {r.alerts.map((a) => (
+                <Notice key={a.title} icon={ALERT_ICON[a.icon]} title={a.title} text={a.text} />
+              ))}
+            </NoticeCard>
+          )}
+          {r.notes && r.notes.length > 0 && (
+            <NoticeCard label={t.goodLabel} icon={INFO} className="mt-9">
+              {r.notes.map((a) => (
                 <Notice key={a.title} icon={ALERT_ICON[a.icon]} title={a.title} text={a.text} />
               ))}
             </NoticeCard>

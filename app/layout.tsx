@@ -33,13 +33,13 @@ const cardo = localFont({
 });
 
 /**
- * Assinatura do rodapé ("Com amor, Gabi e Manu"): Ms Madi, letra de mão
- * simples e monolinha, com cara de assinatura (licença OFL, livre pra uso
+ * Assinatura do rodapé ("Com amor, Gabi e Manu"): Grape Nuts, letra de mão
+ * simples, de caneta, escolhida pelo Manu (licença OFL, livre pra uso
  * comercial — a Photograph Signature do dafont é só pra uso pessoal). Só o
  * latino; sem preload, só baixa quando chega no fim da página.
  */
 const signature = localFont({
-  src: [{ path: "./fonts/ms-madi-latin-400.woff2", weight: "400", style: "normal" }],
+  src: [{ path: "./fonts/grape-nuts-latin-400.woff2", weight: "400", style: "normal" }],
   variable: "--font-signature",
   display: "swap",
   preload: false,

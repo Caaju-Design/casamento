@@ -30,11 +30,11 @@ export function Notice({ icon, title, text }: { icon: ReactNode; title: string; 
   );
 }
 
-/** Card de avisos: pílula com o rótulo no topo e a lista de `Notice`. */
+/** Card de avisos: pílula com o rótulo no topo (centralizada no celular, à esquerda no desktop) e a lista de `Notice`. */
 export function NoticeCard({ label, icon, children, className = "" }: { label: string; icon?: ReactNode; children: ReactNode; className?: string }) {
   return (
     <div className={["relative rounded-[1.75rem] border border-terracota-200 bg-pessego-50/80 px-6 pb-6 pt-8 text-start md:px-7", className].join(" ")}>
-      <span className="absolute -top-3.5 start-1/2 inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-pill bg-terracota-500 px-4 py-1.5 font-body text-100 font-bold uppercase tracking-[0.2em] text-white rtl:translate-x-1/2">
+      <span className="absolute -top-3.5 start-1/2 inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-pill bg-terracota-500 px-4 py-1.5 font-body text-100 font-bold uppercase tracking-[0.2em] text-white rtl:translate-x-1/2 md:start-6 md:translate-x-0 md:rtl:translate-x-0">
         {icon ?? <IconAlert />} {label}
       </span>
       <div className="grid gap-6">{children}</div>

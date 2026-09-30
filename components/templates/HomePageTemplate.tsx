@@ -92,11 +92,11 @@ export function HomePageTemplate({ locale = "pt" }: { locale?: Locale }) {
           </filter>
         </svg>
         {/* duas linhas, como numa carta: "Com amor," e embaixo os nomes, maiores */}
-        <p className="signature-ink mt-9 inline-block -rotate-3 px-4 pb-3 font-signature leading-[1.5] rtl:leading-[1.9] text-[#221a15]">
-          <span className="block text-start" style={{ fontSize: "clamp(3rem, 5.6vw, 4rem)" }}>
+        <p className="signature-ink mx-auto mt-9 block w-fit -rotate-3 px-4 pb-3 font-signature leading-[1.3] rtl:leading-[1.8] text-[#221a15]">
+          <span className="block text-start" style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.5rem)" }}>
             {sigLead}
           </span>
-          <span className="-mt-2 block ps-10" style={{ fontSize: "clamp(3.4rem, 7vw, 5rem)" }}>
+          <span className="block ps-10" style={{ fontSize: "clamp(2.5rem, 4.8vw, 3.4rem)" }}>
             {sigNames}
           </span>
         </p>

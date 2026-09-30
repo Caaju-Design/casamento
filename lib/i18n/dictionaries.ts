@@ -164,10 +164,13 @@ export type Dictionary = {
           /** Dica em texto miúdo (vazia quando o aviso vai no card "Importante"). */
           tip: string;
           /** Avisos no card "Importante" (mesmo do Onde será). */
-          alerts?: { icon: "clock" | "car"; title: string; text: string }[];
+          alerts?: { icon: "clock" | "car" | "ticket"; title: string; text: string }[];
+          /** Dicas no card "Bom saber" (mesmo visual, rótulo com "i"). */
+          notes?: { icon: "clock" | "car" | "ticket"; title: string; text: string }[];
         }
       >;
       importantLabel: string;
+      goodLabel: string;
       /** Rótulos do mapa. "{origin}", "{line}" e "{n}" são trocados. */
       metro: {
         mapLabel: string;
@@ -375,6 +378,7 @@ const pt: Dictionary = {
     arrival: {
       question: "Como você vai chegar?",
       importantLabel: "Importante",
+      goodLabel: "Bom saber",
       lead: "Escolha por onde você chega em São Paulo e veja o caminho de metrô até pertinho do casamento. Se puder escolher o voo, prefira Congonhas: é o aeroporto mais perto de nós.",
       tabs: { congonhas: "Aeroporto de Congonhas", guarulhos: "Aeroporto de Guarulhos", tiete: "Rodoviária do Tietê" },
       routes: {
@@ -414,7 +418,11 @@ const pt: Dictionary = {
             "De lá, pegue um Uber ou 99 até sua hospedagem.",
           ],
           time: "Cerca de 1h30 a 2h",
-          tip: "O Expresso Aeroporto sai de hora em hora: confira os horários no site da CPTM. Com muita mala, Uber ou 99 pode compensar: de 1h a 1h30, dependendo do trânsito.",
+          tip: "",
+          notes: [
+            { icon: "clock", title: "Expresso Aeroporto", text: "Sai de hora em hora: confira os horários no site da CPTM antes de embarcar." },
+            { icon: "car", title: "Com muita mala", text: "Uber ou 99 pode compensar: de 1h a 1h30 até a região do casamento, dependendo do trânsito." },
+          ],
         },
         tiete: {
           title: "De ônibus, pela Rodoviária do Tietê",
@@ -429,7 +437,11 @@ const pt: Dictionary = {
             "De lá, pegue um Uber ou 99 até sua hospedagem.",
           ],
           time: "Cerca de 45 min de metrô",
-          tip: "Compre o bilhete nas bilheterias ou nos totens da estação Portuguesa-Tietê. Evite os horários de pico (7h–9h e 17h–19h) se estiver com malas.",
+          tip: "",
+          notes: [
+            { icon: "ticket", title: "Bilhete", text: "Compre nas bilheterias ou nos totens da estação Portuguesa-Tietê." },
+            { icon: "clock", title: "Horário de pico", text: "Se estiver com malas, evite das 7h às 9h e das 17h às 19h." },
+          ],
         },
       },
       metro: {
@@ -690,6 +702,7 @@ const en: Dictionary = {
     arrival: {
       question: "How are you arriving?",
       importantLabel: "Important",
+      goodLabel: "Good to know",
       lead: "Pick where you arrive in São Paulo and see the subway route to right near the wedding. If you can choose your flight, go for Congonhas: it's the airport closest to us.",
       tabs: { congonhas: "Congonhas Airport", guarulhos: "Guarulhos Airport", tiete: "Tietê Bus Terminal" },
       routes: {
@@ -729,7 +742,11 @@ const en: Dictionary = {
             "From there, take an Uber or 99 to where you're staying.",
           ],
           time: "About 1h30 to 2h",
-          tip: "The Airport Express leaves every hour: check the times on the CPTM website. With lots of luggage, an Uber or 99 may be worth it: 1h to 1h30, depending on traffic.",
+          tip: "",
+          notes: [
+            { icon: "clock", title: "Airport Express", text: "It leaves every hour: check the times on the CPTM website before you go." },
+            { icon: "car", title: "Lots of luggage?", text: "An Uber or 99 may be worth it: 1h to 1h30 to the wedding area, depending on traffic." },
+          ],
         },
         tiete: {
           title: "By bus, via the Tietê Terminal",
@@ -744,7 +761,11 @@ const en: Dictionary = {
             "From there, take an Uber or 99 to where you're staying.",
           ],
           time: "About 45 min by subway",
-          tip: "Buy your ticket at the ticket office or machines at Portuguesa-Tietê station. If you have luggage, avoid rush hours (7–9am and 5–7pm).",
+          tip: "",
+          notes: [
+            { icon: "ticket", title: "Ticket", text: "Buy it at the ticket office or machines at Portuguesa-Tietê station." },
+            { icon: "clock", title: "Rush hour", text: "If you have luggage, avoid 7–9am and 5–7pm." },
+          ],
         },
       },
       metro: {
@@ -1002,6 +1023,7 @@ const ar: Dictionary = {
     arrival: {
       question: "كيف ستصلون؟",
       importantLabel: "مهم",
+      goodLabel: "من المفيد معرفته",
       lead: "اختاروا مكان وصولكم إلى São Paulo وشاهدوا طريق المترو حتى مكان قريب من الزفاف. وإن استطعتم اختيار الرحلة، ففضّلوا مطار Congonhas: فهو الأقرب إلينا.",
       tabs: { congonhas: "مطار Congonhas", guarulhos: "مطار Guarulhos", tiete: "محطة حافلات Tietê" },
       routes: {
@@ -1041,7 +1063,11 @@ const ar: Dictionary = {
             "ومن هناك خذوا Uber أو 99 إلى مكان إقامتكم.",
           ],
           time: "نحو ساعة ونصف إلى ساعتين",
-          tip: "ينطلق قطار المطار السريع كل ساعة: تحقّقوا من المواعيد على موقع CPTM. وإن كانت معكم حقائب كثيرة، فقد يكون Uber أو 99 أنسب: من ساعة إلى ساعة ونصف بحسب الازدحام.",
+          tip: "",
+          notes: [
+            { icon: "clock", title: "قطار المطار السريع", text: "ينطلق كل ساعة: تحقّقوا من المواعيد على موقع CPTM قبل الانطلاق." },
+            { icon: "car", title: "حقائب كثيرة؟", text: "قد يكون Uber أو 99 أنسب: من ساعة إلى ساعة ونصف حتى منطقة الزفاف بحسب الازدحام." },
+          ],
         },
         tiete: {
           title: "بالحافلة عبر محطة Tietê",
@@ -1056,7 +1082,11 @@ const ar: Dictionary = {
             "ومن هناك خذوا Uber أو 99 إلى مكان إقامتكم.",
           ],
           time: "نحو 45 دقيقة بالمترو",
-          tip: "اشتروا التذكرة من شبابيك التذاكر أو الأجهزة في محطة Portuguesa-Tietê. وإن كانت معكم حقائب، فتجنّبوا أوقات الذروة (7–9 صباحًا و5–7 مساءً).",
+          tip: "",
+          notes: [
+            { icon: "ticket", title: "التذكرة", text: "اشتروها من شبابيك التذاكر أو الأجهزة في محطة Portuguesa-Tietê." },
+            { icon: "clock", title: "أوقات الذروة", text: "إن كانت معكم حقائب، فتجنّبوا 7–9 صباحًا و5–7 مساءً." },
+          ],
         },
       },
       metro: {
