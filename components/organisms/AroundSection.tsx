@@ -181,7 +181,7 @@ export function AroundSection({
                           href={directionsUrl(p.query)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex min-h-[36px] shrink-0 items-center rounded-pill bg-page px-3 shadow-[0_6px_16px_-10px_rgba(152,75,44,0.7)] font-body text-[0.7rem] uppercase tracking-[0.12em] text-terracota-700 transition-colors hover:bg-terracota-700 hover:text-white"
+                          className="inline-flex min-h-[36px] shrink-0 items-center rounded-pill bg-salvia-700 px-3 shadow-[0_6px_16px_-10px_rgba(80,78,60,0.8)] font-body text-[0.7rem] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-salvia-800"
                         >
                           {t.route}
                         </a>

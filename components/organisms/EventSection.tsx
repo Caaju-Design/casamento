@@ -29,7 +29,7 @@ function googleCalendar(t: Dictionary["event"]) {
 }
 
 const linkClass =
-  "inline-flex min-h-[44px] items-center justify-center rounded-pill bg-page px-5 font-body text-100 uppercase tracking-[0.14em] text-terracota-700 shadow-[0_6px_16px_-10px_rgba(152,75,44,0.7)] transition-colors hover:bg-terracota-700 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus";
+  "inline-flex min-h-[44px] items-center justify-center rounded-pill bg-salvia-700 px-5 font-body text-100 font-bold uppercase tracking-[0.14em] text-white shadow-[0_6px_16px_-10px_rgba(80,78,60,0.8)] transition-colors hover:bg-salvia-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus";
 
 const primaryClass =
   "inline-flex min-h-[48px] items-center justify-center gap-2 rounded-pill bg-terracota-500 px-7 font-body text-100 uppercase tracking-[0.16em] text-white shadow-[0_10px_24px_-16px_rgba(152,75,44,0.9)] transition-colors hover:bg-terracota-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-border-focus";
