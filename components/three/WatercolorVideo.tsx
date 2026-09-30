@@ -151,13 +151,31 @@ export function WatercolorVideo({
       raf = requestAnimationFrame(loop);
     };
 
+    // Desempenho no celular (pedido do Manu: a rolagem "dava saltos" ao
+    // inverter o sentido depois da Nossa história). Antes o mesmo limite
+    // (150% da tela) criava E destruía o contexto WebGL: bastava ir e voltar
+    // um pouco pra cada foto ser recriada (contexto novo, textura, decodificação)
+    // bem no meio da rolagem. Agora tem folga: cria a 150%, só devolve o
+    // contexto quando fica a mais de 5 telas de distância, e ainda espera 2s
+    // (se voltar antes, cancela).
+    let dropTimer: ReturnType<typeof setTimeout> | null = null;
     const near = new IntersectionObserver(
       (entries) => {
-        const isNear = entries.some((e) => e.isIntersecting);
-        if (!started && isNear) void start();
-        else if (started && !isNear) setGeneration((g) => g + 1);
+        if (!started && entries.some((e) => e.isIntersecting)) void start();
       },
       { rootMargin: "150% 0px 150% 0px" },
+    );
+    const far = new IntersectionObserver(
+      (entries) => {
+        const inRange = entries.some((e) => e.isIntersecting);
+        if (inRange) {
+          if (dropTimer) clearTimeout(dropTimer);
+          dropTimer = null;
+        } else if (started && !dropTimer) {
+          dropTimer = setTimeout(() => setGeneration((g) => g + 1), 2000);
+        }
+      },
+      { rootMargin: "500% 0px 500% 0px" },
     );
     const onScreen = new IntersectionObserver(
       (entries) => {
@@ -174,6 +192,7 @@ export function WatercolorVideo({
       { threshold: 0.15 },
     );
     near.observe(container);
+    far.observe(container);
     onScreen.observe(container);
     const ro = new ResizeObserver(() => resize());
     ro.observe(container);
@@ -182,6 +201,8 @@ export function WatercolorVideo({
       disposed = true;
       cancelAnimationFrame(raf);
       near.disconnect();
+      far.disconnect();
+      if (dropTimer) clearTimeout(dropTimer);
       onScreen.disconnect();
       ro.disconnect();
       canvas?.removeEventListener("webglcontextlost", fail);

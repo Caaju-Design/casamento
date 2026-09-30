@@ -43,6 +43,7 @@ export const PLACES: Place[] = [
   // restaurantes e botecos
   { id: "casarao", name: "Casarão de Minas", category: "restaurante", lat: -23.634195, lng: -46.712846, query: "Casarão de Minas, São Paulo", photo: "/lugares/casarao.webp" },
   { id: "parrilaria", name: "Dumas Parrillaria", category: "restaurante", lat: -23.630789, lng: -46.706196, query: "Dumas Parrillaria, Chácara Santo Antônio, São Paulo", photo: "/lugares/parrilaria.webp" },
+  { id: "bella-julieta", name: "Parrillaria Bella Julieta", category: "restaurante", lat: -23.631034, lng: -46.712216, query: "Parrillaria Bella Julieta, São Paulo" },
   { id: "boteco-vc", name: "Boteco Vila Cruzeiro", category: "restaurante", lat: -23.635214, lng: -46.711534, query: "Boteco Vila Cruzeiro, São Paulo", photo: "/lugares/boteco-vc.webp" },
   { id: "boteco-sp", name: "Boteco São Paulo — Vila Cruzeiro", category: "restaurante", lat: -23.636661, lng: -46.711534, query: "Boteco São Paulo, Vila Cruzeiro, São Paulo", photo: "/lugares/boteco-sp.webp" },
   // shoppings

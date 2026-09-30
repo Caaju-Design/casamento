@@ -76,11 +76,14 @@ export function WatercolorScene({
   // WebGL quando fica longe da tela e pega um novo quando volta
   const [generation, setGeneration] = useState(0);
   const introDoneRef = useRef(false);
+  // Quando a pintura termina, vira uma imagem estática (e o contexto WebGL é
+  // devolvido): as fotos da história não pesam mais na rolagem do celular.
+  const [snapshot, setSnapshot] = useState<string | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
-    if (!canvas || !container) return;
+    if (snapshot || !canvas || !container) return;
 
     let disposed = false;
     let started = false;
@@ -149,6 +152,20 @@ export function WatercolorScene({
         engine.render(paint, a, exact ? b : null, exact ? f - ia : 0, focusU, focusV);
       } catch {
         fail();
+        return;
+      }
+      // pintura completa e parada: tira a "foto" do canvas (na mesma tarefa
+      // do render, antes do navegador limpar o buffer) e troca por <img>
+      if (exact && target >= 1 && shown === target && introT >= 1 && paint >= 1) {
+        try {
+          const url = canvas.toDataURL("image/webp", 0.9);
+          if (url.length > 100) {
+            cancelAnimationFrame(raf);
+            setSnapshot(url);
+          }
+        } catch {
+          /* segue como canvas */
+        }
       }
     };
 
@@ -187,13 +204,31 @@ export function WatercolorScene({
 
     // começa a baixar com antecedência; desenha só quando está na tela; e
     // quando fica bem longe, devolve o contexto WebGL (remonta o canvas)
+    // Desempenho no celular (pedido do Manu: a rolagem "dava saltos" ao
+    // inverter o sentido depois da Nossa história). Antes o mesmo limite
+    // (150% da tela) criava E destruía o contexto WebGL: bastava ir e voltar
+    // um pouco pra cada foto ser recriada (contexto novo, textura, decodificação)
+    // bem no meio da rolagem. Agora tem folga: cria a 150%, só devolve o
+    // contexto quando fica a mais de 5 telas de distância, e ainda espera 2s
+    // (se voltar antes, cancela).
+    let dropTimer: ReturnType<typeof setTimeout> | null = null;
     const near = new IntersectionObserver(
       (entries) => {
-        const isNear = entries.some((e) => e.isIntersecting);
-        if (!started && isNear) void start();
-        else if (started && !isNear) setGeneration((g) => g + 1);
+        if (!started && entries.some((e) => e.isIntersecting)) void start();
       },
       { rootMargin: "150% 0px 150% 0px" },
+    );
+    const far = new IntersectionObserver(
+      (entries) => {
+        const inRange = entries.some((e) => e.isIntersecting);
+        if (inRange) {
+          if (dropTimer) clearTimeout(dropTimer);
+          dropTimer = null;
+        } else if (started && !dropTimer) {
+          dropTimer = setTimeout(() => setGeneration((g) => g + 1), 2000);
+        }
+      },
+      { rootMargin: "500% 0px 500% 0px" },
     );
     const onScreen = new IntersectionObserver(
       (entries) => {
@@ -206,6 +241,7 @@ export function WatercolorScene({
       { threshold: 0.15 },
     );
     near.observe(container);
+    far.observe(container);
     onScreen.observe(container);
     const ro = new ResizeObserver(() => resize());
     ro.observe(container);
@@ -214,17 +250,26 @@ export function WatercolorScene({
       disposed = true;
       cancelAnimationFrame(raf);
       near.disconnect();
+      far.disconnect();
+      if (dropTimer) clearTimeout(dropTimer);
       onScreen.disconnect();
       ro.disconnect();
       canvas.removeEventListener("webglcontextlost", fail);
       store?.dispose();
       engine?.dispose();
     };
-  }, [frames, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains, focusU, focusV, generation]);
+  }, [frames, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains, focusU, focusV, generation, snapshot]);
 
   return (
     <div ref={containerRef} className={["relative", className].filter(Boolean).join(" ")} aria-hidden="true">
-      {failed ? (
+      {snapshot ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={snapshot}
+          alt=""
+          className={["absolute inset-0 block h-full w-full", multiply ? "mix-blend-multiply" : ""].join(" ")}
+        />
+      ) : failed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={frameUrl(frames.desktop, frames.desktop.count - 1)}
