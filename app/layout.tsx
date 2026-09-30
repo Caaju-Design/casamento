@@ -87,7 +87,16 @@ const amiri = localFont({
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${italianno.variable} ${cardo.variable} ${arefRuqaa.variable} ${amiri.variable} ${signature.variable}`}>
+    <html lang="pt-BR" suppressHydrationWarning className={`${italianno.variable} ${cardo.variable} ${arefRuqaa.variable} ${amiri.variable} ${signature.variable}`}>
+      <head>
+        {/* congela --u (1% da altura da tela) em px; só recalcula quando a largura muda — ver globals.css */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){var d=document.documentElement,w=0;function s(){var W=innerWidth;if(W===w)return;w=W;d.style.setProperty('--u',innerHeight/100+'px')}s();addEventListener('resize',s);addEventListener('orientationchange',function(){w=0;setTimeout(s,300)})})()",
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-page font-body text-text-primary">{children}</body>
     </html>
   );

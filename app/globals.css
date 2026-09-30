@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * --u = 1% da altura da tela, CONGELADO em pixels no carregamento (script no
+ * <head>, app/layout.tsx). Pedido do Manu: no iPhone, em navegadores como
+ * Chrome/Brave, a barra some/volta redimensionando a página inteira — e aí até
+ * vh/svh mudam, e todas as seções de "uma tela" (hero, Nossa história, mapa)
+ * mudavam de altura juntas, fazendo a rolagem SALTAR centenas de pixels ao
+ * inverter o sentido. Com --u fixo, a altura só é recalculada quando a
+ * LARGURA muda (girar o celular). Sem JS, cai no svh.
+ */
+:root { --u: 1svh; }
+
 html {
   scroll-behavior: smooth;
   /*

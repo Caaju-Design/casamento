@@ -165,7 +165,7 @@ export function AroundMap({
 
   return (
     <div className="relative isolate overflow-hidden rounded-[1.75rem] border border-caramelo-100 bg-[#efe9df] shadow-[0_18px_50px_-34px_rgba(45,43,35,0.5)]">
-      <div ref={box} role="region" aria-label={labels.mapLabel} className="around-map h-[62svh] max-h-[560px] min-h-[340px] w-full" />
+      <div ref={box} role="region" aria-label={labels.mapLabel} className="around-map h-[calc(var(--u)*62)] max-h-[560px] min-h-[340px] w-full" />
       {/* controles: voltar pro salão + zoom */}
       <div className="absolute bottom-4 end-4 z-[500] flex flex-col items-center gap-3">
         <button

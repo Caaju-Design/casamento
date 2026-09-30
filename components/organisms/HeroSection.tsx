@@ -157,10 +157,10 @@ export function HeroSection({
   const handleFallback = useCallback(() => setPhase("fallback"), []);
 
   return (
-    <div ref={trackRef} className="relative" style={{ height: `${SCROLL_TRACK_VH}vh` }}>
+    <div ref={trackRef} className="relative" style={{ height: `calc(var(--u) * ${SCROLL_TRACK_VH})` }}>
       <section
         id="topo"
-        className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-6 text-center"
+        className="sticky top-0 flex h-[calc(var(--u)*100)] flex-col items-center justify-center overflow-hidden px-6 text-center"
       >
         {/*
           Camada pintada — canvas em aquarela (ou, se WebGL/rede falharem, a
@@ -234,7 +234,7 @@ export function HeroSection({
           começa. Clicar rola um pouco, pra pintura começar a andar.
         */}
         <div
-          className="absolute inset-x-0 top-[calc(50svh+34vw)] z-30 md:bottom-[max(1.5rem,env(safe-area-inset-bottom))] md:top-auto flex justify-center"
+          className="absolute inset-x-0 top-[calc(var(--u)*50+34vw)] z-30 md:bottom-[max(1.5rem,env(safe-area-inset-bottom))] md:top-auto flex justify-center"
           style={{ opacity: `clamp(0, calc(1 - (var(--hero-progress, 0) / ${CALLIGRAPHY_FADE_END})), 1)` }}
         >
           <button

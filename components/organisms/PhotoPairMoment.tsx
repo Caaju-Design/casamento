@@ -59,7 +59,7 @@ export function PhotoPairMoment({ text, first, second, photosSide, firstPlace, s
 
   return (
     <div ref={trackRef} className="relative">
-      <div className={["flex h-[100svh] pt-[72px] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
+      <div className={["flex h-[calc(var(--u)*100)] pt-[72px] flex-col-reverse", right ? "md:flex-row" : "md:flex-row-reverse"].join(" ")}>
         {decor}
         <div className="flex flex-1 items-start justify-center px-8 pb-8 pt-6 md:w-1/2 md:items-center md:px-16 md:py-0">
           <div className="max-w-xl">
