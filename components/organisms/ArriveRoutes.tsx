@@ -122,7 +122,7 @@ export function ArriveRoutes({ t }: { t: Dictionary["stay"]["arrival"] }) {
               </li>
             ))}
           </ol>
-          <p className="mt-6 inline-flex items-center gap-2 rounded-pill bg-salvia-700 px-4 py-2 font-body text-100 font-bold text-white">
+          <p className="mt-6 inline-flex items-center gap-2 rounded-pill bg-salvia-50 px-4 py-2 font-body text-100 font-bold text-salvia-800">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="9" />
               <path d="M12 7v5l3 2" />
