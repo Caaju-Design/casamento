@@ -240,3 +240,11 @@ section[id]:not(#topo):not(#historia) { scroll-margin-top: 72px; }
 /* assinatura: caligrafia de assinatura; no árabe o "مع الحب،" cai na Aref Ruqaa */
 .font-signature { font-family: var(--font-signature), cursive; }
 [lang="ar"] .font-signature { font-family: var(--font-signature), var(--font-aref), cursive; }
+
+/* Imagem parada (quando o WebGL não roda): mesma borda "mastigada" de aquarela, em vez do retângulo cru */
+.watercolor-edge {
+  -webkit-mask-image: url("/historia/borda.png");
+  mask-image: url("/historia/borda.png");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}

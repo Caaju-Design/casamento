@@ -72,6 +72,9 @@ export function WatercolorScene({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
+  // contexto WebGL perdido: remonta com um contexto novo (até 3 vezes) antes de
+  // desistir pra imagem parada — era isso que fazia a foto aparecer "crua"
+  const lostRetries = useRef(0);
   // trocar a geração remonta o <canvas>: é como o painel devolve o contexto
   // WebGL quando fica longe da tela e pega um novo quando volta
   const [generation, setGeneration] = useState(0);
@@ -101,9 +104,19 @@ export function WatercolorScene({
     const markDirty = () => {
       dirty = true;
     };
+    // qualquer falha (contexto perdido, render que estoura): tenta de novo com
+    // um canvas/contexto novo até 3 vezes antes de cair na imagem parada
     const fail = () => {
       if (disposed) return;
-      setFailed(true);
+      if (lostRetries.current < 3) {
+        lostRetries.current += 1;
+        disposed = true;
+        setGeneration((g) => g + 1);
+      } else setFailed(true);
+    };
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      fail();
     };
 
     const resize = () => {
@@ -179,7 +192,7 @@ export function WatercolorScene({
         fail();
         return;
       }
-      canvas.addEventListener("webglcontextlost", fail);
+      canvas.addEventListener("webglcontextlost", onLost);
       resize();
       store = new FrameStore(lite ? frames.mobile : frames.desktop);
       const s = store;
@@ -254,7 +267,7 @@ export function WatercolorScene({
       if (dropTimer) clearTimeout(dropTimer);
       onScreen.disconnect();
       ro.disconnect();
-      canvas.removeEventListener("webglcontextlost", fail);
+      canvas.removeEventListener("webglcontextlost", onLost);
       store?.dispose();
       engine?.dispose();
     };
@@ -274,7 +287,7 @@ export function WatercolorScene({
         <img
           src={frameUrl(frames.desktop, frames.desktop.count - 1)}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover mix-blend-multiply"
+          className="watercolor-edge absolute inset-0 h-full w-full object-cover mix-blend-multiply"
         />
       ) : (
         <canvas key={generation} ref={canvasRef} className={["absolute inset-0 block h-full w-full", multiply ? "mix-blend-multiply" : ""].join(" ")} />

@@ -70,6 +70,9 @@ export function WatercolorVideo({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(false);
+  // contexto WebGL perdido: remonta com um contexto novo (até 3 vezes) antes de
+  // desistir pra imagem parada — era isso que fazia a foto aparecer "crua"
+  const lostRetries = useRef(0);
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [generation, setGeneration] = useState(0);
   const introDoneRef = useRef(false);
@@ -100,8 +103,19 @@ export function WatercolorVideo({
     let shown = 0;
     let lastT = performance.now();
     const lite = isLiteDevice();
+    // qualquer falha (contexto perdido, render que estoura): tenta de novo com
+    // um canvas/contexto novo até 3 vezes antes de cair na imagem parada
     const fail = () => {
-      if (!disposed) setFailed(true);
+      if (disposed) return;
+      if (lostRetries.current < 3) {
+        lostRetries.current += 1;
+        disposed = true;
+        setGeneration((g) => g + 1);
+      } else setFailed(true);
+    };
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      fail();
     };
 
     const resize = () => {
@@ -146,7 +160,7 @@ export function WatercolorVideo({
         fail();
         return;
       }
-      canvas.addEventListener("webglcontextlost", fail);
+      canvas.addEventListener("webglcontextlost", onLost);
       resize();
       raf = requestAnimationFrame(loop);
     };
@@ -205,7 +219,7 @@ export function WatercolorVideo({
       if (dropTimer) clearTimeout(dropTimer);
       onScreen.disconnect();
       ro.disconnect();
-      canvas?.removeEventListener("webglcontextlost", fail);
+      canvas?.removeEventListener("webglcontextlost", onLost);
       engine?.dispose();
     };
   }, [video, progressRef, paintCompleteAt, paintStart, intro, transparent, edgeFade, stains, focusU, focusV, generation]);
@@ -222,7 +236,7 @@ export function WatercolorVideo({
         loop
         playsInline
         preload="auto"
-        className={["absolute inset-0 h-full w-full object-cover mix-blend-multiply", failed ? "" : "opacity-0"].join(" ")}
+        className={["absolute inset-0 h-full w-full object-cover mix-blend-multiply", failed ? "watercolor-edge" : "opacity-0"].join(" ")}
       />
       {!failed && <canvas key={generation} ref={canvasRef} className="absolute inset-0 block h-full w-full mix-blend-multiply" />}
     </div>

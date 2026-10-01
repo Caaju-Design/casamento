@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, type RefObject , useState} from "react";
 import * as THREE from "three";
 import { FRAME_SETS, FrameStore } from "@/components/three/watercolor/frames";
 import { WatercolorEngine } from "@/components/three/watercolor/engine";
@@ -48,6 +48,10 @@ export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallbac
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // callbacks numa ref pra o efeito principal não reiniciar a cada render do pai
   const cb = useRef({ onLoadProgress, onReady, onFallback });
+  // contexto WebGL perdido (GPU sob pressão, aba em segundo plano…): em vez de
+  // cair na imagem parada, remonta o canvas com um contexto novo (até 3 vezes)
+  const [gen, setGen] = useState(0);
+  const retries = useRef(0);
   useEffect(() => {
     cb.current = { onLoadProgress, onReady, onFallback };
   });
@@ -71,7 +75,15 @@ export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallbac
       cb.current.onFallback();
     };
 
-    const onLost = () => fail("contexto WebGL perdido");
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      if (disposed || failed) return;
+      if (retries.current < 3) {
+        retries.current += 1;
+        failed = true;
+        setGen((g) => g + 1);
+      } else fail("contexto WebGL perdido");
+    };
 
     // ---------------------------------------------------------- estado do loop
     let dirty = true;
@@ -210,11 +222,11 @@ export function WatercolorHero({ progressRef, onLoadProgress, onReady, onFallbac
       engine?.dispose();
       engine = null;
     };
-  }, [progressRef]);
+  }, [progressRef, gen]);
 
   return (
     <div ref={containerRef} className="absolute inset-0" aria-hidden="true">
-      <canvas ref={canvasRef} className="block h-full w-full mix-blend-multiply" />
+      <canvas key={gen} ref={canvasRef} className="block h-full w-full mix-blend-multiply" />
     </div>
   );
 }
