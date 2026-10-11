@@ -4,15 +4,18 @@ import { Notice, NoticeCard } from "@/components/molecules/Notice";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { PlaceIcon } from "@/components/molecules/PlaceIcon";
 import { PlaceMap } from "@/components/molecules/PlaceMap";
+import { PlaceMenu } from "@/components/molecules/PlaceMenu";
 import { PlaceThumb } from "@/components/molecules/PlaceThumb";
 import { PLACES, VENUE, directionsUrl, distanceKm, mapsSearchUrl, type Place } from "@/lib/content/places";
+import { getMenu } from "@/lib/content/menus";
 import { placeDesc, placeHref } from "@/lib/content/place-pages";
 import { getDictionary, localeInfo, type Locale } from "@/lib/i18n/dictionaries";
 
 /**
  * Template `PlacePageTemplate` — página de um lugar do "Onde ficar e
  * aproveitar" (#hospedagem), aberta ao tocar no card: foto, categoria, nome,
- * a nossa dica, distância até o salão, rota e Google Maps; embaixo, o mapa
+ * a nossa dica, distância até o salão, rota e Google Maps; o cardápio
+ * quando o lugar tem um (lib/content/menus.ts); embaixo, o mapa
  * com o lugar e o salão, o "Bom saber" da categoria e as outras opções da
  * mesma categoria. Cabeçalho branco igual ao das páginas "janela"
  * (Voltar · logo · idioma). O Voltar leva pra seção já filtrada na categoria.
@@ -24,6 +27,7 @@ export function PlacePageTemplate({ locale, place }: { locale: Locale; place: Pl
   const nf = new Intl.NumberFormat(locale === "ar" ? "ar-u-nu-latn" : locale, { maximumFractionDigits: 1, minimumFractionDigits: 1 });
   const km = (p: Place) => a.distance.replace("{km}", `${nf.format(distanceKm(VENUE, p))} km`);
   const desc = placeDesc(t, place);
+  const menu = getMenu(place.id);
   const others = PLACES.filter((p) => p.category === place.category && p.id !== place.id).sort(
     (x, y) => distanceKm(VENUE, x) - distanceKm(VENUE, y),
   );
@@ -93,6 +97,8 @@ export function PlacePageTemplate({ locale, place }: { locale: Locale; place: Pl
             </div>
           </PaintReveal>
         </div>
+
+        {menu && <PlaceMenu menu={menu} locale={locale} t={a.detail} />}
 
         <div className="mt-12 md:mt-16">
           <PlaceMap

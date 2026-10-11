@@ -143,6 +143,12 @@ export type Dictionary = {
       more: string;
       metaTitle: string;
       metaDescription: string;
+      /** Cardápio (quando o lugar tem). "{date}" vira o mês da foto do cardápio; "{n}", o número de itens. */
+      menuTitle: string;
+      menuFood: string;
+      menuDrinks: string;
+      menuNote: string;
+      menuCount: string;
     };
   };
   stay: {
@@ -374,6 +380,11 @@ const pt: Dictionary = {
       more: "Outras opções por perto",
       metaTitle: "{name} — Gabriela & Emanuel",
       metaDescription: "{name}: uma das dicas de Gabriela & Emanuel perto do salão do casamento, com mapa e rota.",
+      menuTitle: "Cardápio",
+      menuFood: "Para comer",
+      menuDrinks: "Para beber",
+      menuNote: "Valores do cardápio impresso em {date}, podem mudar.",
+      menuCount: "{n} itens",
     },
   },
   stay: {
@@ -708,6 +719,11 @@ const en: Dictionary = {
       more: "Other options nearby",
       metaTitle: "{name} — Gabriela & Emanuel",
       metaDescription: "{name}: one of Gabriela & Emanuel's tips near the wedding venue, with a map and directions.",
+      menuTitle: "Menu",
+      menuFood: "To eat",
+      menuDrinks: "To drink",
+      menuNote: "Prices from the printed menu ({date}) and in Brazilian reais; they may change. Dish names are kept in Portuguese, as on the menu.",
+      menuCount: "{n} items",
     },
   },
   stay: {
@@ -1039,6 +1055,11 @@ const ar: Dictionary = {
       more: "خيارات أخرى قريبة",
       metaTitle: "{name} — Gabriela & Emanuel",
       metaDescription: "{name}: من توصيات Gabriela و Emanuel قرب قاعة الزفاف، مع الخريطة والاتجاهات.",
+      menuTitle: "قائمة الطعام",
+      menuFood: "للأكل",
+      menuDrinks: "للشرب",
+      menuNote: "الأسعار من القائمة المطبوعة ({date}) بالريال البرازيلي، وقد تتغير. أسماء الأطباق بالبرتغالية كما في القائمة.",
+      menuCount: "الأصناف: {n}",
     },
   },
   stay: {
