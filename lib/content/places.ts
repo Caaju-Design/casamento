@@ -73,3 +73,12 @@ export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; ln
 export function directionsUrl(to: string): string {
   return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(VENUE.query)}&destination=${encodeURIComponent(to)}`;
 }
+
+/** Busca do lugar no Google Maps (abre a ficha com fotos, horários e avaliações). */
+export function mapsSearchUrl(query: string): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+export function getPlace(id: string): Place | undefined {
+  return PLACES.find((p) => p.id === id);
+}

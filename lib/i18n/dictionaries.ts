@@ -134,6 +134,16 @@ export type Dictionary = {
     hotelDesc: Record<string, string>;
     notesTitle: string;
     noteFoodTitle: string;
+    /** Página de cada lugar (/lugares/<id>). "{name}" é trocado pelo nome do lugar. */
+    detail: {
+      back: string;
+      open: string;
+      showOnMap: string;
+      openMaps: string;
+      more: string;
+      metaTitle: string;
+      metaDescription: string;
+    };
   };
   stay: {
     eyebrow: string;
@@ -356,6 +366,15 @@ const pt: Dictionary = {
     },
     notesTitle: "Bom saber",
     noteFoodTitle: "Horários e delivery",
+    detail: {
+      back: "Voltar",
+      open: "Ver detalhes de {name}",
+      showOnMap: "Mostrar no mapa",
+      openMaps: "Abrir no Google Maps",
+      more: "Outras opções por perto",
+      metaTitle: "{name} — Gabriela & Emanuel",
+      metaDescription: "{name}: uma das dicas de Gabriela & Emanuel perto do salão do casamento, com mapa e rota.",
+    },
   },
   stay: {
     eyebrow: "Hospedagem",
@@ -681,6 +700,15 @@ const en: Dictionary = {
     },
     notesTitle: "Good to know",
     noteFoodTitle: "Opening hours & delivery",
+    detail: {
+      back: "Back",
+      open: "See details for {name}",
+      showOnMap: "Show on the map",
+      openMaps: "Open in Google Maps",
+      more: "Other options nearby",
+      metaTitle: "{name} — Gabriela & Emanuel",
+      metaDescription: "{name}: one of Gabriela & Emanuel's tips near the wedding venue, with a map and directions.",
+    },
   },
   stay: {
     eyebrow: "Where to stay",
@@ -1003,6 +1031,15 @@ const ar: Dictionary = {
     },
     notesTitle: "من المفيد معرفته",
     noteFoodTitle: "المواعيد والتوصيل",
+    detail: {
+      back: "رجوع",
+      open: "تفاصيل {name}",
+      showOnMap: "إظهار على الخريطة",
+      openMaps: "فتح في Google Maps",
+      more: "خيارات أخرى قريبة",
+      metaTitle: "{name} — Gabriela & Emanuel",
+      metaDescription: "{name}: من توصيات Gabriela و Emanuel قرب قاعة الزفاف، مع الخريطة والاتجاهات.",
+    },
   },
   stay: {
     eyebrow: "الإقامة",

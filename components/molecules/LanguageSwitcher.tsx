@@ -6,9 +6,10 @@ import { LOCALES, type Locale } from "@/lib/i18n/dictionaries";
 /**
  * Molecule `LanguageSwitcher` — seletor de idioma do topo (Português,
  * English, العربية). Cada idioma é uma rota ("/", "/en", "/ar"); ao trocar,
- * mantém a seção em que a pessoa estava (#hash).
+ * mantém a seção em que a pessoa estava (#hash). Fora da home, `path` é a
+ * página atual sem o prefixo do idioma (ex.: "/lugares/flor").
  */
-export function LanguageSwitcher({ locale, label }: { locale: Locale; label: string }) {
+export function LanguageSwitcher({ locale, label, path = "" }: { locale: Locale; label: string; path?: string }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const current = LOCALES.find((l) => l.id === locale)!;
@@ -48,27 +49,30 @@ export function LanguageSwitcher({ locale, label }: { locale: Locale; label: str
       </button>
       {open && (
         <ul className="absolute end-0 top-full z-40 mt-1 min-w-[10rem] overflow-hidden rounded-card border border-caramelo-100 bg-page py-1 shadow-[0_12px_30px_-18px_rgba(45,43,35,0.5)]">
-          {LOCALES.map((l) => (
-            <li key={l.id}>
-              <a
-                href={l.href}
-                hrefLang={l.lang}
-                lang={l.lang}
-                aria-current={l.id === locale ? "true" : undefined}
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = l.href + window.location.hash;
-                }}
-                className={[
-                  "flex items-center justify-between gap-4 px-4 py-2.5 font-body text-200 hover:bg-salvia-50",
-                  l.id === locale ? "text-text-primary" : "text-text-secondary",
-                ].join(" ")}
-              >
-                <span>{l.name}</span>
-                {l.id === locale && <span aria-hidden="true">✓</span>}
-              </a>
-            </li>
-          ))}
+          {LOCALES.map((l) => {
+            const href = path ? `${l.href === "/" ? "" : l.href}${path}` : l.href;
+            return (
+              <li key={l.id}>
+                <a
+                  href={href}
+                  hrefLang={l.lang}
+                  lang={l.lang}
+                  aria-current={l.id === locale ? "true" : undefined}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = href + window.location.hash;
+                  }}
+                  className={[
+                    "flex items-center justify-between gap-4 px-4 py-2.5 font-body text-200 hover:bg-salvia-50",
+                    l.id === locale ? "text-text-primary" : "text-text-secondary",
+                  ].join(" ")}
+                >
+                  <span>{l.name}</span>
+                  {l.id === locale && <span aria-hidden="true">✓</span>}
+                </a>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
