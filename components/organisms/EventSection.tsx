@@ -10,19 +10,19 @@ import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
 
 /**
  * Organism `EventSection` (#evento) — "O grande dia": data, local, como
- * chegar ao salão e o itinerário DOS CONVIDADOS (a chegada das 15h30 é só
+ * chegar ao salão e o itinerário DOS CONVIDADOS (a chegada das 15h é só
  * de padrinhos e pais, fica nos manuais deles). Textos tirados dos manuais
  * do casal. Aquarelas da Cidade do Cabo compondo a tela.
  */
 
 const ADDRESS = "Rua Luís Correia de Melo, 86 - Chácara Santo Antônio, São Paulo - SP, 04726-220";
 
-/** Evento de agenda: 17/04/2027, 16h–22h em São Paulo (UTC−3, sem horário de verão). */
+/** Evento de agenda: 17/04/2027, 15h30–21h30 em São Paulo (UTC−3, sem horário de verão). */
 function googleCalendar(t: Dictionary["event"]) {
   return (
     "https://calendar.google.com/calendar/render?action=TEMPLATE" +
     `&text=${encodeURIComponent(t.calendarTitle)}` +
-    "&dates=20270417T190000Z/20270418T010000Z" +
+    "&dates=20270417T183000Z/20270418T003000Z" +
     `&location=${encodeURIComponent(`Salão de Festas (Andar L), ${ADDRESS}`)}` +
     `&details=${encodeURIComponent(`${t.calendarDetails}\ncasamento.caaju.com.br`)}`
   );
