@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AroundMap } from "@/components/molecules/AroundMap";
 import { Notice, NoticeCard } from "@/components/molecules/Notice";
 import { PlaceIcon } from "@/components/molecules/PlaceIcon";
@@ -8,6 +9,7 @@ import { PlaceThumb } from "@/components/molecules/PlaceThumb";
 import { PaintReveal } from "@/components/molecules/PaintReveal";
 import { SectionHeading } from "@/components/molecules/SectionHeading";
 import { PLACES, VENUE, directionsUrl, distanceKm, type PlaceCategory } from "@/lib/content/places";
+import { placeDesc, placeHref } from "@/lib/content/place-pages";
 import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
 
 /**
@@ -17,7 +19,10 @@ import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
  * pin do salão e dos lugares, e a lista de cards horizontais (miniatura à
  * esquerda) do mais perto pro mais longe — no desktop ao lado do mapa, com
  * rolagem própria — cada um com a distância até o salão e o link de rota.
- * Card e pin conversam: tocar num destaca o outro.
+ * Tocar no card abre a página do lugar (/lugares/<id>); o pin do card
+ * ("Mostrar no mapa") e o pin do mapa conversam: tocar num destaca o outro.
+ * Voltando da página do lugar (`?lugares=<categoria>`), a seção abre já
+ * filtrada naquela categoria.
  */
 
 // sem "Todos": a seção já abre filtrada em hotéis (pedido do Manu)
@@ -60,12 +65,15 @@ export function AroundSection({
   const cardRefs = useRef(new Map<string, HTMLLIElement>());
   const listRef = useRef<HTMLUListElement>(null);
 
-  // descrições: as de comer/beleza vêm das Dicas (por nome), as de hotel do próprio bloco
-  const descByName = useMemo(() => {
-    const m = new Map<string, string>();
-    for (const g of [...tips.food, ...tips.beauty]) for (const p of g.places) m.set(p.name, p.desc);
-    return m;
-  }, [tips]);
+  // voltando da página de um lugar: abre no filtro dele e limpa o ?lugares= da barra
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const cat = url.searchParams.get("lugares") as Filter | null;
+    if (!cat) return;
+    url.searchParams.delete("lugares");
+    window.history.replaceState(window.history.state, "", url);
+    if (FILTERS.includes(cat)) setFilter(cat);
+  }, []);
 
   const nf = useMemo(() => new Intl.NumberFormat(locale === "ar" ? "ar-u-nu-latn" : locale, { maximumFractionDigits: 1, minimumFractionDigits: 1 }), [locale]);
 
@@ -138,7 +146,7 @@ export function AroundSection({
           >
             {places.map((p) => {
               const active = p.id === activeId;
-              const desc = p.category === "hotel" ? t.hotelDesc[p.id] : descByName.get(p.name);
+              const desc = placeDesc({ around: t, tips }, p);
               return (
                 <li
                   key={p.id}
@@ -149,28 +157,47 @@ export function AroundSection({
                 >
                   <article
                     className={[
-                      "flex gap-4 rounded-card bg-page p-3 transition-shadow duration-200 sm:p-4",
+                      "relative flex gap-4 rounded-card bg-page p-3 transition-shadow duration-200 sm:p-4",
                       active ? "shadow-[0_16px_34px_-16px_rgba(152,75,44,0.85)]" : "shadow-[0_14px_34px_-22px_rgba(152,75,44,0.6)] hover:shadow-[0_16px_34px_-18px_rgba(152,75,44,0.7)]",
                     ].join(" ")}
                   >
                     {/* miniatura à esquerda */}
-                    <button
-                      type="button"
-                      onClick={() => select(p.id)}
-                      aria-label={p.name}
-                      className="h-24 w-24 shrink-0 overflow-hidden rounded-[0.9rem] sm:h-28 sm:w-28"
-                    >
+                    <div aria-hidden="true" className="h-24 w-24 shrink-0 overflow-hidden rounded-[0.9rem] sm:h-28 sm:w-28">
                       <PlaceThumb place={p} />
-                    </button>
+                    </div>
 
                     <div className="flex min-w-0 flex-1 flex-col">
-                      <button type="button" onClick={() => select(p.id)} aria-pressed={active} className="text-start">
-                        <span className="block font-body text-200 font-bold leading-snug text-text-primary">{p.name}</span>
-                        <span className="mt-0.5 inline-flex items-center gap-1.5 font-body text-[0.7rem] uppercase tracking-[0.14em] text-salvia-800">
-                          <PlaceIcon kind={p.category} className="h-3.5 w-3.5" />
-                          {t.filters[p.category]}
-                        </span>
-                      </button>
+                      <div className="flex items-start justify-between gap-2">
+                        {/* o link do nome cobre o card inteiro (after:inset-0): tocar em qualquer lugar abre a página */}
+                        <Link
+                          href={placeHref(locale, p.id)}
+                          aria-label={t.detail.open.replace("{name}", p.name)}
+                          className="text-start after:absolute after:inset-0 after:rounded-card focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-border-focus"
+                        >
+                          <span className="block font-body text-200 font-bold leading-snug text-text-primary">{p.name}</span>
+                          <span className="mt-0.5 inline-flex items-center gap-1.5 font-body text-[0.7rem] uppercase tracking-[0.14em] text-salvia-800">
+                            <PlaceIcon kind={p.category} className="h-3.5 w-3.5" />
+                            {t.filters[p.category]}
+                          </span>
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => select(p.id)}
+                          aria-pressed={active}
+                          aria-label={`${t.detail.showOnMap}: ${p.name}`}
+                          title={t.detail.showOnMap}
+                          className={[
+                            "relative z-10 -me-1 -mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors",
+                            "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus",
+                            active ? "bg-terracota-700 text-white" : "text-salvia-800 hover:bg-salvia-50",
+                          ].join(" ")}
+                        >
+                          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
+                            <circle cx="12" cy="10" r="2.4" />
+                          </svg>
+                        </button>
+                      </div>
                       {desc && <p className="mt-1.5 line-clamp-2 font-body text-100 leading-relaxed text-text-secondary">{desc}</p>}
                       <div className="mt-auto flex items-end justify-between gap-2 pt-2">
                         <span className="font-body text-100 leading-tight text-text-primary">
@@ -181,7 +208,7 @@ export function AroundSection({
                           href={directionsUrl(p.query)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex min-h-[36px] shrink-0 items-center rounded-pill bg-salvia-700 px-3 shadow-[0_6px_16px_-10px_rgba(80,78,60,0.8)] font-body text-[0.7rem] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-salvia-800"
+                          className="relative z-10 inline-flex min-h-[36px] shrink-0 items-center rounded-pill bg-salvia-700 px-3 shadow-[0_6px_16px_-10px_rgba(80,78,60,0.8)] font-body text-[0.7rem] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-salvia-800"
                         >
                           {t.route}
                         </a>

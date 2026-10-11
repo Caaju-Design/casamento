@@ -49,11 +49,14 @@ export function AroundMap({
   activeId,
   onSelect,
   labels,
+  fitAll = false,
 }: {
   places: Place[];
   activeId: string | null;
   onSelect: (id: string) => void;
   labels: AroundMapLabels;
+  /** Enquadra o salão + todos os pins mesmo com um ativo (página do lugar). */
+  fitAll?: boolean;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const map = useRef<LeafletMap | null>(null);
@@ -147,18 +150,18 @@ export function AroundMap({
         markers.current.set(p.id, mk);
       }
       const act = places.find((p) => p.id === activeId);
-      if (act) {
+      if (act && !fitAll) {
         m.flyTo([act.lat, act.lng], Math.max(m.getZoom(), 15), { duration: 0.6 });
       } else if (places.length) {
         const b = leaflet.latLngBounds([[VENUE.lat, VENUE.lng], ...places.map((p) => [p.lat, p.lng] as [number, number])]);
-        m.flyToBounds(b, { padding: [48, 48], maxZoom: 16, duration: 0.6 });
+        m.flyToBounds(b, { padding: [48, 48], maxZoom: fitAll ? 17 : 16, duration: 0.6 });
       }
     };
     draw();
     const el = box.current;
     el?.addEventListener("around:ready", draw);
     return () => el?.removeEventListener("around:ready", draw);
-  }, [places, activeId]);
+  }, [places, activeId, fitAll]);
 
   const btn =
     "flex h-10 w-10 items-center justify-center bg-white/95 text-text-primary transition-colors hover:bg-pessego-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus";

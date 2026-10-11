@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { MENUS } from "@/lib/content/menus";
 import { PLACES, VENUE, directionsUrl, distanceKm } from "@/lib/content/places";
 
 describe("places", () => {
@@ -15,5 +16,15 @@ describe("places", () => {
   it("ids únicos e rota saindo do salão", () => {
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length);
     expect(directionsUrl("MorumbiShopping")).toContain("origin=Rua%20Lu%C3%ADs%20Correia%20de%20Melo");
+  });
+
+  it("cardápios só de lugares que existem, com preço em todo item", () => {
+    for (const [id, menu] of Object.entries(MENUS)) {
+      expect(PLACES.some((p) => p.id === id)).toBe(true);
+      for (const s of [...menu.food, ...menu.drinks]) {
+        expect(s.items.length).toBeGreaterThan(0);
+        for (const it of s.items) expect((it.price ?? 0) > 0 || (it.prices?.length ?? 0) > 0).toBe(true);
+      }
+    }
   });
 });
